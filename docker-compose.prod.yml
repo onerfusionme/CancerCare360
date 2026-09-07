@@ -1,0 +1,125 @@
+version: '3.8'
+
+services:
+  postgres:
+    restart: always
+    ports: [] # Do not expose ports to host in production
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4G
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200m"
+        max-file: "10"
+
+  redis:
+    restart: always
+    ports: []
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 2G
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "5"
+
+  elasticsearch:
+    restart: always
+    ports: []
+    environment:
+      - xpack.security.enabled=true # Enable security in prod
+      - "ES_JAVA_OPTS=-Xms2g -Xmx2g"
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4G
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200m"
+        max-file: "10"
+
+  minio:
+    restart: always
+    ports: [] # Proxied through nginx or ingress
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200m"
+        max-file: "10"
+
+  keycloak:
+    restart: always
+    command: start # Start in production mode
+    environment:
+      KC_HOSTNAME: auth.cancercare360.com
+      KC_PROXY: edge
+    ports: []
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200m"
+        max-file: "10"
+
+  clamav:
+    restart: always
+    ports: []
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 2G
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "5"
+
+  backend:
+    restart: always
+    environment:
+      - NODE_ENV=production
+    ports: [] # Proxied
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200m"
+        max-file: "10"
+
+  frontend:
+    restart: always
+    environment:
+      - NODE_ENV=production
+    ports: [] # Proxied
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200m"
+        max-file: "10"

@@ -1,0 +1,237 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: cancercare-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-cancercare360}
+      POSTGRES_USER: ${POSTGRES_USER:-cancercare}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-cancercare123}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infrastructure/scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-cancercare} -d ${POSTGRES_DB:-cancercare360}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - cancercare-network
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: cancercare-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - cancercare-network
+
+  # Elasticsearch
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.1
+    container_name: cancercare-elasticsearch
+    restart: unless-stopped
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://localhost:9200 >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - cancercare-network
+
+  # MinIO (S3 compatible storage)
+  minio:
+    image: minio/minio:latest
+    container_name: cancercare-minio
+    restart: unless-stopped
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-admin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-admin123}
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - cancercare-network
+
+  # MinIO Setup (create default bucket)
+  minio-setup:
+    image: minio/mc:latest
+    container_name: cancercare-minio-setup
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc alias set myminio http://minio:9000 ${MINIO_ROOT_USER:-admin} ${MINIO_ROOT_PASSWORD:-admin123};
+      /usr/bin/mc mb myminio/${MINIO_DEFAULT_BUCKET:-cancercare-documents} --ignore-existing;
+      /usr/bin/mc policy set public myminio/${MINIO_DEFAULT_BUCKET:-cancercare-documents};
+      exit 0;
+      "
+    networks:
+      - cancercare-network
+
+  # Keycloak IAM
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0.1
+    container_name: cancercare-keycloak
+    restart: unless-stopped
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-cancercare360}
+      KC_DB_USERNAME: ${POSTGRES_USER:-cancercare}
+      KC_DB_PASSWORD: ${POSTGRES_PASSWORD:-cancercare123}
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN_USER:-admin}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin123}
+      KC_HOSTNAME: localhost
+    command: start-dev --import-realm
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./infrastructure/keycloak:/opt/keycloak/data/import
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/8080;echo -e \"GET /health/ready HTTP/1.1\r\nhost: http://localhost\r\nConnection: close\r\n\r\n\" >&3;grep \"200 OK\" <&3"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - cancercare-network
+
+  # ClamAV
+  clamav:
+    image: clamav/clamav:latest
+    container_name: cancercare-clamav
+    restart: unless-stopped
+    ports:
+      - "3310:3310"
+    healthcheck:
+      test: ["CMD", "clamdscan", "--ping", "127.0.0.1:3310"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - cancercare-network
+
+  # AI Service (FastAPI + PyMuPDF)
+  ai-service:
+    build:
+      context: ./ai-service
+      dockerfile: Dockerfile
+    container_name: cancercare-ai-service
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - APP_NAME=CancerCare360-AI
+      - DEBUG=true
+      - API_KEY=${AI_SERVICE_API_KEY:-cancercare-ai-secret}
+      - MODEL_PROVIDER=rule-heuristic-engine
+      - CONFIDENCE_THRESHOLD=0.75
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/health')\" || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - cancercare-network
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: cancercare-backend
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=development
+      - PORT=3001
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=${REDIS_URL}
+      - ELASTICSEARCH_URL=${ELASTICSEARCH_URL}
+      - MINIO_ENDPOINT=${MINIO_ENDPOINT}
+      - KEYCLOAK_URL=${KEYCLOAK_URL}
+      - KEYCLOAK_REALM=${KEYCLOAK_REALM}
+      - KEYCLOAK_CLIENT_ID=${KEYCLOAK_CLIENT_ID}
+      - KEYCLOAK_CLIENT_SECRET=${KEYCLOAK_CLIENT_SECRET}
+      - CLAMAV_HOST=${CLAMAV_HOST}
+      - CLAMAV_PORT=${CLAMAV_PORT}
+      - AI_SERVICE_URL=http://ai-service:8000
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+      ai-service:
+        condition: service_healthy
+    networks:
+      - cancercare-network
+
+  # Frontend Web
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: cancercare-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - NEXT_PUBLIC_API_URL=http://localhost:3001
+      - NEXT_PUBLIC_KEYCLOAK_URL=http://localhost:8080
+      - NEXT_PUBLIC_KEYCLOAK_REALM=${KEYCLOAK_REALM}
+      - NEXT_PUBLIC_KEYCLOAK_CLIENT_ID=${FRONTEND_KEYCLOAK_CLIENT_ID}
+    depends_on:
+      - backend
+    networks:
+      - cancercare-network
+
+networks:
+  cancercare-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
+  elasticsearch_data:
+  minio_data:

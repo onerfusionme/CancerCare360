@@ -1,0 +1,122 @@
+'use client';
+
+import React from 'react';
+import { Tabs, Typography, Space, Card, Table, Tag, Badge, Descriptions } from 'antd';
+
+const { Title, Text } = Typography;
+const { TabPane } = Tabs;
+
+export default function AdminPage() {
+  
+  const depts = [
+    { id: 1, name: 'Medical Oncology', clinics: 12, doctors: 45, status: 'Active' },
+    { id: 2, name: 'Surgical Oncology', clinics: 8, doctors: 28, status: 'Active' },
+    { id: 3, name: 'Radiation Oncology', clinics: 5, doctors: 15, status: 'Active' },
+  ];
+
+  const users = [
+    { id: 'U001', name: 'Dr. Jane Smith', role: 'Oncologist', department: 'Medical Oncology', status: 'Active' },
+    { id: 'U002', name: 'Alice Johnson', role: 'Coordinator', department: 'Patient Services', status: 'Active' },
+    { id: 'U003', name: 'Bob Williams', role: 'Admin', department: 'IT', status: 'Offline' },
+    { id: 'U004', name: 'Dr. Richard Roe', role: 'HOD', department: 'Surgical Oncology', status: 'Active' },
+  ];
+
+  const templates = [
+    { id: 'T01', name: 'Breast Cancer (Stage II) Protocol', steps: 12, lastUpdated: '2026-08-15' },
+    { id: 'T02', name: 'Lung Cancer (NSCLC) Pathway', steps: 15, lastUpdated: '2026-08-20' },
+    { id: 'T03', name: 'Colorectal Surgery + Chemo', steps: 18, lastUpdated: '2026-09-01' },
+    { id: 'T04', name: 'Head & Neck Radiotherapy', steps: 9, lastUpdated: '2026-07-30' },
+  ];
+
+  const renderRoleTag = (role: string) => {
+    const colors: Record<string, string> = {
+      'Oncologist': 'blue',
+      'Nurse': 'cyan',
+      'Coordinator': 'purple',
+      'HOD': 'magenta',
+      'Admin': 'volcano'
+    };
+    return <Tag color={colors[role] || 'default'}>{role}</Tag>;
+  };
+
+  return (
+    <div style={{ padding: '24px' }}>
+      <Space direction="vertical" size="large" style={{ width: '100%' }}>
+        <div>
+          <Title level={2} style={{ margin: 0 }}>System Administration</Title>
+          <Text type="secondary">Manage hospital infrastructure, users, and clinical protocols</Text>
+        </div>
+
+        <Card bordered={false}>
+          <Tabs defaultActiveKey="1" size="large">
+            
+            <TabPane tab="Departments & Clinics" key="1">
+              <Table 
+                dataSource={depts} 
+                rowKey="id"
+                pagination={false}
+                columns={[
+                  { title: 'Department', dataIndex: 'name', key: 'name' },
+                  { title: 'Clinic Rooms', dataIndex: 'clinics', key: 'clinics' },
+                  { title: 'Active Doctors', dataIndex: 'doctors', key: 'doctors' },
+                  { title: 'Status', dataIndex: 'status', key: 'status', render: (val) => <Badge status="processing" text={val} /> }
+                ]}
+              />
+            </TabPane>
+
+            <TabPane tab="User & Role Management" key="2">
+              <Table 
+                dataSource={users} 
+                rowKey="id"
+                columns={[
+                  { title: 'User ID', dataIndex: 'id', key: 'id' },
+                  { title: 'Name', dataIndex: 'name', key: 'name' },
+                  { title: 'Role', dataIndex: 'role', key: 'role', render: renderRoleTag },
+                  { title: 'Department', dataIndex: 'department', key: 'department' },
+                  { title: 'Status', dataIndex: 'status', key: 'status', render: (val) => <Badge status={val === 'Active' ? 'success' : 'default'} text={val} /> }
+                ]}
+              />
+            </TabPane>
+
+            <TabPane tab="Milestone Templates" key="3">
+              <Table 
+                dataSource={templates} 
+                rowKey="id"
+                columns={[
+                  { title: 'Template ID', dataIndex: 'id', key: 'id' },
+                  { title: 'Protocol Name', dataIndex: 'name', key: 'name' },
+                  { title: 'Milestone Steps', dataIndex: 'steps', key: 'steps' },
+                  { title: 'Last Updated', dataIndex: 'lastUpdated', key: 'lastUpdated' },
+                ]}
+              />
+            </TabPane>
+
+            <TabPane tab="System Health & Audit Logs" key="4">
+              <Descriptions bordered column={1} size="middle">
+                <Descriptions.Item label="PostgreSQL Database">
+                  <Badge status="success" text="Operational (Latency: 12ms)" />
+                </Descriptions.Item>
+                <Descriptions.Item label="Redis Cache">
+                  <Badge status="success" text="Operational (Hit Rate: 94%)" />
+                </Descriptions.Item>
+                <Descriptions.Item label="Elasticsearch">
+                  <Badge status="success" text="Operational (Indexing OK)" />
+                </Descriptions.Item>
+                <Descriptions.Item label="MinIO Document Store">
+                  <Badge status="success" text="Operational (Storage: 45% used)" />
+                </Descriptions.Item>
+                <Descriptions.Item label="ClamAV Scanner">
+                  <Badge status="success" text="Operational (Definitions Up-to-date)" />
+                </Descriptions.Item>
+                <Descriptions.Item label="AI Prediction Services">
+                  <Badge status="warning" text="Degraded (High Latency: 850ms)" />
+                </Descriptions.Item>
+              </Descriptions>
+            </TabPane>
+            
+          </Tabs>
+        </Card>
+      </Space>
+    </div>
+  );
+}

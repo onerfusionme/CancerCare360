@@ -1,0 +1,40 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "search": "Search",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Success",
+    "dashboard": "Dashboard",
+    "logout": "Logout"
+  },
+  "patient": {
+    "registry": "Patient Registry",
+    "patients": "Patients",
+    "new": "Register Patient",
+    "mrn": "MRN",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "dob": "Date of Birth",
+    "gender": "Gender",
+    "status": "Status",
+    "careStage": "Care Stage",
+    "primaryDoctor": "Primary Doctor"
+  },
+  "status": {
+    "active": "Active",
+    "inactive": "Inactive",
+    "completed": "Completed",
+    "scheduled": "Scheduled",
+    "pending": "Pending",
+    "overdue": "Overdue"
+  },
+  "journey": {
+    "title": "Treatment Journey",
+    "events": "Events",
+    "milestones": "Milestones"
+  }
+}

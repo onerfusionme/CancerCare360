@@ -1,0 +1,168 @@
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { PrismaService } from '../../common/prisma/prisma.service';
+import { UploadDocumentDto } from './dto/upload-document.dto';
+import { DocumentFilterDto } from './dto/document-filter.dto';
+import { ScanStatus, OcrStatus, VerificationStatus } from '@prisma/client';
+import { v4 as uuidv4 } from 'uuid';
+import * as path from 'path';
+
+// Mock MinIO client for the purpose of this implementation
+const minioClient = {
+  presignedGetObject: async (bucket: string, objectName: string, expiry: number) => {
+    return `https://minio.mock/${bucket}/${objectName}?expires=${expiry}`;
+  },
+  putObject: async (bucket: string, objectName: string, buffer: Buffer) => {
+    return true;
+  }
+};
+
+@Injectable()
+export class DocumentService {
+  constructor(private readonly prisma: PrismaService) {}
+
+  async upload(tenantId: string, userId: string, file: Express.Multer.File, dto: UploadDocumentDto) {
+    if (!file) {
+      throw new BadRequestException('File is required');
+    }
+
+    const allowedMimeTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/tiff'];
+    if (!allowedMimeTypes.includes(file.mimetype)) {
+      throw new BadRequestException('Invalid file type');
+    }
+
+    const fileId = uuidv4();
+    const ext = path.extname(file.originalname);
+    const storageKey = `${tenantId}/${dto.patientId || 'general'}/${fileId}${ext}`;
+    const storageBucket = 'cancercare-documents';
+
+    // MinIO upload
+    await minioClient.putObject(storageBucket, storageKey, file.buffer);
+
+    const isImageOrPdf = file.mimetype.startsWith('image/') || file.mimetype === 'application/pdf';
+
+    const document = await this.prisma.document.create({
+      data: {
+        tenantId,
+        patientId: dto.patientId,
+        journeyId: dto.journeyId,
+        documentType: dto.documentType,
+        fileName: file.originalname,
+        mimeType: file.mimetype,
+        fileSize: file.size,
+        storageKey,
+        storageBucket,
+        virusScanStatus: ScanStatus.PENDING,
+        ocrStatus: isImageOrPdf ? OcrStatus.PENDING : OcrStatus.NOT_APPLICABLE,
+        verificationStatus: VerificationStatus.PENDING,
+        source: dto.source,
+        provenance: dto.provenance,
+        uploadedById: userId,
+        // notes: dto.notes - No notes field on document in schema, ignoring or map to extractedData.
+      },
+    });
+
+    return document;
+  }
+
+  async findAll(tenantId: string, filterDto: DocumentFilterDto) {
+    const { page = 1, limit = 10, patientId, journeyId, documentType, verificationStatus, dateFrom, dateTo } = filterDto;
+    const skip = (page - 1) * limit;
+
+    const where = {
+      tenantId,
+      ...(patientId && { patientId }),
+      ...(journeyId && { journeyId }),
+      ...(documentType && { documentType }),
+      ...(verificationStatus && { verificationStatus }),
+      ...((dateFrom || dateTo) && {
+        createdAt: {
+          ...(dateFrom && { gte: new Date(dateFrom) }),
+          ...(dateTo && { lte: new Date(dateTo) }),
+        },
+      }),
+    };
+
+    const [data, total] = await Promise.all([
+      this.prisma.document.findMany({
+        where,
+        skip,
+        take: limit,
+        include: {
+          uploadedBy: { select: { firstName: true, lastName: true } },
+          verifiedBy: { select: { firstName: true, lastName: true } },
+        },
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prisma.document.count({ where }),
+    ]);
+
+    return {
+      data,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
+
+  async findById(tenantId: string, id: string) {
+    const document = await this.prisma.document.findUnique({
+      where: { id, tenantId },
+      include: {
+        uploadedBy: true,
+        verifiedBy: true,
+        patient: true,
+      },
+    });
+
+    if (!document) {
+      throw new NotFoundException(`Document with ID ${id} not found`);
+    }
+
+    return document;
+  }
+
+  async getSignedUrl(tenantId: string, id: string) {
+    const document = await this.findById(tenantId, id);
+    const url = await minioClient.presignedGetObject(document.storageBucket, document.storageKey, 15 * 60);
+    return { url };
+  }
+
+  async updateVerification(tenantId: string, id: string, userId: string, status: VerificationStatus, notes?: string) {
+    const document = await this.prisma.document.findUnique({
+      where: { id, tenantId },
+    });
+
+    if (!document) {
+      throw new NotFoundException(`Document with ID ${id} not found`);
+    }
+
+    return this.prisma.document.update({
+      where: { id, tenantId },
+      data: {
+        verificationStatus: status,
+        verifiedById: userId,
+        verifiedAt: new Date(),
+        // notes mapping?
+      },
+    });
+  }
+
+  async delete(tenantId: string, id: string) {
+    const document = await this.prisma.document.findUnique({
+      where: { id, tenantId },
+    });
+
+    if (!document) {
+      throw new NotFoundException(`Document with ID ${id} not found`);
+    }
+
+    // Implementing soft delete by setting a status if existed or returning actual delete
+    // Since soft-delete status isn't in Document schema, we will do a physical delete for now
+    return this.prisma.document.delete({
+      where: { id, tenantId },
+    });
+  }
+}

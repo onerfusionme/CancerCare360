@@ -1,0 +1,1175 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ----------------------------------------
+// Tenant & Organization
+// ----------------------------------------
+
+model Tenant {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String
+  slug      String   @unique
+  type      TenantType
+  status    TenantStatus
+  settings  Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  hospitals           Hospital[]
+  departments         Department[]
+  users               User[]
+  roles               Role[]
+  careTeams           CareTeam[]
+  patients            Patient[]
+  careJourneys        CareJourney[]
+  journeyEvents       JourneyEvent[]
+  careMilestones      CareMilestone[]
+  milestoneTemplates  MilestoneTemplate[]
+  appointments        Appointment[]
+  doctorSchedules     DoctorSchedule[]
+  waitlistEntries     WaitlistEntry[]
+  investigations      Investigation[]
+  treatmentMilestones TreatmentMilestone[]
+  documents           Document[]
+  careGapRules        CareGapRule[]
+  followUpTasks       FollowUpTask[]
+  outreachLogs        OutreachLog[]
+  notificationTmpls   NotificationTemplate[]
+  notifications       Notification[]
+  educationContents   EducationContent[]
+  campaigns           Campaign[]
+  analyticsEvents     AnalyticsEvent[]
+  auditLogs           AuditLog[]
+  aiInteractionLogs   AiInteractionLog[]
+  integrationConfigs  IntegrationConfig[]
+  integrationLogs     IntegrationLog[]
+  dataConflicts       DataConflict[]
+
+  @@index([status])
+}
+
+enum TenantType {
+  HOSPITAL
+  CLINIC
+  PLATFORM
+}
+
+enum TenantStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+model Hospital {
+  id        String   @id @default(uuid()) @db.Uuid
+  tenantId  String   @db.Uuid
+  name      String
+  code      String
+  address   Json?
+  contact   Json?
+  settings  Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tenant      Tenant       @relation(fields: [tenantId], references: [id])
+  departments Department[]
+
+  @@index([tenantId])
+}
+
+model Department {
+  id         String   @id @default(uuid()) @db.Uuid
+  tenantId   String   @db.Uuid
+  hospitalId String   @db.Uuid
+  name       String
+  type       String
+  settings   Json?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  tenant          Tenant           @relation(fields: [tenantId], references: [id])
+  hospital        Hospital         @relation(fields: [hospitalId], references: [id])
+  users           User[]
+  careTeams       CareTeam[]
+  journeyEvents   JourneyEvent[]
+  appointments    Appointment[]
+  doctorSchedules DoctorSchedule[]
+  waitlistEntries WaitlistEntry[]
+
+  @@index([tenantId])
+  @@index([hospitalId])
+}
+
+// ----------------------------------------
+// Users & RBAC
+// ----------------------------------------
+
+model User {
+  id           String     @id @default(uuid()) @db.Uuid
+  tenantId     String     @db.Uuid
+  keycloakId   String     @unique
+  email        String
+  firstName    String
+  lastName     String
+  phone        String?
+  status       UserStatus
+  departmentId String?    @db.Uuid
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  tenant           Tenant            @relation(fields: [tenantId], references: [id])
+  department       Department?       @relation(fields: [departmentId], references: [id])
+  userRoles        UserRole[]
+  careTeamMembers  CareTeamMember[]
+  mergedHistories  PatientMergeHistory[] @relation("MergedByUser")
+
+  primaryCareJourneys  CareJourney[]      @relation("PrimaryDoctor")
+  journeyEventsCreated JourneyEvent[]     @relation("EventCreatedBy")
+  journeyEventsUpdated JourneyEvent[]     @relation("EventUpdatedBy")
+  journeyEventsResp    JourneyEvent[]     @relation("EventResponsibleUser")
+  milestonesResp       CareMilestone[]    @relation("MilestoneResponsibleUser")
+  appointmentsDoctor   Appointment[]      @relation("AppointmentDoctor")
+  appointmentsCreated  Appointment[]      @relation("AppointmentCreatedBy")
+  doctorSchedules      DoctorSchedule[]
+  waitlistEntries      WaitlistEntry[]
+  investigationsOrdered Investigation[] @relation("InvestigationOrderedBy")
+  investigationsReviewed Investigation[] @relation("InvestigationReviewedBy")
+  documentsVerified    Document[]         @relation("DocumentVerifiedBy")
+  documentsUploaded    Document[]         @relation("DocumentUploadedBy")
+  tasksAssigned        FollowUpTask[]     @relation("TaskAssignedTo")
+  tasksResolved        FollowUpTask[]     @relation("TaskResolvedBy")
+  outreachLogs         OutreachLog[]      @relation("OutreachContactedBy")
+  eduDrafted           EducationContent[] @relation("EduDraftedBy")
+  eduReviewed          EducationContent[] @relation("EduReviewedBy")
+  eduApproved          EducationContent[] @relation("EduApprovedBy")
+  campaignsCreated     Campaign[]         @relation("CampaignCreatedBy")
+  auditLogs            AuditLog[]
+  aiInteractions       AiInteractionLog[] @relation("AiUser")
+  aiInteractionsRev    AiInteractionLog[] @relation("AiReviewedBy")
+  dataConflictsRev     DataConflict[]     @relation("ConflictResolvedBy")
+
+  @@unique([tenantId, email])
+  @@index([tenantId])
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  LOCKED
+}
+
+model Role {
+  id          String   @id @default(uuid()) @db.Uuid
+  tenantId    String?  @db.Uuid
+  name        String
+  description String?
+  isSystem    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  tenant          Tenant?          @relation(fields: [tenantId], references: [id])
+  rolePermissions RolePermission[]
+  userRoles       UserRole[]
+
+  @@index([tenantId])
+}
+
+model Permission {
+  id          String   @id @default(uuid()) @db.Uuid
+  resource    String
+  action      String
+  description String?
+
+  rolePermissions RolePermission[]
+
+  @@unique([resource, action])
+}
+
+model RolePermission {
+  roleId       String @db.Uuid
+  permissionId String @db.Uuid
+
+  role       Role       @relation(fields: [roleId], references: [id])
+  permission Permission @relation(fields: [permissionId], references: [id])
+
+  @@id([roleId, permissionId])
+}
+
+model UserRole {
+  id           String   @id @default(uuid()) @db.Uuid
+  userId       String   @db.Uuid
+  roleId       String   @db.Uuid
+  departmentId String?  @db.Uuid
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+  role Role @relation(fields: [roleId], references: [id])
+
+  @@index([userId])
+  @@index([roleId])
+}
+
+model CareTeam {
+  id           String   @id @default(uuid()) @db.Uuid
+  tenantId     String   @db.Uuid
+  departmentId String   @db.Uuid
+  name         String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  tenant              Tenant               @relation(fields: [tenantId], references: [id])
+  department          Department           @relation(fields: [departmentId], references: [id])
+  members             CareTeamMember[]
+  careJourneys        CareJourney[]
+  treatmentMilestones TreatmentMilestone[]
+
+  @@index([tenantId])
+  @@index([departmentId])
+}
+
+model CareTeamMember {
+  id         String   @id @default(uuid()) @db.Uuid
+  careTeamId String   @db.Uuid
+  userId     String   @db.Uuid
+  role       String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  careTeam CareTeam @relation(fields: [careTeamId], references: [id])
+  user     User     @relation(fields: [userId], references: [id])
+
+  @@index([careTeamId])
+  @@index([userId])
+}
+
+// ----------------------------------------
+// Patient Master
+// ----------------------------------------
+
+model Patient {
+  id                       String   @id @default(uuid()) @db.Uuid
+  tenantId                 String   @db.Uuid
+  mrn                      String
+  abhaId                   String?
+  firstName                String
+  lastName                 String
+  dateOfBirth              DateTime
+  gender                   Gender
+  phone                    String?
+  email                    String?
+  address                  Json?
+  emergencyContact         Json?
+  preferredLanguage        String   @default("en")
+  communicationPreferences Json?
+  sourceSystem             String?
+  externalIds              Json?
+  status                   PatientStatus
+  registeredAt             DateTime @default(now())
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
+
+  tenant              Tenant                @relation(fields: [tenantId], references: [id])
+  identifiers         PatientIdentifier[]
+  mergedAsSurviving   PatientMergeHistory[] @relation("SurvivingPatient")
+  mergedAsMerged      PatientMergeHistory[] @relation("MergedPatient")
+  careJourneys        CareJourney[]
+  journeyEvents       JourneyEvent[]
+  appointments        Appointment[]
+  waitlistEntries     WaitlistEntry[]
+  investigations      Investigation[]
+  treatmentMilestones TreatmentMilestone[]
+  documents           Document[]
+  followUpTasks       FollowUpTask[]
+  outreachLogs        OutreachLog[]
+  dataConflicts       DataConflict[]
+
+  @@unique([tenantId, mrn])
+  @@index([tenantId])
+  @@index([firstName, lastName])
+  @@index([phone])
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+  UNKNOWN
+}
+
+enum PatientStatus {
+  ACTIVE
+  INACTIVE
+  DECEASED
+  MERGED
+}
+
+model PatientIdentifier {
+  id              String   @id @default(uuid()) @db.Uuid
+  patientId       String   @db.Uuid
+  identifierType  String
+  identifierValue String
+  source          String?
+  isPrimary       Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  patient Patient @relation(fields: [patientId], references: [id])
+
+  @@index([patientId])
+  @@index([identifierType, identifierValue])
+}
+
+model PatientMergeHistory {
+  id                 String   @id @default(uuid()) @db.Uuid
+  survivingPatientId String   @db.Uuid
+  mergedPatientId    String   @db.Uuid
+  mergedById         String   @db.Uuid
+  mergedAt           DateTime @default(now())
+  reason             String?
+
+  survivingPatient Patient @relation("SurvivingPatient", fields: [survivingPatientId], references: [id])
+  mergedPatient    Patient @relation("MergedPatient", fields: [mergedPatientId], references: [id])
+  mergedBy         User    @relation("MergedByUser", fields: [mergedById], references: [id])
+
+  @@index([survivingPatientId])
+  @@index([mergedPatientId])
+}
+
+// ----------------------------------------
+// Cancer Journey
+// ----------------------------------------
+
+model CareJourney {
+  id                String    @id @default(uuid()) @db.Uuid
+  tenantId          String    @db.Uuid
+  patientId         String    @db.Uuid
+  diagnosisCategory String
+  careStage         CareStage
+  primaryDoctorId   String    @db.Uuid
+  careTeamId        String?   @db.Uuid
+  status            JourneyStatus
+  startedAt         DateTime
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  tenant              Tenant               @relation(fields: [tenantId], references: [id])
+  patient             Patient              @relation(fields: [patientId], references: [id])
+  primaryDoctor       User                 @relation("PrimaryDoctor", fields: [primaryDoctorId], references: [id])
+  careTeam            CareTeam?            @relation(fields: [careTeamId], references: [id])
+  events              JourneyEvent[]
+  milestones          CareMilestone[]
+  appointments        Appointment[]
+  investigations      Investigation[]
+  treatmentMilestones TreatmentMilestone[]
+  documents           Document[]
+  followUpTasks       FollowUpTask[]
+
+  @@index([tenantId])
+  @@index([patientId])
+  @@index([status])
+}
+
+enum CareStage {
+  SCREENING
+  DIAGNOSIS
+  TREATMENT_PLANNING
+  ACTIVE_TREATMENT
+  SURVIVORSHIP
+  END_OF_LIFE
+}
+
+enum JourneyStatus {
+  ACTIVE
+  COMPLETED
+  ON_HOLD
+  CANCELLED
+}
+
+model JourneyEvent {
+  id                   String    @id @default(uuid()) @db.Uuid
+  tenantId             String    @db.Uuid
+  journeyId            String    @db.Uuid
+  patientId            String    @db.Uuid
+  eventType            EventType
+  eventDate            DateTime
+  status               EventStatus
+  departmentId         String?   @db.Uuid
+  responsibleUserId    String?   @db.Uuid
+  source               String?
+  sourceSystem         String?
+  metadata             Json?
+  relatedDocumentId    String?   @db.Uuid
+  relatedAppointmentId String?   @db.Uuid
+  notes                String?
+  createdById          String    @db.Uuid
+  updatedById          String?   @db.Uuid
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  tenant          Tenant       @relation(fields: [tenantId], references: [id])
+  journey         CareJourney  @relation(fields: [journeyId], references: [id])
+  patient         Patient      @relation(fields: [patientId], references: [id])
+  department      Department?  @relation(fields: [departmentId], references: [id])
+  responsibleUser User?        @relation("EventResponsibleUser", fields: [responsibleUserId], references: [id])
+  createdBy       User         @relation("EventCreatedBy", fields: [createdById], references: [id])
+  updatedBy       User?        @relation("EventUpdatedBy", fields: [updatedById], references: [id])
+
+  @@index([tenantId])
+  @@index([journeyId])
+  @@index([patientId])
+  @@index([eventDate])
+}
+
+enum EventType {
+  CONSULTATION
+  DIAGNOSTIC
+  TREATMENT
+  ADMISSION
+  DISCHARGE
+  FOLLOW_UP
+  MULTIDISCIPLINARY_MEETING
+  NOTE
+}
+
+enum EventStatus {
+  PLANNED
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+model CareMilestone {
+  id                String    @id @default(uuid()) @db.Uuid
+  tenantId          String    @db.Uuid
+  journeyId         String    @db.Uuid
+  milestoneType     String
+  expectedDate      DateTime?
+  actualDate        DateTime?
+  status            MilestoneStatus
+  responsibleUserId String?   @db.Uuid
+  notes             String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  tenant          Tenant      @relation(fields: [tenantId], references: [id])
+  journey         CareJourney @relation(fields: [journeyId], references: [id])
+  responsibleUser User?       @relation("MilestoneResponsibleUser", fields: [responsibleUserId], references: [id])
+
+  @@index([tenantId])
+  @@index([journeyId])
+}
+
+enum MilestoneStatus {
+  PENDING
+  COMPLETED
+  MISSED
+  CANCELLED
+}
+
+model MilestoneTemplate {
+  id                 String   @id @default(uuid()) @db.Uuid
+  tenantId           String   @db.Uuid
+  diagnosisCategory  String
+  milestoneType      String
+  sequence           Int
+  defaultIntervalDays Int
+  isActive           Boolean  @default(true)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+  @@index([diagnosisCategory])
+}
+
+// ----------------------------------------
+// Appointments
+// ----------------------------------------
+
+model Appointment {
+  id                      String    @id @default(uuid()) @db.Uuid
+  tenantId                String    @db.Uuid
+  patientId               String    @db.Uuid
+  journeyId               String?   @db.Uuid
+  doctorId                String    @db.Uuid
+  departmentId            String    @db.Uuid
+  appointmentType         String
+  scheduledAt             DateTime
+  durationMinutes         Int
+  status                  AppointmentStatus
+  checkInAt               DateTime?
+  consultationStartAt     DateTime?
+  consultationEndAt       DateTime?
+  waitingDurationMinutes  Int?
+  cancellationReason      String?
+  notes                   String?
+  createdById             String    @db.Uuid
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+
+  tenant      Tenant       @relation(fields: [tenantId], references: [id])
+  patient     Patient      @relation(fields: [patientId], references: [id])
+  journey     CareJourney? @relation(fields: [journeyId], references: [id])
+  doctor      User         @relation("AppointmentDoctor", fields: [doctorId], references: [id])
+  department  Department   @relation(fields: [departmentId], references: [id])
+  createdBy   User         @relation("AppointmentCreatedBy", fields: [createdById], references: [id])
+
+  @@index([tenantId])
+  @@index([patientId])
+  @@index([doctorId])
+  @@index([scheduledAt])
+}
+
+enum AppointmentStatus {
+  SCHEDULED
+  CONFIRMED
+  CHECKED_IN
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+model DoctorSchedule {
+  id                  String    @id @default(uuid()) @db.Uuid
+  tenantId            String    @db.Uuid
+  doctorId            String    @db.Uuid
+  departmentId        String    @db.Uuid
+  dayOfWeek           Int
+  startTime           String
+  endTime             String
+  slotDurationMinutes Int
+  maxPatients         Int
+  isActive            Boolean   @default(true)
+  effectiveFrom       DateTime
+  effectiveTo         DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  tenant     Tenant     @relation(fields: [tenantId], references: [id])
+  doctor     User       @relation(fields: [doctorId], references: [id])
+  department Department @relation(fields: [departmentId], references: [id])
+
+  @@index([tenantId])
+  @@index([doctorId])
+}
+
+model WaitlistEntry {
+  id             String    @id @default(uuid()) @db.Uuid
+  tenantId       String    @db.Uuid
+  patientId      String    @db.Uuid
+  doctorId       String?   @db.Uuid
+  departmentId   String    @db.Uuid
+  preferredDate  DateTime?
+  priority       WaitlistPriority
+  status         WaitlistStatus
+  notes          String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  tenant     Tenant      @relation(fields: [tenantId], references: [id])
+  patient    Patient     @relation(fields: [patientId], references: [id])
+  doctor     User?       @relation(fields: [doctorId], references: [id])
+  department Department  @relation(fields: [departmentId], references: [id])
+
+  @@index([tenantId])
+  @@index([departmentId])
+}
+
+enum WaitlistPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum WaitlistStatus {
+  ACTIVE
+  FULFILLED
+  CANCELLED
+}
+
+// ----------------------------------------
+// Investigations
+// ----------------------------------------
+
+model Investigation {
+  id                  String    @id @default(uuid()) @db.Uuid
+  tenantId            String    @db.Uuid
+  patientId           String    @db.Uuid
+  journeyId           String?   @db.Uuid
+  investigationType   String
+  orderedById         String    @db.Uuid
+  orderedAt           DateTime
+  status              InvestigationStatus
+  scheduledAt         DateTime?
+  performedAt         DateTime?
+  reportGeneratedAt   DateTime?
+  reportAvailableAt   DateTime?
+  reviewedById        String?   @db.Uuid
+  reviewedAt          DateTime?
+  turnaroundHours     Float?
+  resultSummary       String?
+  relatedDocumentId   String?   @db.Uuid
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  tenant       Tenant       @relation(fields: [tenantId], references: [id])
+  patient      Patient      @relation(fields: [patientId], references: [id])
+  journey      CareJourney? @relation(fields: [journeyId], references: [id])
+  orderedBy    User         @relation("InvestigationOrderedBy", fields: [orderedById], references: [id])
+  reviewedBy   User?        @relation("InvestigationReviewedBy", fields: [reviewedById], references: [id])
+
+  @@index([tenantId])
+  @@index([patientId])
+  @@index([status])
+}
+
+enum InvestigationStatus {
+  ORDERED
+  SCHEDULED
+  SAMPLE_COLLECTED
+  IN_PROGRESS
+  REPORT_AVAILABLE
+  REVIEWED
+  CANCELLED
+}
+
+// ----------------------------------------
+// Treatment
+// ----------------------------------------
+
+model TreatmentMilestone {
+  id                 String    @id @default(uuid()) @db.Uuid
+  tenantId           String    @db.Uuid
+  patientId          String    @db.Uuid
+  journeyId          String?   @db.Uuid
+  treatmentType      TreatmentType
+  cycleNumber        Int?
+  plannedDate        DateTime?
+  scheduledDate      DateTime?
+  actualDate         DateTime?
+  status             TreatmentStatus
+  responsibleTeamId  String?   @db.Uuid
+  notes              String?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  tenant          Tenant       @relation(fields: [tenantId], references: [id])
+  patient         Patient      @relation(fields: [patientId], references: [id])
+  journey         CareJourney? @relation(fields: [journeyId], references: [id])
+  responsibleTeam CareTeam?    @relation(fields: [responsibleTeamId], references: [id])
+
+  @@index([tenantId])
+  @@index([patientId])
+}
+
+enum TreatmentType {
+  SURGERY
+  CHEMOTHERAPY
+  RADIATION
+  IMMUNOTHERAPY
+  TARGETED_THERAPY
+  HORMONE_THERAPY
+}
+
+enum TreatmentStatus {
+  PLANNED
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  DELAYED
+}
+
+// ----------------------------------------
+// Documents
+// ----------------------------------------
+
+model Document {
+  id                 String    @id @default(uuid()) @db.Uuid
+  tenantId           String    @db.Uuid
+  patientId          String?   @db.Uuid
+  journeyId          String?   @db.Uuid
+  documentType       DocumentType
+  fileName           String
+  mimeType           String
+  fileSize           BigInt
+  storageKey         String
+  storageBucket      String
+  encryptionKeyId    String?
+  virusScanStatus    ScanStatus
+  ocrStatus          OcrStatus
+  extractedData      Json?
+  verificationStatus VerificationStatus
+  verifiedById       String?   @db.Uuid
+  verifiedAt         DateTime?
+  source             String?
+  provenance         String?
+  uploadedById       String    @db.Uuid
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  tenant     Tenant       @relation(fields: [tenantId], references: [id])
+  patient    Patient?     @relation(fields: [patientId], references: [id])
+  journey    CareJourney? @relation(fields: [journeyId], references: [id])
+  verifiedBy User?        @relation("DocumentVerifiedBy", fields: [verifiedById], references: [id])
+  uploadedBy User         @relation("DocumentUploadedBy", fields: [uploadedById], references: [id])
+
+  @@index([tenantId])
+  @@index([patientId])
+}
+
+enum DocumentType {
+  CLINICAL_NOTE
+  LAB_REPORT
+  IMAGING_REPORT
+  PATHOLOGY_REPORT
+  CONSENT_FORM
+  PRESCRIPTION
+  DISCHARGE_SUMMARY
+  OTHER
+}
+
+enum ScanStatus {
+  PENDING
+  CLEAN
+  INFECTED
+  FAILED
+}
+
+enum OcrStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  NOT_APPLICABLE
+}
+
+enum VerificationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+// ----------------------------------------
+// Follow-up & Tasks
+// ----------------------------------------
+
+model CareGapRule {
+  id             String   @id @default(uuid()) @db.Uuid
+  tenantId       String   @db.Uuid
+  ruleType       String
+  conditions     Json
+  priorityWeight Int
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+}
+
+model FollowUpTask {
+  id               String    @id @default(uuid()) @db.Uuid
+  tenantId         String    @db.Uuid
+  patientId        String    @db.Uuid
+  journeyId        String?   @db.Uuid
+  taskType         String
+  priority         TaskPriority
+  issueDescription String
+  dueDate          DateTime
+  assignedToId     String?   @db.Uuid
+  status           TaskStatus
+  escalationLevel  Int       @default(0)
+  resolvedAt       DateTime?
+  resolvedById     String?   @db.Uuid
+  resolution       String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  tenant     Tenant       @relation(fields: [tenantId], references: [id])
+  patient    Patient      @relation(fields: [patientId], references: [id])
+  journey    CareJourney? @relation(fields: [journeyId], references: [id])
+  assignedTo User?        @relation("TaskAssignedTo", fields: [assignedToId], references: [id])
+  resolvedBy User?        @relation("TaskResolvedBy", fields: [resolvedById], references: [id])
+  outreachLogs OutreachLog[]
+
+  @@index([tenantId])
+  @@index([patientId])
+  @@index([status])
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum TaskStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CANCELLED
+}
+
+model OutreachLog {
+  id               String    @id @default(uuid()) @db.Uuid
+  tenantId         String    @db.Uuid
+  taskId           String    @db.Uuid
+  patientId        String    @db.Uuid
+  contactedById    String    @db.Uuid
+  contactDate      DateTime
+  channel          CommunicationChannel
+  outcome          OutreachOutcome
+  notes            String?
+  nextAction       String?
+  nextFollowUpDate DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  tenant      Tenant       @relation(fields: [tenantId], references: [id])
+  task        FollowUpTask @relation(fields: [taskId], references: [id])
+  patient     Patient      @relation(fields: [patientId], references: [id])
+  contactedBy User         @relation("OutreachContactedBy", fields: [contactedById], references: [id])
+
+  @@index([tenantId])
+  @@index([taskId])
+  @@index([patientId])
+}
+
+enum CommunicationChannel {
+  PHONE
+  EMAIL
+  SMS
+  WHATSAPP
+  IN_PERSON
+  PORTAL
+}
+
+enum OutreachOutcome {
+  REACHED
+  LEFT_MESSAGE
+  NO_ANSWER
+  INVALID_NUMBER
+  PATIENT_DECLINED
+  RESOLVED
+}
+
+// ----------------------------------------
+// Notifications
+// ----------------------------------------
+
+model NotificationTemplate {
+  id           String               @id @default(uuid()) @db.Uuid
+  tenantId     String?              @db.Uuid
+  templateType String
+  channel      CommunicationChannel
+  language     String               @default("en")
+  subject      String?
+  bodyTemplate String
+  isActive     Boolean              @default(true)
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+
+  tenant        Tenant?        @relation(fields: [tenantId], references: [id])
+  notifications Notification[]
+
+  @@index([tenantId])
+}
+
+model Notification {
+  id            String               @id @default(uuid()) @db.Uuid
+  tenantId      String               @db.Uuid
+  recipientId   String               @db.Uuid
+  recipientType RecipientType
+  channel       CommunicationChannel
+  templateId    String?              @db.Uuid
+  subject       String?
+  body          String
+  status        NotificationStatus
+  sentAt        DateTime?
+  deliveredAt   DateTime?
+  failedAt      DateTime?
+  retryCount    Int                  @default(0)
+  errorMessage  String?
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+
+  tenant   Tenant                @relation(fields: [tenantId], references: [id])
+  template NotificationTemplate? @relation(fields: [templateId], references: [id])
+
+  @@index([tenantId])
+  @@index([recipientId])
+}
+
+enum RecipientType {
+  PATIENT
+  USER
+}
+
+enum NotificationStatus {
+  PENDING
+  SENT
+  DELIVERED
+  FAILED
+}
+
+// ----------------------------------------
+// Education
+// ----------------------------------------
+
+model EducationContent {
+  id           String    @id @default(uuid()) @db.Uuid
+  tenantId     String    @db.Uuid
+  title        String
+  category     String
+  language     String    @default("en")
+  body         String
+  status       ContentStatus
+  draftedById  String    @db.Uuid
+  reviewedById String?   @db.Uuid
+  approvedById String?   @db.Uuid
+  publishedAt  DateTime?
+  archivedAt   DateTime?
+  version      Int       @default(1)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  tenant     Tenant     @relation(fields: [tenantId], references: [id])
+  draftedBy  User       @relation("EduDraftedBy", fields: [draftedById], references: [id])
+  reviewedBy User?      @relation("EduReviewedBy", fields: [reviewedById], references: [id])
+  approvedBy User?      @relation("EduApprovedBy", fields: [approvedById], references: [id])
+  campaigns  Campaign[]
+
+  @@index([tenantId])
+}
+
+enum ContentStatus {
+  DRAFT
+  IN_REVIEW
+  APPROVED
+  PUBLISHED
+  ARCHIVED
+}
+
+// ----------------------------------------
+// Campaigns
+// ----------------------------------------
+
+model Campaign {
+  id             String               @id @default(uuid()) @db.Uuid
+  tenantId       String               @db.Uuid
+  name           String
+  type           CampaignType
+  audienceCriteria Json
+  contentId      String?              @db.Uuid
+  language       String
+  channel        CommunicationChannel
+  scheduledAt    DateTime?
+  approvalStatus ApprovalStatus
+  deliveryStatus DeliveryStatus
+  sentCount      Int                  @default(0)
+  deliveredCount Int                  @default(0)
+  failedCount    Int                  @default(0)
+  createdById    String               @db.Uuid
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+
+  tenant    Tenant            @relation(fields: [tenantId], references: [id])
+  content   EducationContent? @relation(fields: [contentId], references: [id])
+  createdBy User              @relation("CampaignCreatedBy", fields: [createdById], references: [id])
+
+  @@index([tenantId])
+}
+
+enum CampaignType {
+  SCREENING
+  AWARENESS
+  VACCINATION
+  FOLLOW_UP_REMINDER
+}
+
+enum ApprovalStatus {
+  DRAFT
+  PENDING_APPROVAL
+  APPROVED
+  REJECTED
+}
+
+enum DeliveryStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+// ----------------------------------------
+// Analytics
+// ----------------------------------------
+
+model AnalyticsEvent {
+  id         String   @id @default(uuid()) @db.Uuid
+  tenantId   String   @db.Uuid
+  eventType  String
+  dimensions Json
+  metrics    Json
+  recordedAt DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+  @@index([recordedAt])
+}
+
+// ----------------------------------------
+// Audit
+// ----------------------------------------
+
+model AuditLog {
+  id            String   @id @default(uuid()) @db.Uuid
+  tenantId      String?  @db.Uuid
+  userId        String?  @db.Uuid
+  action        String
+  resourceType  String
+  resourceId    String?
+  previousValue Json?
+  newValue      Json?
+  ipAddress     String?
+  userAgent     String?
+  timestamp     DateTime @default(now())
+
+  tenant Tenant? @relation(fields: [tenantId], references: [id])
+  user   User?   @relation(fields: [userId], references: [id])
+
+  @@index([tenantId])
+  @@index([userId])
+  @@index([resourceType, resourceId])
+  @@index([timestamp])
+}
+
+// ----------------------------------------
+// AI
+// ----------------------------------------
+
+model AiInteractionLog {
+  id               String    @id @default(uuid()) @db.Uuid
+  tenantId         String    @db.Uuid
+  userId           String    @db.Uuid
+  capability       String
+  modelProvider    String
+  inputContextRef  String?
+  output           String
+  confidenceScore  Float?
+  reviewedById     String?   @db.Uuid
+  reviewStatus     ReviewStatus?
+  reviewNotes      String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  tenant     Tenant @relation(fields: [tenantId], references: [id])
+  user       User   @relation("AiUser", fields: [userId], references: [id])
+  reviewedBy User?  @relation("AiReviewedBy", fields: [reviewedById], references: [id])
+
+  @@index([tenantId])
+}
+
+enum ReviewStatus {
+  ACCEPTED
+  REJECTED
+  MODIFIED
+}
+
+// ----------------------------------------
+// Integration
+// ----------------------------------------
+
+model IntegrationConfig {
+  id                  String   @id @default(uuid()) @db.Uuid
+  tenantId            String   @db.Uuid
+  systemType          String
+  name                String
+  endpoint            String
+  authConfigEncrypted String?
+  mappingConfig       Json?
+  status              IntegrationStatus
+  lastSyncAt          DateTime?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  tenant          Tenant           @relation(fields: [tenantId], references: [id])
+  integrationLogs IntegrationLog[]
+
+  @@index([tenantId])
+}
+
+enum IntegrationStatus {
+  ACTIVE
+  INACTIVE
+  ERROR
+}
+
+model IntegrationLog {
+  id             String   @id @default(uuid()) @db.Uuid
+  tenantId       String   @db.Uuid
+  integrationId  String   @db.Uuid
+  direction      IntegrationDirection
+  payloadRef     String?
+  status         IntegrationLogStatus
+  errorMessage   String?
+  processedAt    DateTime
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  tenant      Tenant            @relation(fields: [tenantId], references: [id])
+  integration IntegrationConfig @relation(fields: [integrationId], references: [id])
+
+  @@index([tenantId])
+  @@index([integrationId])
+}
+
+enum IntegrationDirection {
+  INBOUND
+  OUTBOUND
+}
+
+enum IntegrationLogStatus {
+  SUCCESS
+  FAILED
+  RETRYING
+}
+
+model DataConflict {
+  id           String    @id @default(uuid()) @db.Uuid
+  tenantId     String    @db.Uuid
+  patientId    String    @db.Uuid
+  fieldName    String
+  sourceA      String
+  valueA       String
+  sourceB      String
+  valueB       String
+  resolution   String?
+  resolvedById String?   @db.Uuid
+  resolvedAt   DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  tenant     Tenant  @relation(fields: [tenantId], references: [id])
+  patient    Patient @relation(fields: [patientId], references: [id])
+  resolvedBy User?   @relation("ConflictResolvedBy", fields: [resolvedById], references: [id])
+
+  @@index([tenantId])
+  @@index([patientId])
+}

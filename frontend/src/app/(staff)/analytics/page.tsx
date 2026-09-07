@@ -1,0 +1,125 @@
+'use client';
+
+import React from 'react';
+import { Card, Row, Col, Typography, Space, Table, Progress, Statistic } from 'antd';
+import { useCareContinuity, useInvestigationTAT } from '@/hooks/use-analytics';
+
+const { Title, Text } = Typography;
+
+export default function AnalyticsPage() {
+  const { data: continuityData, isLoading: isLoadingContinuity } = useCareContinuity();
+  const { data: tatData, isLoading: isLoadingTAT } = useInvestigationTAT();
+
+  const columnsTAT = [
+    {
+      title: 'Investigation',
+      dataIndex: 'investigation',
+      key: 'investigation',
+    },
+    {
+      title: 'SLA (Hours)',
+      dataIndex: 'slaHours',
+      key: 'slaHours',
+    },
+    {
+      title: 'Actual Avg (Hours)',
+      dataIndex: 'actualHours',
+      key: 'actualHours',
+      render: (val: number, record: any) => (
+        <Text type={val > record.slaHours ? 'danger' : 'success'}>
+          {val} {val > record.slaHours ? ' (Breached)' : ''}
+        </Text>
+      )
+    },
+    {
+      title: 'Volume',
+      dataIndex: 'volume',
+      key: 'volume',
+    }
+  ];
+
+  const columnsFunnel = [
+    { title: 'Step', dataIndex: 'step', key: 'step' },
+    { title: 'Retained', dataIndex: 'retained', key: 'retained' },
+    { title: 'Dropped', dataIndex: 'dropped', key: 'dropped', render: (val: number) => <Text type="danger">{val}</Text> }
+  ];
+
+  return (
+    <div style={{ padding: '24px' }}>
+      <Space direction="vertical" size="large" style={{ width: '100%' }}>
+        <div>
+          <Title level={2} style={{ margin: 0 }}>Population & Operational Analytics</Title>
+          <Text type="secondary">Monitor hospital-wide clinical performance and efficiency</Text>
+        </div>
+
+        {/* Top Metrics */}
+        <Row gutter={[16, 16]}>
+          <Col xs={24} sm={12} lg={6}>
+            <Card loading={isLoadingContinuity} bordered={false}>
+              <Statistic title="Total Active Journeys" value={continuityData?.totalActiveJourneys} />
+            </Card>
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <Card loading={isLoadingContinuity} bordered={false}>
+              <Statistic title="Care Continuity Index (%)" value={continuityData?.careContinuityIndex} precision={1} suffix="%" valueStyle={{ color: '#3f8600' }}/>
+            </Card>
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <Card loading={isLoadingContinuity} bordered={false}>
+              <Statistic title="Lost-to-Follow-up Rate (%)" value={continuityData?.lostToFollowUpRate} precision={1} suffix="%" valueStyle={{ color: '#cf1322' }}/>
+            </Card>
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <Card loading={isLoadingContinuity} bordered={false}>
+              <Statistic title="Avg Lab Turnaround (hours)" value={continuityData?.averageLabTurnaroundHours} precision={1} />
+            </Card>
+          </Col>
+        </Row>
+
+        <Row gutter={[16, 16]}>
+          {/* Stage Distribution */}
+          <Col xs={24} lg={12}>
+            <Card title="Cancer Stage Distribution" loading={isLoadingContinuity} bordered={false} style={{ height: '100%' }}>
+              <Space direction="vertical" style={{ width: '100%' }} size="middle">
+                {continuityData?.stageDistribution.map(stage => (
+                  <div key={stage.stage}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                      <Text>{stage.stage}</Text>
+                      <Text type="secondary">{stage.count} patients</Text>
+                    </div>
+                    <Progress percent={stage.percentage} status="active" />
+                  </div>
+                ))}
+              </Space>
+            </Card>
+          </Col>
+
+          {/* Retention Funnel */}
+          <Col xs={24} lg={12}>
+            <Card title="Care Continuity Retention Funnel" loading={isLoadingContinuity} bordered={false} style={{ height: '100%' }}>
+               <Table 
+                dataSource={continuityData?.retentionFunnel} 
+                columns={columnsFunnel} 
+                rowKey="step" 
+                pagination={false} 
+                size="small"
+              />
+            </Card>
+          </Col>
+        </Row>
+
+        {/* Investigation TAT */}
+        <Card title="Investigation Turnaround Times vs SLA" bordered={false}>
+          <Table 
+            loading={isLoadingTAT}
+            dataSource={tatData}
+            columns={columnsTAT}
+            rowKey="investigation"
+            pagination={false}
+          />
+        </Card>
+
+      </Space>
+    </div>
+  );
+}

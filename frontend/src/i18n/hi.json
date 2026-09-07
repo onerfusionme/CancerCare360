@@ -1,0 +1,40 @@
+{
+  "common": {
+    "save": "सहेजें",
+    "cancel": "रद्द करें",
+    "edit": "संपादित करें",
+    "delete": "हटाएं",
+    "search": "खोजें",
+    "loading": "लोड हो रहा है...",
+    "error": "एक त्रुटि हुई",
+    "success": "सफलता",
+    "dashboard": "डैशबोर्ड",
+    "logout": "लॉग आउट"
+  },
+  "patient": {
+    "registry": "रोगी रजिस्ट्री",
+    "patients": "मरीज",
+    "new": "रोगी पंजीकृत करें",
+    "mrn": "MRN",
+    "firstName": "पहला नाम",
+    "lastName": "अंतिम नाम",
+    "dob": "जन्म तिथि",
+    "gender": "लिंग",
+    "status": "स्थिति",
+    "careStage": "देखभाल चरण",
+    "primaryDoctor": "प्राथमिक चिकित्सक"
+  },
+  "status": {
+    "active": "सक्रिय",
+    "inactive": "निष्क्रिय",
+    "completed": "पूरा हुआ",
+    "scheduled": "निर्धारित",
+    "pending": "लंबित",
+    "overdue": "अतिदेय"
+  },
+  "journey": {
+    "title": "उपचार यात्रा",
+    "events": "घटनाएँ",
+    "milestones": "मील के पत्थर"
+  }
+}

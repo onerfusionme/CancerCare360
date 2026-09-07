@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cancercare360
+  labels:
+    app.kubernetes.io/name: cancercare360
+    app.kubernetes.io/environment: production
+    app.kubernetes.io/managed-by: helm
+    pod-security.kubernetes.io/enforce: restricted
