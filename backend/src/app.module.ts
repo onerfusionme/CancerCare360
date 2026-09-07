@@ -46,8 +46,8 @@ import { IntegrationModule } from './modules/integration/integration.module';
       pinoHttp: {
         level: process.env.NODE_ENV !== 'production' ? 'debug' : 'info',
         transport:
-          process.env.NODE_ENV !== 'production'
-            ? { target: 'pino-pretty' }
+          process.env.NODE_ENV === 'development'
+            ? { target: 'pino-pretty', options: { colorize: true } }
             : undefined,
       },
     }),

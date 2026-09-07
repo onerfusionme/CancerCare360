@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { PrismaClient, TenantType, TenantStatus, UserStatus } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
 
