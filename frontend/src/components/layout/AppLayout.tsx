@@ -33,7 +33,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, hasRole } = useAuth();
 
   const menuItems = [
-    { key: '/dashboard', icon: <DashboardOutlined />, label: 'Dashboard' },
+    { key: '/dashboard', icon: <DashboardOutlined />, label: 'Cockpit (All-in-One)' },
     { key: '/registry', icon: <TeamOutlined />, label: 'Patient Registry' },
     { key: '/patients', icon: <UserOutlined />, label: 'Patients' },
     { key: '/consultations', icon: <FileSearchOutlined />, label: 'Consultation Readiness' },

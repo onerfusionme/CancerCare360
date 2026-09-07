@@ -12,6 +12,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 # Next.js telemetry disable
 ENV NEXT_TELEMETRY_DISABLED 1
+ENV DOCKER_BUILD true
 RUN npm run build
 
 # Stage 3: Production runner
