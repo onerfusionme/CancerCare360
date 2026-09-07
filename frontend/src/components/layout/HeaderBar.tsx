@@ -28,8 +28,13 @@ export default function HeaderBar() {
   const isDark = themeMode === 'dark';
 
   const handleLogout = async () => {
-    await logout();
-    router.push('/login');
+    try {
+      await logout();
+    } catch (error) {
+      console.warn('Logout API failed, forcing local logout:', error);
+    } finally {
+      router.push('/login');
+    }
   };
 
   const userMenu = {

@@ -114,43 +114,32 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Clinical Hero Banner */}
+      {/* Clinical Hero Banner - Modern SaaS Style */}
       <div style={{
-        background: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%)',
-        borderRadius: 14,
+        background: '#ffffff',
+        borderRadius: 12,
         padding: '24px 28px',
-        color: '#ffffff',
-        boxShadow: '0 10px 25px -5px rgba(30, 27, 75, 0.25), 0 8px 10px -6px rgba(30, 27, 75, 0.2)',
+        border: '1px solid #e2e8f0',
+        boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.05)',
         position: 'relative',
         overflow: 'hidden',
+        marginBottom: 24,
       }}>
-        {/* Subtle background glow circle */}
-        <div style={{
-          position: 'absolute',
-          top: -60,
-          right: -40,
-          width: 240,
-          height: 240,
-          borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(99, 102, 241, 0.25) 0%, rgba(99, 102, 241, 0) 70%)',
-          pointerEvents: 'none',
-        }} />
-
         <Row gutter={[24, 20]} align="middle">
           <Col xs={24} md={16}>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '4px 10px', background: 'rgba(255, 255, 255, 0.12)', borderRadius: 20, marginBottom: 10 }}>
-              <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#34d399', boxShadow: '0 0 8px #34d399' }} />
-              <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.04em', color: '#cbd5e1' }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '4px 10px', background: '#f1f5f9', border: '1px solid #e2e8f0', borderRadius: 20, marginBottom: 16 }}>
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10b981' }} />
+              <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.04em', color: '#475569' }}>
                 ACTIVE CLINIC • {data?.departmentName || 'ONCOLOGY WING'}
               </span>
             </div>
-            <h2 style={{ fontSize: 22, fontWeight: 700, margin: '0 0 6px 0', color: '#ffffff', letterSpacing: '-0.01em' }}>
+            <h2 style={{ fontSize: 24, fontWeight: 700, margin: '0 0 8px 0', color: '#0f172a', letterSpacing: '-0.01em' }}>
               Welcome back, Dr. {data?.doctorName || 'Oncologist'}
             </h2>
-            <p style={{ margin: 0, fontSize: 13, color: '#cbd5e1', lineHeight: 1.5, maxWidth: 640 }}>
-              You have <strong style={{ color: '#ffffff' }}>{data?.patientsToday || 0} patients</strong> on your clinic roster today. 
-              {data?.criticalGaps > 0 && <span style={{ color: '#fca5a5', fontWeight: 600 }}> {data?.criticalGaps} patients have critical care gaps.</span>}
-              Average wait time is currently <strong style={{ color: '#ffffff' }}>{data?.avgWaitTime || 0} minutes</strong>.
+            <p style={{ margin: 0, fontSize: 14, color: '#64748b', lineHeight: 1.5, maxWidth: 640 }}>
+              You have <strong style={{ color: '#0f172a' }}>{data?.patientsToday || 0} patients</strong> on your clinic roster today. 
+              {data?.criticalGaps > 0 && <span style={{ color: '#e11d48', fontWeight: 500 }}> {data?.criticalGaps} patients have critical care gaps.</span>}
+              Average wait time is currently <strong style={{ color: '#0f172a' }}>{data?.avgWaitTime || 0} minutes</strong>.
             </p>
           </Col>
 
@@ -161,13 +150,12 @@ export default function DashboardPage() {
               icon={<FileTextOutlined />}
               onClick={() => router.push('/consultations')}
               style={{ 
-                background: '#ffffff', 
-                color: '#1e1b4b', 
-                borderColor: '#ffffff', 
+                background: '#0f172a', 
+                color: '#ffffff', 
                 fontWeight: 600,
                 width: '100%',
-                height: 42,
-                boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
+                height: 44,
+                borderRadius: 8,
               }}
             >
               Open Consultation Readiness
@@ -179,11 +167,12 @@ export default function DashboardPage() {
                 onClick={() => router.push('/appointments')}
                 style={{ 
                   flex: 1, 
-                  background: 'rgba(255,255,255,0.12)', 
-                  borderColor: 'rgba(255,255,255,0.2)', 
-                  color: '#ffffff',
-                  fontWeight: 500,
-                  fontSize: 12
+                  background: '#ffffff', 
+                  borderColor: '#cbd5e1', 
+                  color: '#334155',
+                  fontWeight: 600,
+                  fontSize: 13,
+                  borderRadius: 6
                 }}
               >
                 Clinic Flow
@@ -194,11 +183,12 @@ export default function DashboardPage() {
                 onClick={() => router.push('/gaps')}
                 style={{ 
                   flex: 1, 
-                  background: 'rgba(255,255,255,0.12)', 
-                  borderColor: 'rgba(255,255,255,0.2)', 
-                  color: '#ffffff',
-                  fontWeight: 500,
-                  fontSize: 12
+                  background: '#ffffff', 
+                  borderColor: '#cbd5e1', 
+                  color: '#334155',
+                  fontWeight: 600,
+                  fontSize: 13,
+                  borderRadius: 6
                 }}
               >
                 Care Gaps
