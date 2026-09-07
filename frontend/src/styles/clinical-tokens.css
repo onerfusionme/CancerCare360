@@ -15,8 +15,12 @@
   /* Modern Neutral Canvas */
   --onc-canvas-bg: #f8fafc;
   --onc-surface-card: #ffffff;
+  --onc-surface-elevated: #ffffff;
   --onc-border-subtle: #e2e8f0;
   --onc-border-elevated: #cbd5e1;
+  --onc-text-primary: #0f172a;
+  --onc-text-secondary: #64748b;
+  --onc-text-muted: #94a3b8;
 
   /* Clinical Semantic Tones */
   --onc-primary: #4f46e5;
@@ -64,6 +68,68 @@
   --onc-shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.07), 0 1px 2px -1px rgb(0 0 0 / 0.07);
   --onc-shadow-hover: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.05);
   --onc-shadow-floating: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+}
+
+[data-theme='dark'] {
+  --onc-sidebar-bg: #090d16;
+  --onc-sidebar-border: #1e293b;
+  --onc-sidebar-text: #94a3b8;
+  --onc-sidebar-text-hover: #f8fafc;
+  --onc-sidebar-active: #6366f1;
+  --onc-sidebar-active-glow: rgba(99, 102, 241, 0.35);
+
+  /* Deep Obsidian Clinical Canvas */
+  --onc-canvas-bg: #060911;
+  --onc-surface-card: #0f172a;
+  --onc-surface-elevated: #1e293b;
+  --onc-border-subtle: #1e293b;
+  --onc-border-elevated: #334155;
+  --onc-text-primary: #f8fafc;
+  --onc-text-secondary: #94a3b8;
+  --onc-text-muted: #64748b;
+
+  --onc-primary: #6366f1;
+  --onc-primary-light: rgba(99, 102, 241, 0.15);
+  --onc-teal: #14b8a6;
+  --onc-teal-light: rgba(20, 184, 166, 0.15);
+
+  --stage-screening-bg: #1e293b;
+  --stage-screening-text: #94a3b8;
+  --stage-screening-border: #334155;
+
+  --stage-diagnosis-bg: rgba(59, 130, 246, 0.15);
+  --stage-diagnosis-text: #60a5fa;
+  --stage-diagnosis-border: rgba(59, 130, 246, 0.3);
+
+  --stage-treatment-bg: rgba(99, 102, 241, 0.15);
+  --stage-treatment-text: #a5b4fc;
+  --stage-treatment-border: rgba(99, 102, 241, 0.3);
+
+  --stage-survivorship-bg: rgba(16, 185, 129, 0.15);
+  --stage-survivorship-text: #34d399;
+  --stage-survivorship-border: rgba(16, 185, 129, 0.3);
+
+  --stage-palliative-bg: rgba(139, 92, 246, 0.15);
+  --stage-palliative-text: #c4b5fd;
+  --stage-palliative-border: rgba(139, 92, 246, 0.3);
+
+  --alert-urgent-bg: rgba(244, 63, 94, 0.15);
+  --alert-urgent-text: #fb7185;
+  --alert-urgent-border: rgba(244, 63, 94, 0.35);
+  --alert-urgent-glow: rgba(244, 63, 94, 0.4);
+
+  --alert-warning-bg: rgba(245, 158, 11, 0.15);
+  --alert-warning-text: #fbbf24;
+  --alert-warning-border: rgba(245, 158, 11, 0.35);
+
+  --alert-normal-bg: rgba(16, 185, 129, 0.15);
+  --alert-normal-text: #34d399;
+  --alert-normal-border: rgba(16, 185, 129, 0.35);
+
+  --onc-shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.4);
+  --onc-shadow-card: 0 4px 12px 0 rgba(0, 0, 0, 0.45);
+  --onc-shadow-hover: 0 12px 24px -4px rgba(0, 0, 0, 0.6);
+  --onc-shadow-floating: 0 20px 30px -5px rgba(0, 0, 0, 0.7);
 }
 
 /* Base resets & typography */

@@ -7,22 +7,13 @@ import AppLayout from '@/components/layout/AppLayout';
 import { Spin } from 'antd';
 
 export default function StaffLayout({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, isLoading } = useAuth();
-  const router = useRouter();
+  const { isAuthenticated, isLoading, initializeDemoUser } = useAuth();
 
   useEffect(() => {
     if (!isAuthenticated && !isLoading) {
-      router.push('/login');
+      initializeDemoUser();
     }
-  }, [isAuthenticated, isLoading, router]);
-
-  if (isLoading || !isAuthenticated) {
-    return (
-      <div style={{ display: 'flex', height: '100vh', justifyContent: 'center', alignItems: 'center' }}>
-        <Spin size="large" tip="Loading application..." />
-      </div>
-    );
-  }
+  }, [isAuthenticated, isLoading, initializeDemoUser]);
 
   return <AppLayout>{children}</AppLayout>;
 }

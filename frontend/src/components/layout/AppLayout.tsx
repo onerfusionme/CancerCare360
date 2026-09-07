@@ -29,8 +29,9 @@ const { Header, Sider, Content } = Layout;
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { sidebarCollapsed, toggleSidebar } = useAppStore();
+  const { sidebarCollapsed, toggleSidebar, themeMode } = useAppStore();
   const { user, hasRole } = useAuth();
+  const isDark = themeMode === 'dark';
 
   const menuItems = [
     { key: '/dashboard', icon: <DashboardOutlined />, label: 'Cockpit (All-in-One)' },
@@ -54,7 +55,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const activeKey = menuItems.find(item => pathname.startsWith(item.key))?.key || '/dashboard';
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
+    <Layout style={{ minHeight: '100vh', background: isDark ? '#060911' : '#f8fafc' }}>
       <Sider 
         trigger={null} 
         collapsible 
@@ -69,8 +70,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           left: 0,
           top: 0,
           bottom: 0,
-          background: '#0f172a',
-          borderRight: '1px solid #1e293b',
+          background: isDark ? '#090d16' : '#0f172a',
+          borderRight: isDark ? '1px solid #1e293b' : '1px solid #1e293b',
           zIndex: 10,
           display: 'flex',
           flexDirection: 'column',
@@ -81,18 +82,18 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           display: 'flex', 
           alignItems: 'center', 
           padding: sidebarCollapsed ? '0 16px' : '0 20px',
-          borderBottom: '1px solid #1e293b',
+          borderBottom: isDark ? '1px solid #1e293b' : '1px solid #1e293b',
           gap: 12,
         }}>
           <div style={{
             width: 36,
             height: 36,
             borderRadius: 8,
-            background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
+            background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: '0 2px 8px rgba(79, 70, 229, 0.4)',
+            boxShadow: '0 2px 10px rgba(99, 102, 241, 0.4)',
             flexShrink: 0,
           }}>
             <MedicineBoxOutlined style={{ fontSize: 20, color: '#ffffff' }} />
@@ -113,9 +114,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <div style={{ 
             margin: '12px 14px 4px', 
             padding: '8px 12px', 
-            background: '#1e293b', 
+            background: isDark ? '#131c2e' : '#1e293b', 
             borderRadius: 6,
-            border: '1px solid #334155',
+            border: isDark ? '1px solid #1e293b' : '1px solid #334155',
           }}>
             <div style={{ fontSize: 10, color: '#94a3b8', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.05em' }}>
               Active Facility
@@ -147,8 +148,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <div style={{ 
             marginTop: 'auto', 
             padding: '16px 16px', 
-            borderTop: '1px solid #1e293b',
-            background: '#090d16',
+            borderTop: isDark ? '1px solid #1e293b' : '1px solid #1e293b',
+            background: isDark ? '#05070d' : '#090d16',
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
               <span style={{ 
@@ -169,12 +170,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </div>
         )}
       </Sider>
-      <Layout style={{ marginLeft: sidebarCollapsed ? 80 : 264, minHeight: '100vh', transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)' }}>
+      <Layout style={{ marginLeft: sidebarCollapsed ? 80 : 264, minHeight: '100vh', transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)', background: isDark ? '#060911' : '#f8fafc' }}>
         <HeaderBar />
         <Content style={{ 
           margin: 0, 
           padding: '24px 32px', 
-          background: '#f8fafc', 
+          background: isDark ? '#060911' : '#f8fafc', 
           minHeight: 'calc(100vh - 68px)',
         }}>
           {children}

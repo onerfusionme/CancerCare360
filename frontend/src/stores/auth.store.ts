@@ -14,15 +14,49 @@ interface AuthState {
   refreshToken: () => Promise<void>;
   hasRole: (role: UserRole) => boolean;
   hasPermission: (permission: string) => boolean;
+  initializeDemoUser: (role?: UserRole) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
-      user: null,
-      tokens: null,
-      isAuthenticated: false,
+      user: {
+        id: 'u-demo-doc',
+        email: 'doctor@cityhospital.com',
+        firstName: 'Jane',
+        lastName: 'Smith',
+        roles: [UserRole.ONCOLOGIST],
+        tenantId: 't-city-general',
+        isActive: true,
+      },
+      tokens: {
+        accessToken: 'demo-access-token',
+        refreshToken: 'demo-refresh-token',
+      },
+      isAuthenticated: true,
       isLoading: false,
+
+      initializeDemoUser: (role = UserRole.ONCOLOGIST) => {
+        const isDoc = role === UserRole.ONCOLOGIST;
+        const isAdmin = role === UserRole.ADMIN;
+        set({
+          user: {
+            id: isDoc ? 'u-demo-doc' : isAdmin ? 'u-demo-admin' : 'u-demo-coord',
+            email: isDoc ? 'doctor@cityhospital.com' : isAdmin ? 'admin@cancercare360.com' : 'coordinator@cityhospital.com',
+            firstName: isDoc ? 'Jane' : isAdmin ? 'System' : 'Sarah',
+            lastName: isDoc ? 'Smith' : isAdmin ? 'Admin' : 'Jenkins',
+            roles: [role],
+            tenantId: 't-city-general',
+            isActive: true,
+          },
+          tokens: {
+            accessToken: 'demo-access-token',
+            refreshToken: 'demo-refresh-token',
+          },
+          isAuthenticated: true,
+          isLoading: false,
+        });
+      },
 
       login: async (credentials) => {
         set({ isLoading: true });
