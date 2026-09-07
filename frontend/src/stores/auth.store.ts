@@ -20,20 +20,9 @@ interface AuthState {
 export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
-      user: {
-        id: 'u-demo-doc',
-        email: 'doctor@cityhospital.com',
-        firstName: 'Jane',
-        lastName: 'Smith',
-        roles: [UserRole.ONCOLOGIST],
-        tenantId: 't-city-general',
-        isActive: true,
-      },
-      tokens: {
-        accessToken: 'demo-access-token',
-        refreshToken: 'demo-refresh-token',
-      },
-      isAuthenticated: true,
+      user: null,
+      tokens: null,
+      isAuthenticated: false,
       isLoading: false,
 
       initializeDemoUser: (role = UserRole.ONCOLOGIST) => {
@@ -107,6 +96,7 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'auth-storage',
+      version: 1, // Bumping version clears out the old persisted mock data
       partialize: (state) => ({ tokens: state.tokens, user: state.user, isAuthenticated: state.isAuthenticated }),
     }
   )

@@ -141,16 +141,16 @@ export default function DashboardPage() {
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '4px 10px', background: 'rgba(255, 255, 255, 0.12)', borderRadius: 20, marginBottom: 10 }}>
               <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#34d399', boxShadow: '0 0 8px #34d399' }} />
               <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.04em', color: '#cbd5e1' }}>
-                SHIFT ACTIVE • OPD & CHEMO DAYCARE WING A
+                ACTIVE CLINIC • {data?.departmentName || 'ONCOLOGY WING'}
               </span>
             </div>
             <h2 style={{ fontSize: 22, fontWeight: 700, margin: '0 0 6px 0', color: '#ffffff', letterSpacing: '-0.01em' }}>
-              Welcome back, Dr. Jane Smith
+              Welcome back, Dr. {data?.doctorName || 'Oncologist'}
             </h2>
             <p style={{ margin: 0, fontSize: 13, color: '#cbd5e1', lineHeight: 1.5, maxWidth: 640 }}>
-              You have <strong style={{ color: '#ffffff' }}>14 patients</strong> on your clinic roster today. 
-              <span style={{ color: '#fca5a5', fontWeight: 600 }}> 2 patients have critical care gaps</span> (overdue chemotherapy ANC and pending biopsy pathology). 
-              Average wait time is optimal at <strong style={{ color: '#ffffff' }}>14 minutes</strong>.
+              You have <strong style={{ color: '#ffffff' }}>{data?.patientsToday || 0} patients</strong> on your clinic roster today. 
+              {data?.criticalGaps > 0 && <span style={{ color: '#fca5a5', fontWeight: 600 }}> {data?.criticalGaps} patients have critical care gaps.</span>}
+              Average wait time is currently <strong style={{ color: '#ffffff' }}>{data?.avgWaitTime || 0} minutes</strong>.
             </p>
           </Col>
 
@@ -259,17 +259,17 @@ export default function DashboardPage() {
                 </div>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
                   <span style={{ fontSize: 30, fontWeight: 700, color: textPrimary, fontFamily: 'monospace' }}>
-                    14
+                    {data?.patientsToday || 0}
                   </span>
                   <span style={{ fontSize: 13, color: '#10b981', fontWeight: 600 }}>
-                    <ArrowUpOutlined /> +2 vs yesterday
+                    <ArrowUpOutlined /> {data?.patientsTodayTrend || '+0'} vs yesterday
                   </span>
                 </div>
-                <Progress percent={65} strokeColor="#6366f1" size="small" style={{ margin: '8px 0 4px' }} />
+                <Progress percent={data?.clinicProgressPercent || 0} strokeColor="#6366f1" size="small" style={{ margin: '8px 0 4px' }} />
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: textSecondary, marginBottom: 8 }}>
-                  <span>9 Completed</span>
-                  <span>3 In Consult</span>
-                  <span>2 In Queue</span>
+                  <span>{data?.completedAppointments || 0} Completed</span>
+                  <span>{data?.inConsultAppointments || 0} In Consult</span>
+                  <span>{data?.inQueueAppointments || 0} In Queue</span>
                 </div>
                 <div style={{ fontSize: 12, color: '#6366f1', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4, marginTop: 6 }}>
                   <span>Open Appointments Schedule</span> <RightOutlined style={{ fontSize: 10 }} />
@@ -316,10 +316,10 @@ export default function DashboardPage() {
                 </div>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
                   <span style={{ fontSize: 30, fontWeight: 700, color: textPrimary, fontFamily: 'monospace' }}>
-                    84
+                    {data?.activeCohortCount || 0}
                   </span>
                   <span style={{ fontSize: 13, color: '#10b981', fontWeight: 600 }}>
-                    <ArrowUpOutlined /> +5 this month
+                    <ArrowUpOutlined /> {data?.cohortTrend || '+0'} this month
                   </span>
                 </div>
                 <div style={{ marginTop: 12, display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
@@ -372,7 +372,7 @@ export default function DashboardPage() {
                 </div>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
                   <span style={{ fontSize: 30, fontWeight: 700, color: isDark ? '#fda4af' : '#9f1239', fontFamily: 'monospace' }}>
-                    7
+                    {data?.criticalGaps || 0}
                   </span>
                   <span style={{ 
                     background: isDark ? 'rgba(244, 63, 94, 0.3)' : '#fda4af', 
@@ -386,7 +386,7 @@ export default function DashboardPage() {
                   </span>
                 </div>
                 <Text style={{ fontSize: 12, color: isDark ? '#fb7185' : '#be123c', marginTop: 8, display: 'block', fontWeight: 500 }}>
-                  2 overdue chemotherapy, 3 pending pathology biopsy, 2 missed visits.
+                  {data?.criticalGapsDescription || 'Review open care gaps'}
                 </Text>
                 <div style={{ fontSize: 12, color: isDark ? '#fb7185' : '#be123c', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4, marginTop: 8 }}>
                   <span>Review Care Gaps Queue</span> <RightOutlined style={{ fontSize: 10 }} />
@@ -433,10 +433,10 @@ export default function DashboardPage() {
                 </div>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
                   <span style={{ fontSize: 30, fontWeight: 700, color: textPrimary, fontFamily: 'monospace' }}>
-                    14m
+                    {data?.avgWaitTime || 0}m
                   </span>
                   <span style={{ fontSize: 13, color: '#10b981', fontWeight: 600 }}>
-                    <ArrowDownOutlined /> -2 min
+                    <ArrowDownOutlined /> {data?.waitTimeTrend || '-0 min'}
                   </span>
                 </div>
                 <Text style={{ fontSize: 12, marginTop: 8, display: 'block', color: textSecondary }}>
@@ -481,139 +481,84 @@ export default function DashboardPage() {
         }}
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          {/* Patient 1: Priya Sharma */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '14px 18px',
-            background: isDark ? 'rgba(244, 63, 94, 0.08)' : '#fff1f2',
-            borderRadius: 10,
-            border: isDark ? '1px solid rgba(244, 63, 94, 0.25)' : '1px solid #ffe4e6',
-            flexWrap: 'wrap',
-            gap: 12,
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-              <div style={{
-                width: 44,
-                height: 44,
-                borderRadius: 10,
-                background: '#e11d48',
-                color: '#ffffff',
+          {data?.urgentPatients && data.urgentPatients.length > 0 ? (
+            data.urgentPatients.map((patient: any, index: number) => (
+              <div key={index} style={{
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center',
-                fontWeight: 700,
-                fontSize: 16
+                justifyContent: 'space-between',
+                padding: '14px 18px',
+                background: isDark ? 'rgba(244, 63, 94, 0.08)' : '#fff1f2',
+                borderRadius: 10,
+                border: isDark ? '1px solid rgba(244, 63, 94, 0.25)' : '1px solid #ffe4e6',
+                flexWrap: 'wrap',
+                gap: 12,
               }}>
-                PS
-              </div>
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span 
-                    style={{ fontSize: 15, fontWeight: 700, color: textPrimary, cursor: 'pointer', textDecoration: 'underline' }}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                  <div style={{
+                    width: 44,
+                    height: 44,
+                    borderRadius: 10,
+                    background: '#e11d48',
+                    color: '#ffffff',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontWeight: 700,
+                    fontSize: 16
+                  }}>
+                    {patient.firstName?.charAt(0)}{patient.lastName?.charAt(0)}
+                  </div>
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span 
+                        style={{ fontSize: 15, fontWeight: 700, color: textPrimary, cursor: 'pointer', textDecoration: 'underline' }}
+                        onClick={() => router.push('/patients')}
+                      >
+                        {patient.firstName} {patient.lastName}
+                      </span>
+                      <Tag color="magenta" style={{ fontSize: 11, fontWeight: 600 }}>{patient.diagnosis || 'Diagnosis Pending'}</Tag>
+                      <Tag color="red" style={{ fontSize: 11, fontWeight: 600 }}>URGENT GAP</Tag>
+                    </div>
+                    <div style={{ fontSize: 12, color: textSecondary, marginTop: 3 }}>
+                      MRN: <strong style={{ color: textPrimary }}>{patient.mrn}</strong>
+                    </div>
+                    <div style={{ fontSize: 12, color: isDark ? '#fda4af' : '#be123c', fontWeight: 600, marginTop: 2 }}>
+                      Care Gap: {patient.gapDescription || 'Requires immediate attention.'}
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: 10 }}>
+                  <Button 
+                    type="primary" 
+                    danger 
+                    icon={<ThunderboltOutlined />}
                     onClick={() => router.push('/consultations')}
-                    title="Click to view Priya Sharma's clinical briefing"
                   >
-                    Priya Sharma
-                  </span>
-                  <Tag color="magenta" style={{ fontSize: 11, fontWeight: 600 }}>Breast • Stage IIB</Tag>
-                  <Tag color="red" style={{ fontSize: 11, fontWeight: 600 }}>OVERDUE 7 DAYS</Tag>
-                </div>
-                <div style={{ fontSize: 12, color: textSecondary, marginTop: 3 }}>
-                  MRN: <strong style={{ color: textPrimary }}>MRN-ONC-2026-001</strong> • ABHA: 91-5544-3322-1100 • Regimen: AC-T (Chemo Cycle 4 Overdue)
-                </div>
-                <div style={{ fontSize: 12, color: isDark ? '#fda4af' : '#be123c', fontWeight: 600, marginTop: 2 }}>
-                  Care Gap: Missed pre-chemotherapy ANC/CBC blood count investigation. Lost to contact 5 days.
-                </div>
-              </div>
-            </div>
-
-            <div style={{ display: 'flex', gap: 10 }}>
-              <Button 
-                type="primary" 
-                danger 
-                icon={<ThunderboltOutlined />}
-                onClick={() => router.push('/consultations')}
-              >
-                Review Briefing
-              </Button>
-              <Button 
-                icon={<PhoneOutlined />}
-                style={{ 
-                  borderColor: isDark ? 'rgba(244, 63, 94, 0.4)' : '#fca5a5', 
-                  color: isDark ? '#fb7185' : '#9f1239',
-                  background: isDark ? 'transparent' : '#ffffff'
-                }}
-                onClick={() => router.push('/gaps')}
-              >
-                Initiate Outreach
-              </Button>
-            </div>
-          </div>
-
-          {/* Patient 2: Rajesh Patel */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '14px 18px',
-            background: isDark ? 'rgba(245, 158, 11, 0.08)' : '#fffbeb',
-            borderRadius: 10,
-            border: isDark ? '1px solid rgba(245, 158, 11, 0.25)' : '1px solid #fef3c7',
-            flexWrap: 'wrap',
-            gap: 12,
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-              <div style={{
-                width: 44,
-                height: 44,
-                borderRadius: 10,
-                background: '#d97706',
-                color: '#ffffff',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontWeight: 700,
-                fontSize: 16
-              }}>
-                RP
-              </div>
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span 
-                    style={{ fontSize: 15, fontWeight: 700, color: textPrimary, cursor: 'pointer', textDecoration: 'underline' }}
-                    onClick={() => router.push('/investigations')}
-                    title="Click to view Rajesh Patel's pending investigations"
+                    Review Briefing
+                  </Button>
+                  <Button 
+                    icon={<PhoneOutlined />}
+                    style={{ 
+                      borderColor: isDark ? 'rgba(244, 63, 94, 0.4)' : '#fca5a5', 
+                      color: isDark ? '#fb7185' : '#9f1239',
+                      background: isDark ? 'transparent' : '#ffffff'
+                    }}
+                    onClick={() => router.push('/gaps')}
                   >
-                    Rajesh Patel
-                  </span>
-                  <Tag color="orange" style={{ fontSize: 11, fontWeight: 600 }}>Lung (NSCLC) • Stage IIIA</Tag>
-                  <Tag color="gold" style={{ fontSize: 11, fontWeight: 600 }}>PENDING BIOPSY</Tag>
-                </div>
-                <div style={{ fontSize: 12, color: textSecondary, marginTop: 3 }}>
-                  MRN: <strong style={{ color: textPrimary }}>MRN-ONC-2026-042</strong> • Histopathology TAT: 8 days (Breached 5-day TAT SLA)
-                </div>
-                <div style={{ fontSize: 12, color: isDark ? '#fcd34d' : '#92400e', fontWeight: 600, marginTop: 2 }}>
-                  Care Gap: EGFR & ALK molecular mutation profiling pending from central pathology.
+                    Initiate Outreach
+                  </Button>
                 </div>
               </div>
+            ))
+          ) : (
+            <div style={{ padding: '24px', textAlign: 'center', color: textSecondary }}>
+              <CheckCircleOutlined style={{ fontSize: 32, color: '#10b981', marginBottom: 12 }} />
+              <div style={{ fontSize: 16, fontWeight: 600, color: textPrimary }}>No Urgent Care Gaps</div>
+              <div>All patients are currently on track with their care pathways.</div>
             </div>
-
-            <div style={{ display: 'flex', gap: 10 }}>
-              <Button 
-                type="default" 
-                style={{ 
-                  borderColor: isDark ? 'rgba(245, 158, 11, 0.5)' : '#f59e0b', 
-                  color: isDark ? '#fbbf24' : '#b45309',
-                  background: isDark ? 'transparent' : '#ffffff'
-                }}
-                onClick={() => router.push('/investigations')}
-              >
-                Expedite Pathology
-              </Button>
-            </div>
-          </div>
+          )}
         </div>
       </Card>
 

@@ -16,6 +16,7 @@ export interface RoleDashboardData {
     url: string;
     icon: string;
   }[];
+  [key: string]: any;
 }
 
 export interface CareContinuityMetrics {
