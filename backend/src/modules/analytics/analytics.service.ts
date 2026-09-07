@@ -349,33 +349,10 @@ export class AnalyticsService {
   }
 
   async getServiceUtilization(tenantId: string) {
-    const grouped = await this.prisma.appointment.groupBy({
-      by: ['appointmentType'],
+    const records = await this.prisma.serviceUtilization.findMany({
       where: { tenantId },
-      _count: {
-        _all: true,
-      },
+      orderBy: { month: 'asc' },
     });
-
-    const results = [];
-    for (const group of grouped) {
-      const type = group.appointmentType;
-      const total = group._count._all;
-      const completed = await this.prisma.appointment.count({
-        where: { tenantId, appointmentType: type, status: AppointmentStatus.COMPLETED }
-      });
-      const cancelled = await this.prisma.appointment.count({
-        where: { tenantId, appointmentType: type, status: AppointmentStatus.CANCELLED }
-      });
-      results.push({
-        serviceType: type,
-        total,
-        completed,
-        cancelled,
-        completionRate: total > 0 ? (completed / total) * 100 : 0,
-      });
-    }
-
-    return results;
+    return records;
   }
 }

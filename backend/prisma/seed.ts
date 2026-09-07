@@ -114,6 +114,7 @@ async function main() {
         tenantId,
         keycloakId: 'kc-admin',
         email: 'admin@cancercare.com',
+        password: await hashPassword('Admin@123'),
         firstName: 'Admin',
         lastName: 'User',
         status: UserStatus.ACTIVE,
@@ -128,6 +129,7 @@ async function main() {
         tenantId,
         keycloakId: 'kc-priya',
         email: 'priya.mehta@cancercare.com',
+        password: await hashPassword('Doctor@123'),
         firstName: 'Priya',
         lastName: 'Mehta',
         status: UserStatus.ACTIVE,
@@ -143,6 +145,7 @@ async function main() {
         tenantId,
         keycloakId: 'kc-rajesh',
         email: 'rajesh.kumar@cancercare.com',
+        password: await hashPassword('Doctor@123'),
         firstName: 'Rajesh',
         lastName: 'Kumar',
         status: UserStatus.ACTIVE,
@@ -158,6 +161,7 @@ async function main() {
         tenantId,
         keycloakId: 'kc-ananya',
         email: 'ananya.desai@cancercare.com',
+        password: await hashPassword('Doctor@123'),
         firstName: 'Ananya',
         lastName: 'Desai',
         status: UserStatus.ACTIVE,
@@ -173,6 +177,7 @@ async function main() {
         tenantId,
         keycloakId: 'kc-coord',
         email: 'coordinator@cancercare.com',
+        password: await hashPassword('Coord@123'),
         firstName: 'Care',
         lastName: 'Coordinator',
         status: UserStatus.ACTIVE,
@@ -335,6 +340,67 @@ async function main() {
           priorityWeight: (5 - i) * 10,
         }
       });
+    }
+
+    // Referrals (10)
+    const referralSources = ['SELF', 'DOCTOR', 'HOSPITAL', 'ONLINE', 'INSURANCE', 'OTHER'];
+    for (let i = 0; i < 10; i++) {
+      await tx.referral.create({
+        data: {
+          tenantId,
+          patientId: patients[i % patients.length].id,
+          referredByType: referralSources[i % referralSources.length] as any,
+          referredByName: i % 2 === 0 ? 'Dr. Smith (City Gen)' : 'Google Search',
+          convertedToJourney: i % 3 !== 0, // 66% converted
+          referredToId: doctors[i % doctors.length],
+          createdAt: getPastDate(30 - i * 2),
+        }
+      });
+    }
+
+    // Patient Feedbacks (15)
+    for (let i = 0; i < 15; i++) {
+      const isDetractor = i % 5 === 0; // 20%
+      const isPassive = i % 5 === 1; // 20%
+      // Promoters 60%
+      let nps = isDetractor ? (Math.floor(Math.random() * 7)) : (isPassive ? (Math.floor(Math.random() * 2) + 7) : (Math.floor(Math.random() * 2) + 9));
+      
+      await tx.patientFeedback.create({
+        data: {
+          tenantId,
+          patientId: patients[i % patients.length].id,
+          appointmentId: i < 10 ? (await tx.appointment.findFirst({ where: { patientId: patients[i].id }}))?.id : null,
+          doctorId: doctors[i % doctors.length],
+          npsScore: nps,
+          overallRating: Math.ceil(nps / 2) || 1,
+          waitTimeRating: Math.max(1, Math.ceil(nps / 2) - 1),
+          careQualityRating: Math.ceil(nps / 2) || 1,
+          communicationRating: Math.ceil(nps / 2) || 1,
+          comment: nps >= 9 ? 'Great care and attention.' : 'Wait times could be better.',
+          createdAt: getPastDate(15 - i),
+        }
+      });
+    }
+
+    // Service Utilization (12 months of mock data)
+    const serviceCategories = ['CONSULTATION', 'CHEMOTHERAPY', 'RADIATION', 'SURGERY', 'IMAGING', 'LAB_TEST'];
+    for (let m = 11; m >= 0; m--) {
+      const monthDate = new Date();
+      monthDate.setMonth(monthDate.getMonth() - m);
+      monthDate.setDate(1);
+      
+      for (const category of serviceCategories) {
+        await tx.serviceUtilization.create({
+          data: {
+            tenantId,
+            serviceType: category,
+            totalCount: Math.floor(Math.random() * 50) + 10,
+            completedCount: Math.floor(Math.random() * 40) + 5,
+            cancelledCount: Math.floor(Math.random() * 5),
+            month: monthDate,
+          }
+        });
+      }
     }
 
   });
