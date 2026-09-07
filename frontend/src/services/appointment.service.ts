@@ -1,51 +1,61 @@
-import axios from 'axios';
-import { Appointment, AppointmentFilter, CreateAppointmentDto, UpdateAppointmentDto, TimeSlot } from '@/types/appointment';
-
-const API_URL = '/api/appointments';
+import apiClient from './api-client';
+import { Appointment, AppointmentFilter, CreateAppointmentDto, UpdateAppointmentDto, TimeSlot, AppointmentStatus } from '@/types/appointment';
 
 export const appointmentService = {
   getAppointments: async (filter?: AppointmentFilter): Promise<Appointment[]> => {
-    const { data } = await axios.get(API_URL, { params: filter });
-    return data;
+    const response = await apiClient.get('/api/v1/appointments', { params: filter });
+    return response.data;
   },
+  
   getAppointment: async (id: string): Promise<Appointment> => {
-    const { data } = await axios.get(`${API_URL}/${id}`);
-    return data;
+    const response = await apiClient.get(`/api/v1/appointments/${id}`);
+    return response.data;
   },
+  
   createAppointment: async (dto: CreateAppointmentDto): Promise<Appointment> => {
-    const { data } = await axios.post(API_URL, dto);
-    return data;
+    const response = await apiClient.post('/api/v1/appointments', dto);
+    return response.data;
   },
+  
   updateAppointment: async (id: string, dto: UpdateAppointmentDto): Promise<Appointment> => {
-    const { data } = await axios.patch(`${API_URL}/${id}`, dto);
-    return data;
+    const response = await apiClient.patch(`/api/v1/appointments/${id}`, dto);
+    return response.data;
   },
+  
   checkIn: async (id: string): Promise<Appointment> => {
-    const { data } = await axios.post(`${API_URL}/${id}/check-in`);
-    return data;
+    const response = await apiClient.patch(`/api/v1/appointments/${id}/check-in`);
+    return response.data;
   },
+  
   startConsultation: async (id: string): Promise<Appointment> => {
-    const { data } = await axios.post(`${API_URL}/${id}/start`);
-    return data;
+    const response = await apiClient.patch(`/api/v1/appointments/${id}/start`);
+    return response.data;
   },
+  
   completeConsultation: async (id: string): Promise<Appointment> => {
-    const { data } = await axios.post(`${API_URL}/${id}/complete`);
-    return data;
+    const response = await apiClient.patch(`/api/v1/appointments/${id}/complete`);
+    return response.data;
   },
+  
   cancel: async (id: string, reason: string): Promise<Appointment> => {
-    const { data } = await axios.post(`${API_URL}/${id}/cancel`, { reason });
-    return data;
+    const response = await apiClient.patch(`/api/v1/appointments/${id}/cancel`, { reason });
+    return response.data;
   },
+  
   markNoShow: async (id: string): Promise<Appointment> => {
-    const { data } = await axios.post(`${API_URL}/${id}/no-show`);
-    return data;
+    const response = await apiClient.patch(`/api/v1/appointments/${id}/no-show`);
+    return response.data;
   },
-  getTodaysAppointments: async (doctorId: string): Promise<Appointment[]> => {
-    const { data } = await axios.get(`${API_URL}/today/${doctorId}`);
-    return data;
+  
+  getTodaysAppointments: async (doctorId?: string): Promise<Appointment[]> => {
+    const params: any = { date: new Date().toISOString().split('T')[0] };
+    if (doctorId) params.doctorId = doctorId;
+    const response = await apiClient.get('/api/v1/appointments', { params });
+    return response.data;
   },
+  
   getAvailableSlots: async (doctorId: string, date: string): Promise<TimeSlot[]> => {
-    const { data } = await axios.get(`${API_URL}/slots/${doctorId}/${date}`);
-    return data;
+    const response = await apiClient.get(`/api/v1/appointments/slots`, { params: { doctorId, date } });
+    return response.data;
   }
 };

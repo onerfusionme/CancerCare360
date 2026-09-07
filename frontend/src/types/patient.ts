@@ -70,5 +70,6 @@ export interface CreatePatientDto {
 export interface UpdatePatientDto extends Partial<CreatePatientDto> {
   status?: PatientStatus;
   primaryDoctorId?: string;
+  primaryDoctorName?: string;
   careStage?: string;
 }

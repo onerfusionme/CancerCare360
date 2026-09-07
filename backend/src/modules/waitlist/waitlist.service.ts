@@ -11,13 +11,13 @@ export class WaitlistService {
       data: {
         ...dto,
         tenantId,
-        status: 'PENDING',
+        status: 'ACTIVE',
       } as any,
     });
   }
 
   async findAll(tenantId: string, departmentId?: string) {
-    const where: any = { tenantId, status: 'PENDING' };
+    const where: any = { tenantId, status: 'ACTIVE' };
     if (departmentId) {
       where.departmentId = departmentId;
     }
@@ -25,8 +25,8 @@ export class WaitlistService {
     return this.prisma.waitlistEntry.findMany({
       where,
       include: {
-        patient: { select: { id: true, name: true, mrn: true } },
-        doctor: { select: { id: true, name: true } },
+        patient: { select: { id: true, firstName: true, lastName: true, mrn: true } },
+        doctor: { select: { id: true, firstName: true, lastName: true } },
         department: { select: { id: true, name: true } },
       } as any,
       orderBy: [

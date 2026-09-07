@@ -72,3 +72,14 @@ export function useCompleteConsultation() {
     }
   });
 }
+
+export function useCancelAppointment() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, reason }: { id: string; reason?: string }) => 
+      appointmentService.cancel(id, reason || 'Cancelled by clinician'),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['appointments'] });
+    }
+  });
+}

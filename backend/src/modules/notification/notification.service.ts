@@ -55,7 +55,7 @@ export class NotificationService {
        }
     }
 
-    // In production, dispatch to BullMQ. Here, just save as SENT.
+    // TODO: Integrate SMS/Email provider dispatch
     return this.prisma.notification.create({
        data: {
           tenantId,
@@ -65,8 +65,7 @@ export class NotificationService {
           templateId: dto.templateId,
           subject: finalSubject,
           body: finalBody,
-          status: 'SENT',
-          sentAt: new Date(),
+          status: 'PENDING',
        } as any,
     });
   }

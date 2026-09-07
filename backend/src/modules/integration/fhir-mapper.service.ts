@@ -10,7 +10,7 @@ export class FhirMapperService {
         { system: 'http://hospital.org/mrn', value: patient.mrn },
         { system: 'https://healthid.ndhm.gov.in', value: patient.abhaId },
       ],
-      name: [{ text: patient.name, family: patient.lastName, given: [patient.firstName] }],
+      name: [{ text: `${patient.firstName} ${patient.lastName}`, family: patient.lastName, given: [patient.firstName] }],
       telecom: [{ system: 'phone', value: patient.phone }],
       gender: patient.gender ? patient.gender.toLowerCase() : 'unknown',
       birthDate: patient.dateOfBirth ? new Date(patient.dateOfBirth).toISOString().split('T')[0] : null,

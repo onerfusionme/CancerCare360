@@ -57,3 +57,13 @@ export function useUpdatePatient() {
     },
   });
 }
+
+export function useDeletePatient() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => patientService.deletePatient(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: patientKeys.lists() });
+    },
+  });
+}

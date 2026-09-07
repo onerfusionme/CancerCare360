@@ -46,8 +46,8 @@ export class FollowUpService {
         skip,
         take: limit,
         include: {
-          patient: { select: { id: true, name: true } },
-          assignedTo: { select: { id: true, name: true } },
+          patient: { select: { id: true, firstName: true, lastName: true } },
+          assignedTo: { select: { id: true, firstName: true, lastName: true } },
         } as any,
         orderBy: [{ dueDate: 'asc' }, { priority: 'desc' }],
       }),

@@ -76,7 +76,7 @@ export class AiService {
     capability: string,
     inputContextRef: string,
     output: any,
-    confidenceScore: number,
+    confidenceScore: number | null,
   ) {
     return this.prisma.aiInteractionLog.create({
       data: {
@@ -100,7 +100,7 @@ export class AiService {
       throw new NotFoundException('Document not found');
     }
 
-    const documentText = (document.extractedData as any)?.extractedText || 'Dummy pathology report with carcinoma';
+    const documentText = (document.extractedData as any)?.extractedText || '';
     
     const result = await this.callAiServiceFormData('/api/v1/extract', documentText, dto.documentType || 'auto');
 
@@ -112,13 +112,14 @@ export class AiService {
       },
     });
 
+    const scores = result.confidence_scores ? Object.values(result.confidence_scores as Record<string, number>) : [];
     await this.logInteraction(
       tenantId,
       userId,
       'DOCUMENT_EXTRACTION',
       `Document:${document.id}`,
       result,
-      Object.values(result.confidence_scores as Record<string, number>)[0] || 0.85
+      scores.length > 0 ? scores[0] : null
     );
 
     return result;
@@ -138,7 +139,7 @@ export class AiService {
       'CONSULTATION_SUMMARY',
       `Patient:${dto.patientId}`,
       result,
-      0.9
+      result.confidence_score || null
     );
 
     return result;
@@ -156,7 +157,7 @@ export class AiService {
       'CARE_GAP_EXPLANATION',
       `GapType:${dto.gapType}`,
       result,
-      0.95
+      result.confidence_score || null
     );
 
     return result;
@@ -175,7 +176,7 @@ export class AiService {
       'PATIENT_EDUCATION_DRAFT',
       `Topic:${dto.topic}`,
       result,
-      0.85
+      result.confidence_score || null
     );
 
     return result;

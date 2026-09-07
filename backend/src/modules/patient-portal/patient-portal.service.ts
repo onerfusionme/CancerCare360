@@ -172,7 +172,6 @@ export class PatientPortalService {
     await this.prisma.auditLog.create({
       data: {
         tenantId,
-        userId: patientId,
         action: 'GRANT_ABDM_CONSENT_ARTEFACT',
         resourceType: 'PatientConsent',
         resourceId: patientId,
@@ -207,7 +206,6 @@ export class PatientPortalService {
     await this.prisma.auditLog.create({
       data: {
         tenantId,
-        userId: patientId,
         action: 'REVOKE_ALL_DIGITAL_CONSENT',
         resourceType: 'PatientConsent',
         resourceId: patientId,

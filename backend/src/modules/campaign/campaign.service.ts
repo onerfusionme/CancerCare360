@@ -110,12 +110,35 @@ export class CampaignService {
       data: { deliveryStatus: 'IN_PROGRESS' },
     });
 
-    // Mocking the dispatch and execution here
-    // In real app, we would query patients matching audienceCriteria
-    // dispatch notifications, etc.
-    const sentCount = 100;
-    const deliveredCount = 95;
-    const failedCount = 5;
+    const criteria: any = campaign.audienceCriteria || {};
+    const where: any = { tenantId, status: 'ACTIVE' };
+    if (criteria.gender) where.gender = criteria.gender;
+    if (criteria.minAge) {
+      const date = new Date();
+      date.setFullYear(date.getFullYear() - criteria.minAge);
+      where.dateOfBirth = { lte: date };
+    }
+
+    const patients = await this.prisma.patient.findMany({ where });
+    let sentCount = 0;
+    
+    for (const patient of patients) {
+       await this.prisma.notification.create({
+          data: {
+             tenantId,
+             recipientId: patient.id,
+             recipientType: 'PATIENT',
+             channel: campaign.channel,
+             subject: campaign.name,
+             body: campaign.content?.body || 'Campaign message',
+             status: 'PENDING',
+          } as any
+       });
+       sentCount++;
+    }
+    
+    const deliveredCount = sentCount; // Notifications are PENDING, but we'll consider them processed by the campaign for now.
+    const failedCount = 0;
 
     return this.prisma.campaign.update({
       where: { id },

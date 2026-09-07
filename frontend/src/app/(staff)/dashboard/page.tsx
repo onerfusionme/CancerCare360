@@ -15,9 +15,10 @@ import {
   Tag,
   Alert,
   Badge,
-  Progress,
-  Divider,
-  Tooltip
+  Progress, 
+  Divider, 
+  Tooltip,
+  Dropdown
 } from 'antd';
 import { 
   ArrowUpOutlined, 
@@ -35,7 +36,9 @@ import {
   MedicineBoxOutlined,
   RightOutlined,
   PhoneOutlined,
-  CheckOutlined
+  CheckOutlined,
+  ExperimentOutlined,
+  UserAddOutlined
 } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
 import { useRoleDashboard } from '@/hooks/use-analytics';
@@ -60,12 +63,12 @@ export default function DashboardPage() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-      {/* Top Bar: Title and Role Switcher */}
+      {/* Top Bar: Title, Quick Actions, and Role Switcher */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <Title level={3} style={{ margin: 0, color: textPrimary, fontWeight: 700 }}>
-              Oncology Command Center
+              Clinical Dashboard
             </Title>
             <Tag color="indigo" style={{ 
               background: isDark ? 'rgba(99, 102, 241, 0.2)' : '#e0e7ff', 
@@ -73,7 +76,7 @@ export default function DashboardPage() {
               border: isDark ? '1px solid rgba(99, 102, 241, 0.4)' : '1px solid #c7d2fe', 
               fontWeight: 600 
             }}>
-              LIVE CLINIC V2.4
+              DASHBOARD OVERVIEW
             </Tag>
           </div>
           <Text style={{ fontSize: 13, color: textSecondary }}>
@@ -81,7 +84,22 @@ export default function DashboardPage() {
           </Text>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <Text style={{ fontSize: 12, fontWeight: 600, color: textSecondary }}>VIEW PERSPECTIVE:</Text>
+          <Dropdown
+            menu={{
+              items: [
+                { key: '1', label: 'Register New Patient', icon: <UserAddOutlined />, onClick: () => router.push('/patients') },
+                { key: '2', label: 'Book Appointment', icon: <CalendarOutlined />, onClick: () => router.push('/appointments') },
+                { key: '3', label: 'Order Investigation', icon: <ExperimentOutlined />, onClick: () => router.push('/investigations') },
+                { key: '4', label: 'Care Gap Task Desk', icon: <AlertOutlined />, onClick: () => router.push('/gaps') },
+              ]
+            }}
+          >
+            <Button type="primary" icon={<PlusOutlined />} style={{ fontWeight: 600 }}>
+              + Quick Action
+            </Button>
+          </Dropdown>
+
+          <Text style={{ fontSize: 12, fontWeight: 600, color: textSecondary }}>PERSPECTIVE:</Text>
           <Segmented 
             options={roles} 
             value={activeRole} 
@@ -204,187 +222,231 @@ export default function DashboardPage() {
       ) : (
         <Row gutter={[16, 16]}>
           <Col xs={24} sm={12} lg={6}>
-            <Card 
-              style={{ 
-                borderRadius: 12, 
-                border: `1px solid ${cardBorder}`, 
-                background: cardBg,
-                boxShadow: isDark ? '0 4px 12px rgba(0,0,0,0.25)' : '0 1px 3px rgba(0,0,0,0.04)',
-                height: '100%'
-              }}
-              bodyStyle={{ padding: 20 }}
+            <div 
+              onClick={() => router.push('/appointments')}
+              style={{ cursor: 'pointer', height: '100%' }}
+              title="Click to view today's appointments and clinic schedule"
             >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
-                <span style={{ fontSize: 13, color: textSecondary, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                  Today&apos;s Clinic Roster
-                </span>
-                <span style={{ 
-                  background: isDark ? 'rgba(99, 102, 241, 0.2)' : '#e0e7ff', 
-                  color: isDark ? '#818cf8' : '#4f46e5', 
-                  width: 32, 
-                  height: 32, 
-                  borderRadius: 8, 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center',
-                  fontSize: 16 
-                }}>
-                  <CalendarOutlined />
-                </span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-                <span style={{ fontSize: 30, fontWeight: 700, color: textPrimary, fontFamily: 'monospace' }}>
-                  14
-                </span>
-                <span style={{ fontSize: 13, color: '#10b981', fontWeight: 600 }}>
-                  <ArrowUpOutlined /> +2 vs yesterday
-                </span>
-              </div>
-              <Progress percent={65} strokeColor="#6366f1" size="small" style={{ margin: '8px 0 4px' }} />
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: textSecondary }}>
-                <span>9 Completed</span>
-                <span>3 In Consult</span>
-                <span>2 In Queue</span>
-              </div>
-            </Card>
-          </Col>
-
-          <Col xs={24} sm={12} lg={6}>
-            <Card 
-              style={{ 
-                borderRadius: 12, 
-                border: `1px solid ${cardBorder}`, 
-                background: cardBg,
-                boxShadow: isDark ? '0 4px 12px rgba(0,0,0,0.25)' : '0 1px 3px rgba(0,0,0,0.04)',
-                height: '100%'
-              }}
-              bodyStyle={{ padding: 20 }}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
-                <span style={{ fontSize: 13, color: textSecondary, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                  Active Cancer Cohort
-                </span>
-                <span style={{ 
-                  background: isDark ? 'rgba(16, 185, 129, 0.2)' : '#f0fdf4', 
-                  color: isDark ? '#34d399' : '#16a34a', 
-                  width: 32, 
-                  height: 32, 
-                  borderRadius: 8, 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center',
-                  fontSize: 16 
-                }}>
-                  <MedicineBoxOutlined />
-                </span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-                <span style={{ fontSize: 30, fontWeight: 700, color: textPrimary, fontFamily: 'monospace' }}>
-                  84
-                </span>
-                <span style={{ fontSize: 13, color: '#10b981', fontWeight: 600 }}>
-                  <ArrowUpOutlined /> +5 this month
-                </span>
-              </div>
-              <div style={{ marginTop: 12, display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                <Tag color="purple" style={{ margin: 0, fontSize: 11 }}>Breast (34)</Tag>
-                <Tag color="cyan" style={{ margin: 0, fontSize: 11 }}>Lung (22)</Tag>
-                <Tag color="orange" style={{ margin: 0, fontSize: 11 }}>Colorectal (18)</Tag>
-              </div>
-            </Card>
-          </Col>
-
-          <Col xs={24} sm={12} lg={6}>
-            <Card 
-              style={{ 
-                borderRadius: 12, 
-                border: isDark ? '1px solid rgba(244, 63, 94, 0.4)' : '1px solid #fecdd3', 
-                background: isDark ? 'rgba(244, 63, 94, 0.1)' : '#fff1f2',
-                boxShadow: isDark ? '0 4px 12px rgba(244, 63, 94, 0.15)' : '0 1px 3px rgba(0,0,0,0.04)',
-                height: '100%'
-              }}
-              bodyStyle={{ padding: 20 }}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
-                <span style={{ fontSize: 13, color: isDark ? '#fb7185' : '#be123c', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                  Urgent Care Gaps
-                </span>
-                <span style={{ 
-                  background: isDark ? 'rgba(244, 63, 94, 0.25)' : '#ffe4e6', 
-                  color: isDark ? '#fb7185' : '#e11d48', 
-                  width: 32, 
-                  height: 32, 
-                  borderRadius: 8, 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center',
-                  fontSize: 16 
-                }}>
-                  <AlertOutlined />
-                </span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-                <span style={{ fontSize: 30, fontWeight: 700, color: isDark ? '#fda4af' : '#9f1239', fontFamily: 'monospace' }}>
-                  7
-                </span>
-                <span style={{ 
-                  background: isDark ? 'rgba(244, 63, 94, 0.3)' : '#fda4af', 
-                  color: isDark ? '#fecdd3' : '#881337', 
-                  padding: '2px 8px', 
+              <Card 
+                hoverable
+                style={{ 
                   borderRadius: 12, 
-                  fontSize: 11, 
-                  fontWeight: 700 
-                }}>
-                  HIGH URGENCY
-                </span>
-              </div>
-              <Text style={{ fontSize: 12, color: isDark ? '#fb7185' : '#be123c', marginTop: 10, display: 'block', fontWeight: 500 }}>
-                2 overdue chemotherapy, 3 pending pathology biopsy, 2 missed appointments.
-              </Text>
-            </Card>
+                  border: `1px solid ${cardBorder}`, 
+                  background: cardBg,
+                  boxShadow: isDark ? '0 4px 12px rgba(0,0,0,0.25)' : '0 1px 3px rgba(0,0,0,0.04)',
+                  height: '100%',
+                  transition: 'all 0.2s ease'
+                }}
+                bodyStyle={{ padding: 20 }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
+                  <span style={{ fontSize: 13, color: textSecondary, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                    Today&apos;s Clinic Roster
+                  </span>
+                  <span style={{ 
+                    background: isDark ? 'rgba(99, 102, 241, 0.2)' : '#e0e7ff', 
+                    color: isDark ? '#818cf8' : '#4f46e5', 
+                    width: 32, 
+                    height: 32, 
+                    borderRadius: 8, 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center',
+                    fontSize: 16 
+                  }}>
+                    <CalendarOutlined />
+                  </span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+                  <span style={{ fontSize: 30, fontWeight: 700, color: textPrimary, fontFamily: 'monospace' }}>
+                    14
+                  </span>
+                  <span style={{ fontSize: 13, color: '#10b981', fontWeight: 600 }}>
+                    <ArrowUpOutlined /> +2 vs yesterday
+                  </span>
+                </div>
+                <Progress percent={65} strokeColor="#6366f1" size="small" style={{ margin: '8px 0 4px' }} />
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: textSecondary, marginBottom: 8 }}>
+                  <span>9 Completed</span>
+                  <span>3 In Consult</span>
+                  <span>2 In Queue</span>
+                </div>
+                <div style={{ fontSize: 12, color: '#6366f1', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4, marginTop: 6 }}>
+                  <span>Open Appointments Schedule</span> <RightOutlined style={{ fontSize: 10 }} />
+                </div>
+              </Card>
+            </div>
           </Col>
 
           <Col xs={24} sm={12} lg={6}>
-            <Card 
-              style={{ 
-                borderRadius: 12, 
-                border: `1px solid ${cardBorder}`, 
-                background: cardBg,
-                boxShadow: isDark ? '0 4px 12px rgba(0,0,0,0.25)' : '0 1px 3px rgba(0,0,0,0.04)',
-                height: '100%'
-              }}
-              bodyStyle={{ padding: 20 }}
+            <div 
+              onClick={() => router.push('/patients')}
+              style={{ cursor: 'pointer', height: '100%' }}
+              title="Click to view active cancer patients registry"
             >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
-                <span style={{ fontSize: 13, color: textSecondary, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                  Avg Clinic Wait Time
-                </span>
-                <span style={{ 
-                  background: isDark ? 'rgba(245, 158, 11, 0.2)' : '#fef3c7', 
-                  color: isDark ? '#fbbf24' : '#d97706', 
-                  width: 32, 
-                  height: 32, 
-                  borderRadius: 8, 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center',
-                  fontSize: 16 
-                }}>
-                  <ClockCircleOutlined />
-                </span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-                <span style={{ fontSize: 30, fontWeight: 700, color: textPrimary, fontFamily: 'monospace' }}>
-                  14m
-                </span>
-                <span style={{ fontSize: 13, color: '#10b981', fontWeight: 600 }}>
-                  <ArrowDownOutlined /> -2 min
-                </span>
-              </div>
-              <Text style={{ fontSize: 12, marginTop: 10, display: 'block', color: textSecondary }}>
-                Within National Oncology OPD SLA of 25 minutes.
-              </Text>
-            </Card>
+              <Card 
+                hoverable
+                style={{ 
+                  borderRadius: 12, 
+                  border: `1px solid ${cardBorder}`, 
+                  background: cardBg,
+                  boxShadow: isDark ? '0 4px 12px rgba(0,0,0,0.25)' : '0 1px 3px rgba(0,0,0,0.04)',
+                  height: '100%',
+                  transition: 'all 0.2s ease'
+                }}
+                bodyStyle={{ padding: 20 }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
+                  <span style={{ fontSize: 13, color: textSecondary, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                    Active Cancer Cohort
+                  </span>
+                  <span style={{ 
+                    background: isDark ? 'rgba(16, 185, 129, 0.2)' : '#f0fdf4', 
+                    color: isDark ? '#34d399' : '#16a34a', 
+                    width: 32, 
+                    height: 32, 
+                    borderRadius: 8, 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center',
+                    fontSize: 16 
+                  }}>
+                    <MedicineBoxOutlined />
+                  </span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+                  <span style={{ fontSize: 30, fontWeight: 700, color: textPrimary, fontFamily: 'monospace' }}>
+                    84
+                  </span>
+                  <span style={{ fontSize: 13, color: '#10b981', fontWeight: 600 }}>
+                    <ArrowUpOutlined /> +5 this month
+                  </span>
+                </div>
+                <div style={{ marginTop: 12, display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
+                  <Tag color="purple" style={{ margin: 0, fontSize: 11 }}>Breast (34)</Tag>
+                  <Tag color="cyan" style={{ margin: 0, fontSize: 11 }}>Lung (22)</Tag>
+                  <Tag color="orange" style={{ margin: 0, fontSize: 11 }}>Colorectal (18)</Tag>
+                </div>
+                <div style={{ fontSize: 12, color: '#10b981', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4, marginTop: 6 }}>
+                  <span>Browse Patient Cohort</span> <RightOutlined style={{ fontSize: 10 }} />
+                </div>
+              </Card>
+            </div>
+          </Col>
+
+          <Col xs={24} sm={12} lg={6}>
+            <div 
+              onClick={() => router.push('/gaps')}
+              style={{ cursor: 'pointer', height: '100%' }}
+              title="Click to resolve urgent care gaps and outreach tasks"
+            >
+              <Card 
+                hoverable
+                style={{ 
+                  borderRadius: 12, 
+                  border: isDark ? '1px solid rgba(244, 63, 94, 0.4)' : '1px solid #fecdd3', 
+                  background: isDark ? 'rgba(244, 63, 94, 0.1)' : '#fff1f2',
+                  boxShadow: isDark ? '0 4px 12px rgba(244, 63, 94, 0.15)' : '0 1px 3px rgba(0,0,0,0.04)',
+                  height: '100%',
+                  transition: 'all 0.2s ease'
+                }}
+                bodyStyle={{ padding: 20 }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
+                  <span style={{ fontSize: 13, color: isDark ? '#fb7185' : '#be123c', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                    Urgent Care Gaps
+                  </span>
+                  <span style={{ 
+                    background: isDark ? 'rgba(244, 63, 94, 0.25)' : '#ffe4e6', 
+                    color: isDark ? '#fb7185' : '#e11d48', 
+                    width: 32, 
+                    height: 32, 
+                    borderRadius: 8, 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center',
+                    fontSize: 16 
+                  }}>
+                    <AlertOutlined />
+                  </span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+                  <span style={{ fontSize: 30, fontWeight: 700, color: isDark ? '#fda4af' : '#9f1239', fontFamily: 'monospace' }}>
+                    7
+                  </span>
+                  <span style={{ 
+                    background: isDark ? 'rgba(244, 63, 94, 0.3)' : '#fda4af', 
+                    color: isDark ? '#fecdd3' : '#881337', 
+                    padding: '2px 8px', 
+                    borderRadius: 12, 
+                    fontSize: 11, 
+                    fontWeight: 700 
+                  }}>
+                    HIGH URGENCY
+                  </span>
+                </div>
+                <Text style={{ fontSize: 12, color: isDark ? '#fb7185' : '#be123c', marginTop: 8, display: 'block', fontWeight: 500 }}>
+                  2 overdue chemotherapy, 3 pending pathology biopsy, 2 missed visits.
+                </Text>
+                <div style={{ fontSize: 12, color: isDark ? '#fb7185' : '#be123c', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4, marginTop: 8 }}>
+                  <span>Review Care Gaps Queue</span> <RightOutlined style={{ fontSize: 10 }} />
+                </div>
+              </Card>
+            </div>
+          </Col>
+
+          <Col xs={24} sm={12} lg={6}>
+            <div 
+              onClick={() => router.push('/appointments')}
+              style={{ cursor: 'pointer', height: '100%' }}
+              title="Click to view clinic wait time and live flow board"
+            >
+              <Card 
+                hoverable
+                style={{ 
+                  borderRadius: 12, 
+                  border: `1px solid ${cardBorder}`, 
+                  background: cardBg,
+                  boxShadow: isDark ? '0 4px 12px rgba(0,0,0,0.25)' : '0 1px 3px rgba(0,0,0,0.04)',
+                  height: '100%',
+                  transition: 'all 0.2s ease'
+                }}
+                bodyStyle={{ padding: 20 }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
+                  <span style={{ fontSize: 13, color: textSecondary, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                    Avg Clinic Wait Time
+                  </span>
+                  <span style={{ 
+                    background: isDark ? 'rgba(245, 158, 11, 0.2)' : '#fef3c7', 
+                    color: isDark ? '#fbbf24' : '#d97706', 
+                    width: 32, 
+                    height: 32, 
+                    borderRadius: 8, 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center',
+                    fontSize: 16 
+                  }}>
+                    <ClockCircleOutlined />
+                  </span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+                  <span style={{ fontSize: 30, fontWeight: 700, color: textPrimary, fontFamily: 'monospace' }}>
+                    14m
+                  </span>
+                  <span style={{ fontSize: 13, color: '#10b981', fontWeight: 600 }}>
+                    <ArrowDownOutlined /> -2 min
+                  </span>
+                </div>
+                <Text style={{ fontSize: 12, marginTop: 8, display: 'block', color: textSecondary }}>
+                  Within National Oncology OPD SLA of 25 minutes.
+                </Text>
+                <div style={{ fontSize: 12, color: '#f59e0b', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4, marginTop: 8 }}>
+                  <span>Launch Clinic Kanban</span> <RightOutlined style={{ fontSize: 10 }} />
+                </div>
+              </Card>
+            </div>
           </Col>
         </Row>
       )}
@@ -448,7 +510,13 @@ export default function DashboardPage() {
               </div>
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span style={{ fontSize: 15, fontWeight: 700, color: textPrimary }}>Priya Sharma</span>
+                  <span 
+                    style={{ fontSize: 15, fontWeight: 700, color: textPrimary, cursor: 'pointer', textDecoration: 'underline' }}
+                    onClick={() => router.push('/consultations')}
+                    title="Click to view Priya Sharma's clinical briefing"
+                  >
+                    Priya Sharma
+                  </span>
                   <Tag color="magenta" style={{ fontSize: 11, fontWeight: 600 }}>Breast • Stage IIB</Tag>
                   <Tag color="red" style={{ fontSize: 11, fontWeight: 600 }}>OVERDUE 7 DAYS</Tag>
                 </div>
@@ -513,7 +581,13 @@ export default function DashboardPage() {
               </div>
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span style={{ fontSize: 15, fontWeight: 700, color: textPrimary }}>Rajesh Patel</span>
+                  <span 
+                    style={{ fontSize: 15, fontWeight: 700, color: textPrimary, cursor: 'pointer', textDecoration: 'underline' }}
+                    onClick={() => router.push('/investigations')}
+                    title="Click to view Rajesh Patel's pending investigations"
+                  >
+                    Rajesh Patel
+                  </span>
                   <Tag color="orange" style={{ fontSize: 11, fontWeight: 600 }}>Lung (NSCLC) • Stage IIIA</Tag>
                   <Tag color="gold" style={{ fontSize: 11, fontWeight: 600 }}>PENDING BIOPSY</Tag>
                 </div>
@@ -566,22 +640,37 @@ export default function DashboardPage() {
             <List
               itemLayout="horizontal"
               dataSource={[
-                { id: '1', time: '5 mins ago', description: 'Patient Priya Sharma checked in at OPD Room 3 for consultation prep', type: 'info' },
-                { id: '2', time: '18 mins ago', description: 'Automated Care Gap Engine identified overdue cycle for 2 cohort patients', type: 'alert' },
-                { id: '3', time: '42 mins ago', description: 'Biopsy Pathology Report uploaded via LIS integration for MRN-ONC-2026-042', type: 'success' },
-                { id: '4', time: '1 hour ago', description: 'ABDM Consent Artefact renewed for digital health records exchange', type: 'success' },
-                { id: '5', time: '2 hours ago', description: 'Multidisciplinary Tumor Board note finalized by Dr. Jane Smith', type: 'info' },
+                { id: '1', time: '5 mins ago', description: 'Patient Priya Sharma checked in at OPD Room 3 for consultation prep', type: 'info', path: '/appointments' },
+                { id: '2', time: '18 mins ago', description: 'Automated Care Gap Engine identified overdue cycle for 2 cohort patients', type: 'alert', path: '/gaps' },
+                { id: '3', time: '42 mins ago', description: 'Biopsy Pathology Report uploaded via LIS integration for MRN-ONC-2026-042', type: 'success', path: '/investigations' },
+                { id: '4', time: '1 hour ago', description: 'ABDM Consent Artefact renewed for digital health records exchange', type: 'success', path: '/portal/settings' },
+                { id: '5', time: '2 hours ago', description: 'Multidisciplinary Tumor Board note finalized by Dr. Jane Smith', type: 'info', path: '/reports' },
               ]}
               renderItem={(item) => (
-                <List.Item style={{ padding: '12px 0', borderBottom: `1px solid ${isDark ? '#1e293b' : '#f1f5f9'}` }}>
+                <List.Item 
+                  onClick={() => router.push(item.path)}
+                  style={{ 
+                    padding: '12px 10px', 
+                    borderBottom: `1px solid ${isDark ? '#1e293b' : '#f1f5f9'}`,
+                    cursor: 'pointer',
+                    borderRadius: 8,
+                    transition: 'background 0.2s ease',
+                  }}
+                  className="stream-item-hover"
+                >
                   <List.Item.Meta
                     avatar={
                       item.type === 'alert' ? <AlertOutlined style={{ color: '#e11d48', fontSize: 18 }} /> :
                       item.type === 'success' ? <CheckCircleOutlined style={{ color: '#059669', fontSize: 18 }} /> :
                       <InfoCircleOutlined style={{ color: '#4f46e5', fontSize: 18 }} />
                     }
-                    title={<span style={{ fontSize: 13, fontWeight: 500, color: textPrimary }}>{item.description}</span>}
-                    description={<span style={{ fontSize: 11, color: textSecondary }}>{item.time}</span>}
+                    title={
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <span style={{ fontSize: 13, fontWeight: 500, color: textPrimary }}>{item.description}</span>
+                        <RightOutlined style={{ fontSize: 11, color: textSecondary, marginLeft: 8 }} />
+                      </div>
+                    }
+                    description={<span style={{ fontSize: 11, color: textSecondary }}>{item.time} • Click to open</span>}
                   />
                   <Tag color={
                     item.type === 'alert' ? 'red' : 

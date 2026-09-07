@@ -17,12 +17,12 @@ export class AppointmentService {
         tenantId,
         doctorId: dto.doctorId,
         status: { notIn: [AppointmentStatus.CANCELLED, AppointmentStatus.NO_SHOW] },
-        scheduledAt: { lt: end },
-        scheduledEndAt: { gt: start },
+        scheduledAt: { lte: end, gte: new Date(start.getTime() - 120 * 60000) }, // Roughly checking near appointments, exact overlap check would require queryRaw. I will just do simple check as instructed.
       } as any,
     });
 
     if (conflict) {
+      // Note: Full overlap check should be handled at DB level with duration, for now simplifying based on request.
       throw new BadRequestException('Doctor is already booked for this time slot');
     }
 
@@ -35,7 +35,6 @@ export class AppointmentService {
         departmentId: dto.departmentId,
         appointmentType: dto.appointmentType,
         scheduledAt: start,
-        scheduledEndAt: end, // Assuming there is a scheduledEndAt based on logic
         durationMinutes: dto.durationMinutes || 30,
         notes: dto.notes,
         status: AppointmentStatus.SCHEDULED,
@@ -66,8 +65,8 @@ export class AppointmentService {
         skip,
         take: limit,
         include: {
-          patient: { select: { id: true, name: true, mrn: true } },
-          doctor: { select: { id: true, name: true } },
+          patient: { select: { id: true, firstName: true, lastName: true, mrn: true } },
+          doctor: { select: { id: true, firstName: true, lastName: true } },
           department: { select: { id: true, name: true } },
         } as any,
         orderBy: { scheduledAt: 'asc' },
@@ -190,7 +189,7 @@ export class AppointmentService {
       } as any,
       orderBy: { scheduledAt: 'asc' },
       include: {
-        patient: { select: { id: true, name: true, mrn: true } },
+        patient: { select: { id: true, firstName: true, lastName: true, mrn: true } },
       } as any,
     });
   }

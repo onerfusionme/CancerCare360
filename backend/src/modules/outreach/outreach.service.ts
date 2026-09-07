@@ -13,7 +13,7 @@ export class OutreachService {
       data: {
         ...dto,
         tenantId,
-        createdById: userId,
+        contactedById: userId,
         contactDate,
       } as any,
     });
@@ -36,7 +36,7 @@ export class OutreachService {
     return this.prisma.outreachLog.findMany({
       where: { tenantId, taskId } as any,
       orderBy: { contactDate: 'desc' },
-      include: { createdBy: { select: { id: true, name: true } } } as any,
+      include: { contactedBy: { select: { id: true, firstName: true, lastName: true } } } as any,
     });
   }
 
@@ -45,7 +45,7 @@ export class OutreachService {
       where: { tenantId, patientId } as any,
       orderBy: { contactDate: 'desc' },
       include: { 
-         createdBy: { select: { id: true, name: true } },
+         contactedBy: { select: { id: true, firstName: true, lastName: true } },
          task: { select: { id: true, taskType: true, issueDescription: true } }
       } as any,
     });

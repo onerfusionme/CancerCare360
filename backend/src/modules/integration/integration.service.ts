@@ -13,11 +13,9 @@ export class IntegrationService {
     await (this.prisma as any).auditLog.create({
       data: {
         tenantId,
-        userId: 'SYSTEM',
         action: 'INBOUND_WEBHOOK_PROCESSED',
         resourceType: 'WEBHOOK',
-        details: JSON.stringify({ sourceSystem, payload }),
-        createdAt: new Date(),
+        newValue: { sourceSystem, payload } as any,
       },
     });
 
@@ -34,7 +32,18 @@ export class IntegrationService {
         });
       }
     } else if (payload.type === 'PATIENT_ADMISSION') {
-      // Inbound admission update
+      await this.prisma.patient.create({
+        data: {
+          tenantId,
+          mrn: payload.mrn || `MRN-${Date.now()}`,
+          firstName: payload.firstName || 'Unknown',
+          lastName: payload.lastName || 'Patient',
+          dateOfBirth: payload.dateOfBirth ? new Date(payload.dateOfBirth) : new Date(),
+          gender: payload.gender || 'UNKNOWN',
+          status: 'ACTIVE',
+          sourceSystem,
+        },
+      });
     }
 
     return { success: true, message: 'Webhook processed' };

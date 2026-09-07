@@ -38,3 +38,14 @@ export const useUpdateInvestigation = () => {
     }
   });
 };
+
+export const useDeleteInvestigation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => investigationService.deleteInvestigation(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['investigations'] });
+    }
+  });
+};
+

@@ -48,8 +48,21 @@ export class CareGapService {
       let gaps: any[] = [];
 
       if (type === CareGapRuleType.OVERDUE_MILESTONE) {
-         // Placeholder for OVERDUE_MILESTONE logic
-         gaps = []; 
+         const overdueMilestones = await this.prisma.careMilestone.findMany({ 
+            where: { tenantId, expectedDate: { lt: new Date() }, status: { not: 'COMPLETED' } } as any,
+            include: { journey: { include: { patient: true } } } as any
+         });
+         gaps = overdueMilestones.map((m: any) => ({
+            patientId: m.journey.patient.id,
+            patientName: `${m.journey.patient.firstName} ${m.journey.patient.lastName}`,
+            mrn: m.journey.patient.mrn,
+            gapType: type,
+            description: `Overdue milestone: ${m.milestoneType}`,
+            priorityScore: weight,
+            detectedAt: new Date(),
+            ruleId: (rule as any).id,
+            actionableInfo: { milestoneId: m.id },
+         }));
       } else if (type === CareGapRuleType.MISSED_APPOINTMENT) {
          const lookbackDate = new Date();
          lookbackDate.setDate(lookbackDate.getDate() - (cond.lookbackDays || 7));
@@ -63,23 +76,66 @@ export class CareGapService {
             include: { patient: true } as any,
          });
          
-         gaps = missedAppts.map(appt => ({
-            patientId: (appt as any).patientId,
-            patientName: (appt as any).patient.name,
-            mrn: (appt as any).patient.mrn,
+         gaps = missedAppts.map((appt: any) => ({
+            patientId: appt.patientId,
+            patientName: `${appt.patient.firstName} ${appt.patient.lastName}`,
+            mrn: appt.patient.mrn,
             gapType: type,
             description: 'Missed appointment detected',
             priorityScore: weight,
             detectedAt: new Date(),
             ruleId: (rule as any).id,
-            actionableInfo: { appointmentId: (appt as any).id },
+            actionableInfo: { appointmentId: appt.id },
          }));
       } else if (type === CareGapRuleType.MISSING_FOLLOW_UP) {
-         // Placeholder
+         const missingFollowUps = await this.prisma.followUpTask.findMany({ 
+            where: { tenantId, dueDate: { lt: new Date() }, status: 'OPEN' } as any,
+            include: { patient: true } as any
+         });
+         gaps = missingFollowUps.map((t: any) => ({
+            patientId: t.patientId,
+            patientName: `${t.patient.firstName} ${t.patient.lastName}`,
+            mrn: t.patient.mrn,
+            gapType: type,
+            description: `Overdue follow-up task: ${t.taskType}`,
+            priorityScore: weight,
+            detectedAt: new Date(),
+            ruleId: (rule as any).id,
+            actionableInfo: { taskId: t.id },
+         }));
       } else if (type === CareGapRuleType.PENDING_INVESTIGATION) {
-         // Placeholder
+         const threshold = new Date(Date.now() - (cond.thresholdDays || 7) * 86400000);
+         const pendingInvestigations = await this.prisma.investigation.findMany({
+            where: { tenantId, status: 'ORDERED', orderedAt: { lt: threshold } } as any,
+            include: { patient: true } as any
+         });
+         gaps = pendingInvestigations.map((i: any) => ({
+            patientId: i.patientId,
+            patientName: `${i.patient.firstName} ${i.patient.lastName}`,
+            mrn: i.patient.mrn,
+            gapType: type,
+            description: `Pending investigation: ${i.investigationType}`,
+            priorityScore: weight,
+            detectedAt: new Date(),
+            ruleId: (rule as any).id,
+            actionableInfo: { investigationId: i.id },
+         }));
       } else if (type === CareGapRuleType.TREATMENT_DELAY) {
-         // Placeholder
+         const treatmentDelays = await this.prisma.treatmentMilestone.findMany({
+            where: { tenantId, scheduledDate: { lt: new Date() }, status: { not: 'COMPLETED' } } as any,
+            include: { patient: true } as any
+         });
+         gaps = treatmentDelays.map((t: any) => ({
+            patientId: t.patientId,
+            patientName: `${t.patient.firstName} ${t.patient.lastName}`,
+            mrn: t.patient.mrn,
+            gapType: type,
+            description: `Treatment delay: ${t.treatmentType}`,
+            priorityScore: weight,
+            detectedAt: new Date(),
+            ruleId: (rule as any).id,
+            actionableInfo: { treatmentId: t.id },
+         }));
       }
 
       allGaps = allGaps.concat(gaps);

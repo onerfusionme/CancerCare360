@@ -5,20 +5,17 @@ import { DocumentFilterDto } from './dto/document-filter.dto';
 import { ScanStatus, OcrStatus, VerificationStatus } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
 import * as path from 'path';
-
-// Mock MinIO client for the purpose of this implementation
-const minioClient = {
-  presignedGetObject: async (bucket: string, objectName: string, expiry: number) => {
-    return `https://minio.mock/${bucket}/${objectName}?expires=${expiry}`;
-  },
-  putObject: async (bucket: string, objectName: string, buffer: Buffer) => {
-    return true;
-  }
-};
+import * as fs from 'fs';
 
 @Injectable()
 export class DocumentService {
-  constructor(private readonly prisma: PrismaService) {}
+  private readonly uploadDir = path.join(process.cwd(), 'uploads');
+
+  constructor(private readonly prisma: PrismaService) {
+    if (!fs.existsSync(this.uploadDir)) {
+      fs.mkdirSync(this.uploadDir, { recursive: true });
+    }
+  }
 
   async upload(tenantId: string, userId: string, file: Express.Multer.File, dto: UploadDocumentDto) {
     if (!file) {
@@ -32,11 +29,12 @@ export class DocumentService {
 
     const fileId = uuidv4();
     const ext = path.extname(file.originalname);
-    const storageKey = `${tenantId}/${dto.patientId || 'general'}/${fileId}${ext}`;
-    const storageBucket = 'cancercare-documents';
+    const objectName = `${fileId}${ext}`;
+    const storageKey = path.join(this.uploadDir, objectName);
+    const storageBucket = 'local-fs';
 
-    // MinIO upload
-    await minioClient.putObject(storageBucket, storageKey, file.buffer);
+    // Save to local filesystem
+    fs.writeFileSync(storageKey, file.buffer);
 
     const isImageOrPdf = file.mimetype.startsWith('image/') || file.mimetype === 'application/pdf';
 
@@ -49,7 +47,7 @@ export class DocumentService {
         fileName: file.originalname,
         mimeType: file.mimetype,
         fileSize: file.size,
-        storageKey,
+        storageKey: objectName, // Store relative object name
         storageBucket,
         virusScanStatus: ScanStatus.PENDING,
         ocrStatus: isImageOrPdf ? OcrStatus.PENDING : OcrStatus.NOT_APPLICABLE,
@@ -57,7 +55,6 @@ export class DocumentService {
         source: dto.source,
         provenance: dto.provenance,
         uploadedById: userId,
-        // notes: dto.notes - No notes field on document in schema, ignoring or map to extractedData.
       },
     });
 
@@ -126,7 +123,7 @@ export class DocumentService {
 
   async getSignedUrl(tenantId: string, id: string) {
     const document = await this.findById(tenantId, id);
-    const url = await minioClient.presignedGetObject(document.storageBucket, document.storageKey, 15 * 60);
+    const url = `/api/v1/documents/files/${document.storageKey}`;
     return { url };
   }
 
@@ -145,7 +142,6 @@ export class DocumentService {
         verificationStatus: status,
         verifiedById: userId,
         verifiedAt: new Date(),
-        // notes mapping?
       },
     });
   }
@@ -159,8 +155,11 @@ export class DocumentService {
       throw new NotFoundException(`Document with ID ${id} not found`);
     }
 
-    // Implementing soft delete by setting a status if existed or returning actual delete
-    // Since soft-delete status isn't in Document schema, we will do a physical delete for now
+    const filePath = path.join(this.uploadDir, document.storageKey);
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+
     return this.prisma.document.delete({
       where: { id, tenantId },
     });

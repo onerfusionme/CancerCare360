@@ -12,11 +12,12 @@ export interface Appointment {
   id: string;
   patientId: string;
   doctorId: string;
-  departmentId: string;
+  departmentId?: string;
   appointmentType: string;
   scheduledAt: string;
-  durationMinutes: number;
+  durationMinutes?: number;
   status: AppointmentStatus;
+  room?: string;
   checkInAt?: string;
   consultationStartAt?: string;
   consultationEndAt?: string;
@@ -30,10 +31,11 @@ export interface Appointment {
 export interface CreateAppointmentDto {
   patientId: string;
   doctorId: string;
-  departmentId: string;
+  departmentId?: string;
   appointmentType: string;
   scheduledAt: string;
-  durationMinutes: number;
+  durationMinutes?: number;
+  room?: string;
   notes?: string;
 }
 
@@ -53,5 +55,6 @@ export interface AppointmentFilter {
 export interface TimeSlot {
   startTime: string;
   endTime: string;
-  available: boolean;
+  available?: boolean;
+  isAvailable?: boolean;
 }

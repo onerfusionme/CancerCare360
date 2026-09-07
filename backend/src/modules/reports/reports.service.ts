@@ -17,9 +17,8 @@ export class ReportsService {
       }
       data = await (this.prisma as any).patient.findMany({ where: whereClause });
     } else if (dto.reportType === 'CARE_GAPS') {
-      data = await (this.prisma as any).careGap.findMany({
+      data = await (this.prisma as any).careGapRule.findMany({
         where: { tenantId },
-        include: { patient: true },
       });
     } else if (dto.reportType === 'INVESTIGATION_TAT') {
       data = await (this.prisma as any).investigation.findMany({

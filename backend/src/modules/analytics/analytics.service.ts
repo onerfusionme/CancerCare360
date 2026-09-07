@@ -132,7 +132,7 @@ export class AnalyticsService {
 
       const avgWaitDuration = consultations.length > 0
         ? consultations.reduce((acc, curr) => acc + (curr.waitingDurationMinutes || 0), 0) / consultations.length
-        : 18; // default benchmark minutes
+        : 0;
 
       const investigations = await this.prisma.investigation.findMany({
         where: {
@@ -146,7 +146,7 @@ export class AnalyticsService {
 
       const avgTat = investigations.length > 0
         ? investigations.reduce((acc, curr) => acc + (curr.turnaroundHours || 0), 0) / investigations.length
-        : 24;
+        : 0;
 
       const activeJourneysByDiagnosis = await this.prisma.careJourney.groupBy({
         by: ['diagnosisCategory'],
@@ -173,8 +173,14 @@ export class AnalyticsService {
         where: { tenantId, timestamp: { gte: yesterday } },
       });
 
+      const documents = await this.prisma.document.aggregate({
+        where: { tenantId },
+        _sum: { fileSize: true }
+      });
+      const storageUsedMB = documents._sum.fileSize ? Math.round(Number(documents._sum.fileSize) / (1024 * 1024)) : 0;
+
       const systemStats = {
-        storageUsedMB: 1420,
+        storageUsedMB,
         aiInteractionsToday: await this.prisma.aiInteractionLog.count({ where: { tenantId, createdAt: { gte: yesterday } } }),
       };
 
@@ -221,7 +227,7 @@ export class AnalyticsService {
 
     const careContinuityIndex = totalMilestones > 0 
       ? Math.round(((totalMilestones - overdueMilestones) / totalMilestones) * 100) 
-      : 92;
+      : 0;
 
     const stages = ['SCREENING', 'DIAGNOSIS', 'TREATMENT_PLANNING', 'ACTIVE_TREATMENT', 'SURVIVORSHIP'];
     const stageBreakdown: Record<string, number> = {};
@@ -270,7 +276,7 @@ export class AnalyticsService {
 
     const result: Record<string, number> = {};
     for (const type in stats) {
-      result[type] = stats[type].count > 0 ? Math.round((stats[type].sum / stats[type].count) * 10) / 10 : 24.0;
+      result[type] = stats[type].count > 0 ? Math.round((stats[type].sum / stats[type].count) * 10) / 10 : 0;
     }
 
     return result;

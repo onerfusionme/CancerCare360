@@ -1,43 +1,54 @@
-import axios from 'axios';
-import { FollowUpTask, CreateTaskDto, UpdateTaskDto, TaskFilter, TaskDashboardStats } from '@/types/follow-up';
-
-const API_URL = '/api/tasks';
+import apiClient from './api-client';
+import { FollowUpTask, CreateTaskDto, UpdateTaskDto, TaskFilter, TaskDashboardStats, TaskPriority, TaskStatus } from '@/types/follow-up';
 
 export const followUpService = {
   getTasks: async (filter?: TaskFilter): Promise<FollowUpTask[]> => {
-    const { data } = await axios.get(API_URL, { params: filter });
-    return data;
+    const response = await apiClient.get('/api/v1/follow-up-tasks', { params: filter });
+    return response.data;
   },
+  
   getTask: async (id: string): Promise<FollowUpTask> => {
-    const { data } = await axios.get(`${API_URL}/${id}`);
-    return data;
+    const response = await apiClient.get(`/api/v1/follow-up-tasks/${id}`);
+    return response.data;
   },
+  
   createTask: async (dto: CreateTaskDto): Promise<FollowUpTask> => {
-    const { data } = await axios.post(API_URL, dto);
-    return data;
+    const response = await apiClient.post('/api/v1/follow-up-tasks', dto);
+    return response.data;
   },
+  
   updateTask: async (id: string, dto: UpdateTaskDto): Promise<FollowUpTask> => {
-    const { data } = await axios.patch(`${API_URL}/${id}`, dto);
-    return data;
+    const response = await apiClient.patch(`/api/v1/follow-up-tasks/${id}`, dto);
+    return response.data;
   },
+  
+  deleteTask: async (id: string): Promise<boolean> => {
+    const response = await apiClient.delete(`/api/v1/follow-up-tasks/${id}`);
+    return response.data;
+  },
+  
   assignTask: async (id: string, userId: string): Promise<FollowUpTask> => {
-    const { data } = await axios.post(`${API_URL}/${id}/assign`, { assignedToId: userId });
-    return data;
+    const response = await apiClient.patch(`/api/v1/follow-up-tasks/${id}/assign`, { userId });
+    return response.data;
   },
+  
   escalateTask: async (id: string): Promise<FollowUpTask> => {
-    const { data } = await axios.post(`${API_URL}/${id}/escalate`);
-    return data;
+    const response = await apiClient.patch(`/api/v1/follow-up-tasks/${id}/escalate`);
+    return response.data;
   },
+  
   getMyTasks: async (): Promise<FollowUpTask[]> => {
-    const { data } = await axios.get(`${API_URL}/my`);
-    return data;
+    const response = await apiClient.get('/api/v1/follow-up-tasks/my');
+    return response.data;
   },
+  
   getOverdueTasks: async (): Promise<FollowUpTask[]> => {
-    const { data } = await axios.get(`${API_URL}/overdue`);
-    return data;
+    const response = await apiClient.get('/api/v1/follow-up-tasks', { params: { overdue: true } });
+    return response.data;
   },
+  
   getDashboardStats: async (): Promise<TaskDashboardStats> => {
-    const { data } = await axios.get(`${API_URL}/stats`);
-    return data;
+    const response = await apiClient.get('/api/v1/follow-up-tasks/stats');
+    return response.data;
   }
 };

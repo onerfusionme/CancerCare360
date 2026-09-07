@@ -34,7 +34,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const isDark = themeMode === 'dark';
 
   const menuItems = [
-    { key: '/dashboard', icon: <DashboardOutlined />, label: 'Cockpit (All-in-One)' },
+    { key: '/dashboard', icon: <DashboardOutlined />, label: 'Dashboard' },
     { key: '/registry', icon: <TeamOutlined />, label: 'Patient Registry' },
     { key: '/patients', icon: <UserOutlined />, label: 'Patients' },
     { key: '/consultations', icon: <FileSearchOutlined />, label: 'Consultation Readiness' },

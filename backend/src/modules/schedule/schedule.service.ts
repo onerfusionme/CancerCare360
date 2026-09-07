@@ -28,7 +28,7 @@ export class ScheduleService {
     const schedules = await this.prisma.doctorSchedule.findMany({
       where: { tenantId, departmentId, isActive: true } as any,
       include: {
-        doctor: { select: { id: true, name: true } },
+        doctor: { select: { id: true, firstName: true, lastName: true } },
       } as any,
     });
 
