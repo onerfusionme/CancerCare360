@@ -1,0 +1,226 @@
+/* ==========================================================================
+   CancerCare360 — Clinical Design System Tokens & Oncology Theme Styles
+   Inspired by Flatiron Health, Epic Cosmos, and Canvas Medical
+   ========================================================================== */
+
+:root {
+  /* Slate Executive Navigation Palette */
+  --onc-sidebar-bg: #0f172a;
+  --onc-sidebar-border: #1e293b;
+  --onc-sidebar-text: #94a3b8;
+  --onc-sidebar-text-hover: #f1f5f9;
+  --onc-sidebar-active: #4f46e5;
+  --onc-sidebar-active-glow: rgba(79, 70, 229, 0.25);
+
+  /* Modern Neutral Canvas */
+  --onc-canvas-bg: #f8fafc;
+  --onc-surface-card: #ffffff;
+  --onc-border-subtle: #e2e8f0;
+  --onc-border-elevated: #cbd5e1;
+
+  /* Clinical Semantic Tones */
+  --onc-primary: #4f46e5;
+  --onc-primary-light: #eef2ff;
+  --onc-teal: #0d9488;
+  --onc-teal-light: #f0fdfa;
+
+  /* Oncology Stage Semantic Tokens */
+  --stage-screening-bg: #f1f5f9;
+  --stage-screening-text: #475569;
+  --stage-screening-border: #cbd5e1;
+
+  --stage-diagnosis-bg: #eff6ff;
+  --stage-diagnosis-text: #1d4ed8;
+  --stage-diagnosis-border: #bfdbfe;
+
+  --stage-treatment-bg: #eef2ff;
+  --stage-treatment-text: #4338ca;
+  --stage-treatment-border: #c7d2fe;
+
+  --stage-survivorship-bg: #ecfdf5;
+  --stage-survivorship-text: #047857;
+  --stage-survivorship-border: #a7f3d0;
+
+  --stage-palliative-bg: #f5f3ff;
+  --stage-palliative-text: #6d28d9;
+  --stage-palliative-border: #ddd6fe;
+
+  /* Clinical Urgency & Care Gap Alerts */
+  --alert-urgent-bg: #fff1f2;
+  --alert-urgent-text: #be123c;
+  --alert-urgent-border: #fecdd3;
+  --alert-urgent-glow: rgba(225, 29, 72, 0.35);
+
+  --alert-warning-bg: #fffbeb;
+  --alert-warning-text: #b45309;
+  --alert-warning-border: #fde68a;
+
+  --alert-normal-bg: #f0fdf4;
+  --alert-normal-text: #15803d;
+  --alert-normal-border: #bbf7d0;
+
+  /* Elevation Shadows */
+  --onc-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --onc-shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.07), 0 1px 2px -1px rgb(0 0 0 / 0.07);
+  --onc-shadow-hover: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+  --onc-shadow-floating: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+}
+
+/* Base resets & typography */
+body {
+  background-color: var(--onc-canvas-bg) !important;
+  color: #0f172a;
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+}
+
+/* Tabular numbers for clinical lab deltas, countdowns, and timers */
+.font-tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Elevated Clinical Card Component */
+.clinical-card {
+  background: #ffffff !important;
+  border: 1px solid var(--onc-border-subtle) !important;
+  border-radius: 12px !important;
+  box-shadow: var(--onc-shadow-card) !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.clinical-card:hover {
+  box-shadow: var(--onc-shadow-hover) !important;
+  border-color: var(--onc-border-elevated) !important;
+}
+
+/* Executive Sidebar Customization */
+.executive-sider {
+  background: var(--onc-sidebar-bg) !important;
+  border-right: 1px solid var(--onc-sidebar-border) !important;
+}
+
+.executive-sider .ant-menu {
+  background: transparent !important;
+  border-right: none !important;
+}
+
+.executive-sider .ant-menu-item {
+  color: var(--onc-sidebar-text) !important;
+  border-radius: 8px !important;
+  margin: 4px 12px !important;
+  width: calc(100% - 24px) !important;
+  font-weight: 500;
+  transition: all 0.15s ease;
+}
+
+.executive-sider .ant-menu-item:hover {
+  color: var(--onc-sidebar-text-hover) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+.executive-sider .ant-menu-item-selected {
+  color: #ffffff !important;
+  background: var(--onc-sidebar-active) !important;
+  box-shadow: 0 0 16px var(--onc-sidebar-active-glow) !important;
+  font-weight: 600;
+}
+
+/* Hero Clinical Header */
+.clinical-hero-banner {
+  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%);
+  border-radius: 16px;
+  padding: 24px 32px;
+  color: #ffffff;
+  box-shadow: 0 10px 25px -5px rgba(67, 56, 202, 0.3);
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.clinical-hero-banner::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 350px;
+  height: 350px;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.25) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* Pulse animation for wait time SLA breaches & overdue gaps */
+@keyframes clinical-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(225, 29, 72, 0.5);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(225, 29, 72, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(225, 29, 72, 0);
+  }
+}
+
+.sla-pulse-urgent {
+  animation: clinical-pulse 2s infinite;
+}
+
+/* Patient Ribbon Styling */
+.patient-ribbon {
+  background: linear-gradient(to right, #ffffff, #f8fafc);
+  border: 1px solid var(--onc-border-subtle);
+  border-left: 5px solid var(--onc-primary);
+  border-radius: 12px;
+  padding: 16px 24px;
+  box-shadow: var(--onc-shadow-card);
+  margin-bottom: 24px;
+}
+
+/* Kanban Clinic Flow Column */
+.kanban-column {
+  background: #f1f5f9;
+  border-radius: 12px;
+  padding: 16px;
+  min-height: 600px;
+  border: 1px solid #e2e8f0;
+}
+
+.kanban-header {
+  font-weight: 600;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+  border-bottom: 2px solid #cbd5e1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Lab delta badges */
+.lab-delta-abnormal-high {
+  background: #fff1f2;
+  color: #be123c;
+  border: 1px solid #fecdd3;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.lab-delta-abnormal-low {
+  background: #fefce8;
+  color: #a16207;
+  border: 1px solid #fef08a;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.lab-delta-normal {
+  background: #f0fdf4;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+  padding: 2px 8px;
+  border-radius: 6px;
+}

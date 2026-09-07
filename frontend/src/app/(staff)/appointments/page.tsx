@@ -13,7 +13,7 @@ const { Option } = Select;
 
 export default function AppointmentsPage() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState('1');
+  const [activeTab, setActiveTab] = useState('2');
   const [selectedDoctor, setSelectedDoctor] = useState<string>('doc1'); // mock doctor id
 
   // Tab 1: All Appointments

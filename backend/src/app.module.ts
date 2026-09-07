@@ -4,6 +4,7 @@ import { LoggerModule } from 'nestjs-pino';
 import configuration from './config/configuration';
 
 import { PrismaModule } from './common/prisma/prisma.module';
+import { CacheModule } from './common/cache/cache.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { TenantModule } from './modules/tenant/tenant.module';
 import { UserModule } from './modules/user/user.module';
@@ -52,6 +53,7 @@ import { IntegrationModule } from './modules/integration/integration.module';
       },
     }),
     PrismaModule,
+    CacheModule,
     AuditModule, // Global module
     AuthModule,
     TenantModule,

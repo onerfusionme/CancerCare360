@@ -375,6 +375,7 @@ model CareJourney {
   @@index([tenantId])
   @@index([patientId])
   @@index([status])
+  @@index([tenantId, careStage, status])
 }
 
 enum CareStage {
@@ -527,6 +528,7 @@ model Appointment {
   @@index([patientId])
   @@index([doctorId])
   @@index([scheduledAt])
+  @@index([tenantId, scheduledAt, status])
 }
 
 enum AppointmentStatus {
@@ -808,6 +810,7 @@ model FollowUpTask {
   @@index([tenantId])
   @@index([patientId])
   @@index([status])
+  @@index([tenantId, dueDate, status])
 }
 
 enum TaskPriority {

@@ -59,8 +59,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         trigger={null} 
         collapsible 
         collapsed={sidebarCollapsed}
-        theme="light"
-        width={260}
+        theme="dark"
+        width={264}
+        className="executive-sider"
         style={{
           overflow: 'auto',
           height: '100vh',
@@ -68,32 +69,114 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           left: 0,
           top: 0,
           bottom: 0,
-          boxShadow: '2px 0 8px 0 rgba(29,35,41,.05)',
-          zIndex: 10
+          background: '#0f172a',
+          borderRight: '1px solid #1e293b',
+          zIndex: 10,
+          display: 'flex',
+          flexDirection: 'column',
         }}
       >
-        <div style={{ height: 64, display: 'flex', alignItems: 'center', justifyContent: 'center', borderBottom: '1px solid #f0f0f0' }}>
-          {sidebarCollapsed ? (
-            <MedicineBoxOutlined style={{ fontSize: 24, color: '#1677ff' }} />
-          ) : (
-            <Space>
-              <MedicineBoxOutlined style={{ fontSize: 24, color: '#1677ff' }} />
-              <span style={{ fontSize: 18, fontWeight: 600, color: '#1677ff' }}>CancerCare360</span>
-            </Space>
+        <div style={{ 
+          height: 68, 
+          display: 'flex', 
+          alignItems: 'center', 
+          padding: sidebarCollapsed ? '0 16px' : '0 20px',
+          borderBottom: '1px solid #1e293b',
+          gap: 12,
+        }}>
+          <div style={{
+            width: 36,
+            height: 36,
+            borderRadius: 8,
+            background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 2px 8px rgba(79, 70, 229, 0.4)',
+            flexShrink: 0,
+          }}>
+            <MedicineBoxOutlined style={{ fontSize: 20, color: '#ffffff' }} />
+          </div>
+          {!sidebarCollapsed && (
+            <div style={{ overflow: 'hidden' }}>
+              <div style={{ fontSize: 16, fontWeight: 700, color: '#f8fafc', letterSpacing: '-0.02em', lineHeight: 1.2 }}>
+                CancerCare<span style={{ color: '#818cf8' }}>360</span>
+              </div>
+              <div style={{ fontSize: 10, fontWeight: 600, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                Enterprise Oncology OS
+              </div>
+            </div>
           )}
         </div>
+
+        {!sidebarCollapsed && (
+          <div style={{ 
+            margin: '12px 14px 4px', 
+            padding: '8px 12px', 
+            background: '#1e293b', 
+            borderRadius: 6,
+            border: '1px solid #334155',
+          }}>
+            <div style={{ fontSize: 10, color: '#94a3b8', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.05em' }}>
+              Active Facility
+            </div>
+            <div style={{ fontSize: 12, color: '#f1f5f9', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              City General Hospital
+            </div>
+            <div style={{ fontSize: 11, color: '#818cf8' }}>
+              Medical Oncology Wing
+            </div>
+          </div>
+        )}
+
         <Menu
-          theme="light"
+          theme="dark"
           mode="inline"
           selectedKeys={[activeKey]}
           items={menuItems}
           onClick={({ key }) => router.push(key)}
-          style={{ borderRight: 0, marginTop: 8 }}
+          style={{ 
+            background: 'transparent', 
+            borderRight: 0, 
+            marginTop: 8,
+            padding: '0 8px',
+          }}
         />
+
+        {!sidebarCollapsed && (
+          <div style={{ 
+            marginTop: 'auto', 
+            padding: '16px 16px', 
+            borderTop: '1px solid #1e293b',
+            background: '#090d16',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+              <span style={{ 
+                width: 7, 
+                height: 7, 
+                borderRadius: '50%', 
+                background: '#10b981', 
+                boxShadow: '0 0 6px #10b981',
+                display: 'inline-block' 
+              }} />
+              <span style={{ fontSize: 11, color: '#94a3b8', fontWeight: 500 }}>
+                FHIR R4 & ABDM Connected
+              </span>
+            </div>
+            <div style={{ fontSize: 10, color: '#64748b' }}>
+              DPDP Act 2023 Non-Autonomous Guardrails Active
+            </div>
+          </div>
+        )}
       </Sider>
-      <Layout style={{ marginLeft: sidebarCollapsed ? 80 : 260, transition: 'all 0.2s' }}>
+      <Layout style={{ marginLeft: sidebarCollapsed ? 80 : 264, minHeight: '100vh', transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)' }}>
         <HeaderBar />
-        <Content style={{ margin: '24px 16px', padding: 24, background: '#fff', borderRadius: 8, minHeight: 280 }}>
+        <Content style={{ 
+          margin: 0, 
+          padding: '24px 32px', 
+          background: '#f8fafc', 
+          minHeight: 'calc(100vh - 68px)',
+        }}>
           {children}
         </Content>
       </Layout>
