@@ -17,7 +17,8 @@ import {
   MenuFoldOutlined,
   BellOutlined,
   GlobalOutlined,
-  LogoutOutlined
+  LogoutOutlined,
+  RiseOutlined
 } from '@ant-design/icons';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAppStore } from '@/stores/app.store';
@@ -43,7 +44,15 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     { key: '/investigations', icon: <ExperimentOutlined />, label: 'Investigations' },
     { key: '/journey', icon: <MedicineBoxOutlined />, label: 'Treatment Journey' },
     { key: '/education', icon: <ReadOutlined />, label: 'Education & Engagement' },
-    { key: '/analytics', icon: <BarChartOutlined />, label: 'Analytics' },
+    { 
+      key: 'analytics-group', 
+      icon: <BarChartOutlined />, 
+      label: 'Analytics',
+      children: [
+        { key: '/analytics', label: 'Operational Analytics' },
+        { key: '/analytics/practice', icon: <RiseOutlined />, label: 'Practice Growth' }
+      ]
+    },
     { key: '/reports', icon: <FileTextOutlined />, label: 'Reports' },
   ];
 

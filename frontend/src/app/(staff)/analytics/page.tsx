@@ -2,13 +2,14 @@
 
 import React from 'react';
 import { Card, Row, Col, Typography, Space, Table, Progress, Statistic } from 'antd';
-import { useCareContinuity, useInvestigationTAT } from '@/hooks/use-analytics';
+import { useCareContinuity, useInvestigationTAT, usePopulationGaps } from '@/hooks/use-analytics';
 
 const { Title, Text } = Typography;
 
 export default function AnalyticsPage() {
   const { data: continuityData, isLoading: isLoadingContinuity } = useCareContinuity();
   const { data: tatData, isLoading: isLoadingTAT } = useInvestigationTAT();
+  const { data: populationGaps, isLoading: isLoadingGaps } = usePopulationGaps();
 
   const columnsTAT = [
     {
@@ -107,6 +108,25 @@ export default function AnalyticsPage() {
             </Card>
           </Col>
         </Row>
+
+        {/* Care Gap Distribution */}
+        <Card title="Care Gap Distribution" loading={isLoadingGaps} bordered={false}>
+          <Space direction="vertical" style={{ width: '100%' }} size="middle">
+            {populationGaps?.byType?.map((gap: any) => (
+              <div key={gap.type}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                  <Text>{gap.type}</Text>
+                  <Text type="secondary">{gap.count} patients</Text>
+                </div>
+                {/* Assuming total is some relative number or we just show a relative bar */}
+                <div style={{ width: '100%', backgroundColor: '#f0f0f0', borderRadius: 4, height: 16 }}>
+                  <div style={{ width: `${Math.min((gap.count / 100) * 100, 100)}%`, backgroundColor: '#ff4d4f', height: '100%', borderRadius: 4 }}></div>
+                </div>
+              </div>
+            ))}
+            {(!populationGaps?.byType || populationGaps.byType.length === 0) && <Text type="secondary">No gap data available</Text>}
+          </Space>
+        </Card>
 
         {/* Investigation TAT */}
         <Card title="Investigation Turnaround Times vs SLA" bordered={false}>

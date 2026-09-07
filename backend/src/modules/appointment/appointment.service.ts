@@ -261,4 +261,107 @@ export class AppointmentService {
 
     return slots;
   }
+
+  async calculateNoShowRisk(tenantId: string, patientId: string): Promise<{ riskScore: number; riskLevel: string; factors: string[] }> {
+    const oneYearAgo = new Date();
+    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+    
+    const history = await this.prisma.appointment.findMany({
+      where: {
+        tenantId,
+        patientId,
+        scheduledAt: { gte: oneYearAgo, lte: new Date() }
+      } as any,
+      orderBy: { scheduledAt: 'desc' }
+    });
+
+    if (history.length === 0) {
+      return { riskScore: 0, riskLevel: 'LOW', factors: ['No appointment history in last 12 months'] };
+    }
+
+    let noShowCount = 0;
+    let cancelCount = 0;
+    let recentStreak = 0;
+    let streakActive = true;
+    let lastCompletedDate: Date | null = null;
+
+    for (const appt of history) {
+      const status = (appt as any).status;
+      if (status === 'NO_SHOW') {
+        noShowCount++;
+        if (streakActive) recentStreak++;
+      } else if (status === 'CANCELLED') {
+        cancelCount++;
+        streakActive = false;
+      } else if (status === 'COMPLETED') {
+        if (!lastCompletedDate) lastCompletedDate = (appt as any).scheduledAt;
+        streakActive = false;
+      } else {
+        streakActive = false;
+      }
+    }
+
+    const total = history.length;
+    const noShowRatio = noShowCount / total;
+    const cancellationRatio = cancelCount / total;
+
+    let daysSinceLastVisit = 0;
+    if (lastCompletedDate) {
+      daysSinceLastVisit = Math.floor((new Date().getTime() - lastCompletedDate.getTime()) / (1000 * 3600 * 24));
+    } else {
+      daysSinceLastVisit = 365;
+    }
+
+    const score1 = Math.min(noShowRatio * 100 * 0.4, 40);
+    const score2 = Math.min(cancellationRatio * 100 * 0.2, 20);
+    const score3 = Math.min((daysSinceLastVisit / 365) * 20, 20);
+    const score4 = Math.min(recentStreak * 10, 20);
+
+    const riskScore = Math.round(score1 + score2 + score3 + score4);
+    
+    let riskLevel = 'LOW';
+    if (riskScore >= 60) riskLevel = 'HIGH';
+    else if (riskScore >= 30) riskLevel = 'MEDIUM';
+
+    const factors = [];
+    if (noShowRatio > 0.2) factors.push(`High no-show rate (${Math.round(noShowRatio * 100)}%)`);
+    if (cancellationRatio > 0.3) factors.push(`High cancellation rate (${Math.round(cancellationRatio * 100)}%)`);
+    if (daysSinceLastVisit > 180) factors.push(`Over 6 months since last completed visit`);
+    if (recentStreak > 0) factors.push(`${recentStreak} consecutive recent no-shows`);
+
+    return { riskScore, riskLevel, factors };
+  }
+
+  async getHighRiskAppointments(tenantId: string, date?: string) {
+    const targetDate = date ? new Date(date) : new Date();
+    if (!date) targetDate.setDate(targetDate.getDate() + 1); // default tomorrow
+    
+    const start = new Date(targetDate);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(targetDate);
+    end.setHours(23, 59, 59, 999);
+
+    const appointments = await this.prisma.appointment.findMany({
+      where: {
+        tenantId,
+        scheduledAt: { gte: start, lte: end },
+        status: 'SCHEDULED'
+      } as any,
+      include: {
+        patient: { select: { id: true, firstName: true, lastName: true, mrn: true, phone: true } }
+      } as any
+    });
+
+    const risks = await Promise.all(
+      appointments.map(async (appt) => {
+        const risk = await this.calculateNoShowRisk(tenantId, (appt as any).patientId);
+        return {
+          appointment: appt,
+          ...risk
+        };
+      })
+    );
+
+    return risks.sort((a, b) => b.riskScore - a.riskScore);
+  }
 }

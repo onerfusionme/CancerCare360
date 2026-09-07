@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { Cron, CronExpression } from '@nestjs/schedule';
 import { CareGapService } from './care-gap.service';
 import { PrismaService } from '../../common/prisma/prisma.service';
 
@@ -17,6 +18,16 @@ export class CareGapProcessor {
     private readonly careGapService: CareGapService,
     private readonly prisma: PrismaService,
   ) {}
+
+  @Cron(CronExpression.EVERY_DAY_AT_2AM)
+  async scheduledGapScan() {
+    this.logger.log('[Cron] Starting scheduled daily care gap scan...');
+    const tenants = await this.prisma.tenant.findMany({ where: { status: 'ACTIVE' }, select: { id: true } });
+    for (const tenant of tenants) {
+      await this.processCohortScan({ tenantId: tenant.id, triggerSource: 'DAILY_CRON' });
+    }
+    this.logger.log('[Cron] Scheduled daily care gap scan complete.');
+  }
 
   /**
    * Enqueue or schedule asynchronous cohort scan

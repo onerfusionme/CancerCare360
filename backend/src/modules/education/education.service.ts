@@ -17,9 +17,11 @@ export class EducationService {
         language: createEducationDto.language || 'en',
         body: createEducationDto.body,
         status: (createEducationDto.status as ContentStatus) || ContentStatus.DRAFT,
+        targetDiagnosis: (createEducationDto as any).targetDiagnosis,
+        targetCareStage: (createEducationDto as any).targetCareStage,
         tenantId,
         draftedById: userId,
-      },
+      } as any,
     });
   }
 
@@ -69,7 +71,9 @@ export class EducationService {
       data: {
         ...updateEducationDto,
         status: updateEducationDto.status ? (updateEducationDto.status as ContentStatus) : undefined,
-      },
+        targetDiagnosis: (updateEducationDto as any).targetDiagnosis,
+        targetCareStage: (updateEducationDto as any).targetCareStage,
+      } as any,
     });
   }
 

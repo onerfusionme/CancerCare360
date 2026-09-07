@@ -31,3 +31,23 @@ export const exportPatientFhir = async (patientId: string): Promise<Blob> => {
   const { data } = await apiClient.get(`/api/v1/patients/${patientId}/export-fhir`, { responseType: 'blob' });
   return data;
 };
+
+export const getRegistryStats = async () => {
+  const { data } = await apiClient.get('/api/v1/analytics/registry-stats');
+  return data;
+};
+
+export const getPopulationGaps = async () => {
+  const { data } = await apiClient.get('/api/v1/analytics/population-gaps');
+  return data;
+};
+
+export const getPracticeGrowth = async () => {
+  const { data } = await apiClient.get('/api/v1/analytics/practice-growth');
+  return data;
+};
+
+export const getServiceUtilization = async () => {
+  const { data } = await apiClient.get('/api/v1/analytics/service-utilization');
+  return data;
+};

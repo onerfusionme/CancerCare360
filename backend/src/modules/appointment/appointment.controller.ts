@@ -54,6 +54,15 @@ export class AppointmentController {
     return this.appointmentService.getAvailableSlots(tenantId, doctorId, date);
   }
 
+  @Get('no-show-risks')
+  @ApiOperation({ summary: 'Get high risk appointments for no-shows' })
+  getHighRiskAppointments(
+    @CurrentTenant() tenantId: string,
+    @Query('date') date?: string,
+  ) {
+    return this.appointmentService.getHighRiskAppointments(tenantId, date);
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get appointment details' })
   findById(

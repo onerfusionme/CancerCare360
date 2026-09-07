@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Table, Button, Select, Space, Typography, Card, Row, Col, Statistic } from 'antd';
+import { Table, Button, Select, Space, Typography, Card, Row, Col, Statistic, Modal, Form, Input, DatePicker } from 'antd';
 import { FilterOutlined, SettingOutlined } from '@ant-design/icons';
 import { usePatients } from '@/hooks/use-patients';
+import { useRegistryStats } from '@/hooks/use-analytics';
 import StatusBadge from '@/components/ui/StatusBadge';
 import { PatientStatus } from '@/types/patient';
 
@@ -13,8 +14,14 @@ const { Option } = Select;
 export default function RegistryPage() {
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState<PatientStatus | undefined>(undefined);
+  const [department, setDepartment] = useState<string | undefined>(undefined);
+  const [careStage, setCareStage] = useState<string | undefined>(undefined);
+  const [advancedFilters, setAdvancedFilters] = useState<any>({});
+  const [isAdvancedFiltersOpen, setIsAdvancedFiltersOpen] = useState(false);
+  const [form] = Form.useForm();
   
-  const { data, isLoading } = usePatients({ page, limit: 15, status });
+  const { data, isLoading } = usePatients({ page, limit: 15, status, department, careStage, ...advancedFilters });
+  const { data: stats } = useRegistryStats();
 
   const columns = [
     { title: 'MRN', dataIndex: 'mrn', key: 'mrn' },
@@ -31,41 +38,41 @@ export default function RegistryPage() {
         <Title level={3} style={{ margin: 0 }}>Patient Registry</Title>
         <Space>
           <Button icon={<SettingOutlined />}>Saved Views</Button>
-          <Button type="primary" icon={<FilterOutlined />}>Advanced Filters</Button>
+          <Button type="primary" icon={<FilterOutlined />} onClick={() => setIsAdvancedFiltersOpen(true)}>Advanced Filters</Button>
         </Space>
       </div>
 
       <Row gutter={16}>
         <Col span={6}>
           <Card size="small">
-            <Statistic title="Total Patients" value={1423} />
+            <Statistic title="Total Patients" value={stats?.totalPatients || 0} />
           </Card>
         </Col>
         <Col span={6}>
           <Card size="small">
-            <Statistic title="Active" value={854} valueStyle={{ color: '#52c41a' }} />
+            <Statistic title="Active" value={stats?.activePatients || 0} valueStyle={{ color: '#52c41a' }} />
           </Card>
         </Col>
         <Col span={6}>
           <Card size="small">
-            <Statistic title="Follow-up Due" value={124} valueStyle={{ color: '#faad14' }} />
+            <Statistic title="Follow-up Due" value={stats?.followUpPatients || 0} valueStyle={{ color: '#faad14' }} />
           </Card>
         </Col>
         <Col span={6}>
           <Card size="small">
-            <Statistic title="Overdue" value={45} valueStyle={{ color: '#ff4d4f' }} />
+            <Statistic title="Inactive/Overdue" value={stats?.inactivePatients || 0} valueStyle={{ color: '#ff4d4f' }} />
           </Card>
         </Col>
       </Row>
 
       <Card size="small" title="Quick Filters">
         <Space wrap>
-          <Select placeholder="Department" style={{ width: 150 }} allowClear>
+          <Select placeholder="Department" style={{ width: 150 }} allowClear onChange={setDepartment}>
             <Option value="med_onc">Medical Oncology</Option>
             <Option value="rad_onc">Radiation Oncology</Option>
             <Option value="surg_onc">Surgical Oncology</Option>
           </Select>
-          <Select placeholder="Care Stage" style={{ width: 150 }} allowClear>
+          <Select placeholder="Care Stage" style={{ width: 150 }} allowClear onChange={setCareStage}>
             <Option value="SCREENING">Screening</Option>
             <Option value="DIAGNOSIS">Diagnosis</Option>
             <Option value="ACTIVE_TREATMENT">Active Treatment</Option>
@@ -84,14 +91,46 @@ export default function RegistryPage() {
           rowKey="id"
           loading={isLoading}
           pagination={{
-            current: data?.meta.currentPage || 1,
-            pageSize: data?.meta.itemsPerPage || 15,
-            total: data?.meta.totalItems || 0,
+            current: data?.meta?.currentPage || 1,
+            pageSize: data?.meta?.itemsPerPage || 15,
+            total: data?.meta?.totalItems || 0,
             onChange: setPage
           }}
           size="middle"
         />
       </Card>
+
+      <Modal
+        title="Advanced Filters"
+        open={isAdvancedFiltersOpen}
+        onCancel={() => setIsAdvancedFiltersOpen(false)}
+        onOk={() => {
+          form.validateFields().then(values => {
+            setAdvancedFilters({
+               diagnosis: values.diagnosis,
+               fromDate: values.dateRange?.[0]?.toISOString(),
+               toDate: values.dateRange?.[1]?.toISOString(),
+               doctorId: values.doctorId
+            });
+            setIsAdvancedFiltersOpen(false);
+          });
+        }}
+      >
+        <Form form={form} layout="vertical">
+          <Form.Item name="diagnosis" label="Diagnosis Text">
+            <Input placeholder="e.g. Breast Cancer" />
+          </Form.Item>
+          <Form.Item name="dateRange" label="Registration Date Range">
+            <DatePicker.RangePicker style={{ width: '100%' }} />
+          </Form.Item>
+          <Form.Item name="doctorId" label="Doctor">
+            <Select placeholder="Select Doctor" allowClear>
+              <Option value="doc1">Dr. Jane Smith</Option>
+              <Option value="doc2">Dr. Ramesh Rao</Option>
+            </Select>
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 }

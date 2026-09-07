@@ -1,20 +1,8 @@
-// Test if PrismaClient works in the same way as NestJS PrismaService
+// Test with postgres superuser
+process.env.DATABASE_URL = "postgresql://postgres@127.0.0.1:5432/cancercare360?schema=public";
 const { PrismaClient } = require("@prisma/client");
-
-class PrismaService extends PrismaClient {
-  constructor() {
-    super();
-  }
-  async onModuleInit() {
-    await this.$connect();
-  }
-}
-
-const p = new PrismaService();
-p.onModuleInit()
-  .then(() => { 
-    console.log("DB_CONNECTION: OK via PrismaService pattern"); 
-    return p.$queryRaw`SELECT current_user, current_database()`;
-  })
-  .then(r => { console.log("QUERY:", JSON.stringify(r)); return p.$disconnect(); })
-  .catch(e => { console.error("DB_CONNECTION: FAIL -", e.message.substring(0, 200)); process.exit(1); });
+const p = new PrismaClient();
+p.$connect()
+  .then(() => { console.log("POSTGRES_CONNECT: OK"); return p.$queryRaw`SELECT 1`; })
+  .then(() => { console.log("QUERY: OK"); return p.$disconnect(); })
+  .catch(e => { console.error("FAIL:", e.message.substring(0, 200)); process.exit(1); });

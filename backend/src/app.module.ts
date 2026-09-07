@@ -5,6 +5,7 @@ import configuration from './config/configuration';
 
 import { PrismaModule } from './common/prisma/prisma.module';
 import { CacheModule } from './common/cache/cache.module';
+import { ScheduleModule as NestScheduleModule } from '@nestjs/schedule';
 import { AuthModule } from './modules/auth/auth.module';
 import { TenantModule } from './modules/tenant/tenant.module';
 import { UserModule } from './modules/user/user.module';
@@ -36,6 +37,8 @@ import { PatientPortalModule } from './modules/patient-portal/patient-portal.mod
 import { AnalyticsModule } from './modules/analytics/analytics.module';
 import { ReportsModule } from './modules/reports/reports.module';
 import { IntegrationModule } from './modules/integration/integration.module';
+import { ReferralModule } from './modules/referral/referral.module';
+import { FeedbackModule } from './modules/feedback/feedback.module';
 
 @Module({
   imports: [
@@ -54,6 +57,7 @@ import { IntegrationModule } from './modules/integration/integration.module';
     }),
     PrismaModule,
     CacheModule,
+    NestScheduleModule.forRoot(),
     AuditModule, // Global module
     AuthModule,
     TenantModule,
@@ -83,6 +87,8 @@ import { IntegrationModule } from './modules/integration/integration.module';
     AnalyticsModule,
     ReportsModule,
     IntegrationModule,
+    ReferralModule,
+    FeedbackModule,
   ],
 })
 export class AppModule {}

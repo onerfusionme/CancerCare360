@@ -5,6 +5,10 @@ import {
   getInvestigationTAT,
   generateReport,
   exportPatientFhir,
+  getRegistryStats,
+  getPopulationGaps,
+  getPracticeGrowth,
+  getServiceUtilization,
 } from '../services/analytics.service';
 import { ReportRequestDto } from '../types/analytics';
 
@@ -39,5 +43,33 @@ export const useGenerateReport = () => {
 export const useExportFhir = () => {
   return useMutation({
     mutationFn: (patientId: string) => exportPatientFhir(patientId),
+  });
+};
+
+export const useRegistryStats = () => {
+  return useQuery({
+    queryKey: ['analytics', 'registry-stats'],
+    queryFn: getRegistryStats,
+  });
+};
+
+export const usePopulationGaps = () => {
+  return useQuery({
+    queryKey: ['analytics', 'population-gaps'],
+    queryFn: getPopulationGaps,
+  });
+};
+
+export const usePracticeGrowth = () => {
+  return useQuery({
+    queryKey: ['analytics', 'practice-growth'],
+    queryFn: getPracticeGrowth,
+  });
+};
+
+export const useServiceUtilization = () => {
+  return useQuery({
+    queryKey: ['analytics', 'service-utilization'],
+    queryFn: getServiceUtilization,
   });
 };

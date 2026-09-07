@@ -17,6 +17,11 @@ export default function PortalEducation() {
     { id: '4', title: 'Financial Assistance (PMJAY)', tag: 'Finance' }
   ];
 
+  const recommended = [
+    { id: '1', title: 'Managing Chemotherapy', tag: 'Treatment' },
+    { id: '2', title: 'Dietary Advice in India', tag: 'Nutrition' }
+  ];
+
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
@@ -28,23 +33,49 @@ export default function PortalEducation() {
         </Radio.Group>
       </div>
 
-      <Row gutter={[16, 16]}>
-        {categories.map(cat => (
-          <Col xs={24} sm={12} md={8} key={cat.id}>
-            <Card 
-              hoverable 
-              onClick={() => setSelectedArticle(cat)}
-              style={{ height: '100%' }}
-            >
-              <Space direction="vertical" style={{ width: '100%' }}>
-                <Tag color="blue">{cat.tag}</Tag>
-                <Title level={5} style={{ marginTop: 8 }}>{cat.title}</Title>
-                <Text type="secondary">Read more about {cat.title.toLowerCase()}...</Text>
-              </Space>
-            </Card>
-          </Col>
-        ))}
-      </Row>
+      {recommended.length > 0 && (
+        <div style={{ marginBottom: 32 }}>
+          <Title level={4} style={{ color: '#1890ff' }}>Recommended for You</Title>
+          <Row gutter={[16, 16]}>
+            {recommended.map(cat => (
+              <Col xs={24} sm={12} md={8} key={cat.id}>
+                <Card 
+                  hoverable 
+                  onClick={() => setSelectedArticle(cat)}
+                  style={{ height: '100%', borderColor: '#1890ff', borderWidth: 2 }}
+                >
+                  <Space direction="vertical" style={{ width: '100%' }}>
+                    <Tag color="blue">{cat.tag}</Tag>
+                    <Title level={5} style={{ marginTop: 8 }}>{cat.title}</Title>
+                    <Text type="secondary">Read more about {cat.title.toLowerCase()}...</Text>
+                  </Space>
+                </Card>
+              </Col>
+            ))}
+          </Row>
+        </div>
+      )}
+
+      <div>
+        <Title level={4}>All Resources</Title>
+        <Row gutter={[16, 16]}>
+          {categories.map(cat => (
+            <Col xs={24} sm={12} md={8} key={cat.id}>
+              <Card 
+                hoverable 
+                onClick={() => setSelectedArticle(cat)}
+                style={{ height: '100%' }}
+              >
+                <Space direction="vertical" style={{ width: '100%' }}>
+                  <Tag color="blue">{cat.tag}</Tag>
+                  <Title level={5} style={{ marginTop: 8 }}>{cat.title}</Title>
+                  <Text type="secondary">Read more about {cat.title.toLowerCase()}...</Text>
+                </Space>
+              </Card>
+            </Col>
+          ))}
+        </Row>
+      </div>
 
       <Modal
         title={selectedArticle?.title}

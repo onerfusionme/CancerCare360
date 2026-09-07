@@ -136,6 +136,31 @@ export class CareGapService {
             ruleId: (rule as any).id,
             actionableInfo: { treatmentId: t.id },
          }));
+      } else if (type === 'LOST_TO_CARE') {
+         const ninetyDaysAgo = new Date();
+         ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+         const lostPatients = await this.prisma.patient.findMany({
+            where: {
+               tenantId,
+               status: 'ACTIVE',
+               appointments: { none: { scheduledAt: { gt: ninetyDaysAgo } } },
+               investigations: { none: { createdAt: { gt: ninetyDaysAgo } } },
+               journeyEvents: { none: { eventDate: { gt: ninetyDaysAgo } } }
+            } as any
+         });
+         gaps = lostPatients.map((p: any) => ({
+            patientId: p.id,
+            patientName: `${p.firstName} ${p.lastName}`,
+            mrn: p.mrn,
+            gapType: 'LOST_TO_CARE',
+            ruleType: 'LOST_TO_CARE',
+            description: 'Patient lost to care (no activity in last 90 days)',
+            priorityScore: 90,
+            priorityWeight: 90,
+            detectedAt: new Date(),
+            ruleId: (rule as any).id,
+            actionableInfo: { patientId: p.id },
+         }));
       }
 
       allGaps = allGaps.concat(gaps);

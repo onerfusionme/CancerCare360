@@ -18,7 +18,9 @@ import {
   Tooltip, 
   Row, 
   Col, 
-  Typography 
+  Typography,
+  Progress,
+  Badge
 } from 'antd';
 import { 
   PlusOutlined, 
@@ -37,7 +39,8 @@ import {
   useCheckIn, 
   useStartConsultation, 
   useCompleteConsultation,
-  useCancelAppointment 
+  useCancelAppointment,
+  useNoShowRisks
 } from '@/hooks/use-appointments';
 import { AppointmentStatus, Appointment } from '@/types/appointment';
 import { waitlistService } from '@/services/waitlist.service';
@@ -68,6 +71,7 @@ export default function AppointmentsPage() {
     queryKey: ['waitlist'],
     queryFn: () => waitlistService.getWaitlist()
   });
+  const { data: noShowData, isLoading: noShowLoading } = useNoShowRisks(dayjs().add(1, 'day').format('YYYY-MM-DD'));
 
   // Mutations
   const createAppointmentMutation = useCreateAppointment();
@@ -241,6 +245,66 @@ export default function AppointmentsPage() {
     }
   ];
 
+  const noShowColumns = [
+    {
+      title: 'Patient',
+      key: 'patient',
+      render: (_: any, record: any) => record.patient?.name || 'Unknown'
+    },
+    { 
+      title: 'Time', 
+      dataIndex: 'scheduledAt', 
+      key: 'scheduledAt',
+      render: (val: string) => val ? dayjs(val).format('hh:mm A') : 'N/A'
+    },
+    { 
+      title: 'Doctor', 
+      key: 'doctor',
+      render: (_: any, record: any) => record.doctor?.name || 'Dr. Jane Smith'
+    },
+    {
+      title: 'Risk Score',
+      dataIndex: 'riskScore',
+      key: 'riskScore',
+      render: (score: number) => {
+        let color = '#52c41a'; // green
+        if (score >= 60) color = '#ff4d4f'; // red
+        else if (score >= 30) color = '#faad14'; // orange
+        return <Progress percent={score} size="small" strokeColor={color} />;
+      }
+    },
+    {
+      title: 'Risk Level',
+      dataIndex: 'riskLevel',
+      key: 'riskLevel',
+      render: (level: string) => {
+        const colorMap: Record<string, string> = { 'HIGH': 'red', 'MEDIUM': 'orange', 'LOW': 'green' };
+        return <Badge color={colorMap[level?.toUpperCase()] || 'blue'} text={level} />;
+      }
+    },
+    {
+      title: 'Risk Factors',
+      dataIndex: 'factors',
+      key: 'factors',
+      render: (factors: string[]) => (
+        <>
+          {factors?.map((f: string) => (
+            <Tag key={f} style={{ marginBottom: 4 }}>{f}</Tag>
+          ))}
+        </>
+      )
+    },
+    {
+      title: 'Actions',
+      key: 'actions',
+      render: (_: any, record: any) => (
+        <Button size="small" type="primary" onClick={() => message.success('Reminder sent!')}>
+          Send Reminder
+        </Button>
+      )
+    }
+  ];
+
   const waitlistColumns = [
     {
       title: 'Patient',
@@ -328,6 +392,21 @@ export default function AppointmentsPage() {
                   dataSource={waitlist || []} 
                   rowKey="id" 
                   loading={waitlistLoading}
+                  pagination={{ pageSize: 8 }}
+                />
+              </Card>
+            )
+          },
+          {
+            key: '4',
+            label: `No-Show Risk (${noShowData?.data?.length || 0})`,
+            children: (
+              <Card>
+                <Table 
+                  columns={noShowColumns} 
+                  dataSource={noShowData?.data || []} 
+                  rowKey="id" 
+                  loading={noShowLoading}
                   pagination={{ pageSize: 8 }}
                 />
               </Card>

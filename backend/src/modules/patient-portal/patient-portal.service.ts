@@ -145,6 +145,51 @@ export class PatientPortalService {
     return this.educationService.findPublished(tenantId, undefined, language);
   }
 
+  async getRecommendedEducation(tenantId: string, patientId: string) {
+    const patient = await this.prisma.patient.findFirst({
+      where: { id: patientId, tenantId },
+      include: {
+        careJourneys: {
+          where: { status: 'ACTIVE' },
+          take: 1
+        }
+      } as any
+    });
+
+    if (!patient) throw new NotFoundException('Patient not found');
+
+    const activeJourney = patient.careJourneys?.[0];
+    const diagnosis = (activeJourney as any)?.diagnosis || null;
+    const careStage = (activeJourney as any)?.careStage || null;
+
+    const allPublished = await this.prisma.educationContent.findMany({
+      where: { tenantId, status: 'PUBLISHED' } as any,
+    });
+
+    const recommended = [];
+    const general = [];
+
+    for (const content of allPublished) {
+      const targetDiag = (content as any).targetDiagnosis;
+      const targetStage = (content as any).targetCareStage;
+      
+      let isRecommended = false;
+      if (diagnosis && targetDiag && diagnosis.toLowerCase().includes(targetDiag.toLowerCase())) {
+        isRecommended = true;
+      } else if (careStage && targetStage && careStage === targetStage) {
+        isRecommended = true;
+      }
+      
+      if (isRecommended) {
+        recommended.push(content);
+      } else if (!targetDiag && !targetStage) {
+        general.push(content);
+      }
+    }
+
+    return { recommended, general };
+  }
+
   async recordConsent(tenantId: string, patientId: string, dto: ConsentRequestDto) {
     const patient = await this.prisma.patient.findFirst({ where: { id: patientId, tenantId } });
     if (!patient) throw new NotFoundException('Patient not found');

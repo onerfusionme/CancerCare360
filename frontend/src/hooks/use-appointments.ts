@@ -83,3 +83,10 @@ export function useCancelAppointment() {
     }
   });
 }
+
+export function useNoShowRisks(date?: string) {
+  return useQuery({
+    queryKey: ['appointments', 'no-show-risks', date],
+    queryFn: () => appointmentService.getNoShowRisks(date),
+  });
+}

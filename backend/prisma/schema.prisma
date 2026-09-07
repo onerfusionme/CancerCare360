@@ -51,6 +51,9 @@ model Tenant {
   integrationConfigs  IntegrationConfig[]
   integrationLogs     IntegrationLog[]
   dataConflicts       DataConflict[]
+  referrals           Referral[]
+  feedbacks           PatientFeedback[]
+  serviceUtilizations ServiceUtilization[]
 
   @@index([status])
 }
@@ -102,6 +105,8 @@ model Department {
   appointments    Appointment[]
   doctorSchedules DoctorSchedule[]
   waitlistEntries WaitlistEntry[]
+  referrals       Referral[]
+  serviceUtilizations ServiceUtilization[]
 
   @@index([tenantId])
   @@index([hospitalId])
@@ -154,6 +159,8 @@ model User {
   aiInteractions       AiInteractionLog[] @relation("AiUser")
   aiInteractionsRev    AiInteractionLog[] @relation("AiReviewedBy")
   dataConflictsRev     DataConflict[]     @relation("ConflictResolvedBy")
+  referralsReceived    Referral[]         @relation("ReferralReceivedBy")
+  feedbacksReceived    PatientFeedback[]  @relation("FeedbackDoctor")
 
   @@unique([tenantId, email])
   @@index([tenantId])
@@ -290,6 +297,8 @@ model Patient {
   followUpTasks       FollowUpTask[]
   outreachLogs        OutreachLog[]
   dataConflicts       DataConflict[]
+  referrals           Referral[]
+  feedbacks           PatientFeedback[]
 
   @@unique([tenantId, mrn])
   @@index([tenantId])
@@ -523,6 +532,7 @@ model Appointment {
   doctor      User         @relation("AppointmentDoctor", fields: [doctorId], references: [id])
   department  Department   @relation(fields: [departmentId], references: [id])
   createdBy   User         @relation("AppointmentCreatedBy", fields: [createdById], references: [id])
+  feedbacks   PatientFeedback[]
 
   @@index([tenantId])
   @@index([patientId])
@@ -934,21 +944,23 @@ enum NotificationStatus {
 // ----------------------------------------
 
 model EducationContent {
-  id           String    @id @default(uuid()) @db.Uuid
-  tenantId     String    @db.Uuid
-  title        String
-  category     String
-  language     String    @default("en")
-  body         String
-  status       ContentStatus
-  draftedById  String    @db.Uuid
-  reviewedById String?   @db.Uuid
-  approvedById String?   @db.Uuid
-  publishedAt  DateTime?
-  archivedAt   DateTime?
-  version      Int       @default(1)
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  id              String     @id @default(uuid()) @db.Uuid
+  tenantId        String     @db.Uuid
+  title           String
+  category        String
+  language        String     @default("en")
+  body            String
+  status          ContentStatus
+  targetDiagnosis String?
+  targetCareStage CareStage?
+  draftedById     String     @db.Uuid
+  reviewedById    String?    @db.Uuid
+  approvedById    String?    @db.Uuid
+  publishedAt     DateTime?
+  archivedAt      DateTime?
+  version         Int        @default(1)
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
 
   tenant     Tenant     @relation(fields: [tenantId], references: [id])
   draftedBy  User       @relation("EduDraftedBy", fields: [draftedById], references: [id])
@@ -957,6 +969,7 @@ model EducationContent {
   campaigns  Campaign[]
 
   @@index([tenantId])
+  @@index([targetDiagnosis])
 }
 
 enum ContentStatus {
@@ -1176,4 +1189,97 @@ model DataConflict {
 
   @@index([tenantId])
   @@index([patientId])
+}
+
+// ----------------------------------------
+// Practice Growth - Referral Tracking
+// ----------------------------------------
+
+model Referral {
+  id                 String         @id @default(uuid()) @db.Uuid
+  tenantId           String         @db.Uuid
+  patientId          String         @db.Uuid
+  referredByName     String
+  referredByType     ReferralSource
+  referredByContact  String?
+  referredToId       String         @db.Uuid
+  departmentId       String?        @db.Uuid
+  notes              String?
+  convertedToJourney Boolean        @default(false)
+  referralDate       DateTime       @default(now())
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+
+  tenant     Tenant     @relation(fields: [tenantId], references: [id])
+  patient    Patient    @relation(fields: [patientId], references: [id])
+  referredTo User       @relation("ReferralReceivedBy", fields: [referredToId], references: [id])
+  department Department? @relation(fields: [departmentId], references: [id])
+
+  @@index([tenantId])
+  @@index([patientId])
+  @@index([referredToId])
+  @@index([referredByType])
+}
+
+enum ReferralSource {
+  SELF
+  DOCTOR
+  HOSPITAL
+  ONLINE
+  INSURANCE
+  OTHER
+}
+
+// ----------------------------------------
+// Practice Growth - Patient Feedback & NPS
+// ----------------------------------------
+
+model PatientFeedback {
+  id                String    @id @default(uuid()) @db.Uuid
+  tenantId          String    @db.Uuid
+  patientId         String    @db.Uuid
+  appointmentId     String?   @db.Uuid
+  doctorId          String?   @db.Uuid
+  overallRating     Int
+  npsScore          Int?
+  waitTimeRating    Int?
+  careQualityRating Int?
+  communicationRating Int?
+  comment           String?
+  isAnonymous       Boolean   @default(false)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  tenant      Tenant       @relation(fields: [tenantId], references: [id])
+  patient     Patient      @relation(fields: [patientId], references: [id])
+  appointment Appointment? @relation(fields: [appointmentId], references: [id])
+  doctor      User?        @relation("FeedbackDoctor", fields: [doctorId], references: [id])
+
+  @@index([tenantId])
+  @@index([patientId])
+  @@index([doctorId])
+}
+
+// ----------------------------------------
+// Practice Growth - Service Utilization
+// ----------------------------------------
+
+model ServiceUtilization {
+  id              String   @id @default(uuid()) @db.Uuid
+  tenantId        String   @db.Uuid
+  serviceType     String
+  departmentId    String?  @db.Uuid
+  month           DateTime
+  totalCount      Int      @default(0)
+  completedCount  Int      @default(0)
+  cancelledCount  Int      @default(0)
+  averageDuration Int?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  tenant     Tenant      @relation(fields: [tenantId], references: [id])
+  department Department? @relation(fields: [departmentId], references: [id])
+
+  @@unique([tenantId, serviceType, month])
+  @@index([tenantId])
 }

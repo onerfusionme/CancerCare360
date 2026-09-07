@@ -281,4 +281,101 @@ export class AnalyticsService {
 
     return result;
   }
+
+  async getPracticeGrowthMetrics(tenantId: string) {
+    const twelveMonthsAgo = new Date();
+    twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
+    
+    const recentPatients = await this.prisma.patient.findMany({
+      where: { tenantId, registeredAt: { gte: twelveMonthsAgo } },
+      select: { registeredAt: true },
+    });
+    
+    const newPatientsPerMonth: Record<string, number> = {};
+    recentPatients.forEach(p => {
+      const monthYear = `${p.registeredAt.getFullYear()}-${String(p.registeredAt.getMonth() + 1).padStart(2, '0')}`;
+      newPatientsPerMonth[monthYear] = (newPatientsPerMonth[monthYear] || 0) + 1;
+    });
+
+    const activePatientsCount = await this.prisma.patient.count({
+      where: { tenantId, status: 'ACTIVE' },
+    });
+    
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+
+    const activePatients = await this.prisma.patient.findMany({
+      where: { tenantId, status: 'ACTIVE' },
+      select: {
+        id: true,
+        _count: {
+          select: {
+            appointments: {
+              where: { scheduledAt: { gte: sixMonthsAgo } },
+            }
+          }
+        }
+      }
+    });
+    
+    const retainedPatientsCount = activePatients.filter(p => p._count.appointments >= 2).length;
+    const retentionRate = activePatientsCount > 0 ? (retainedPatientsCount / activePatientsCount) * 100 : 0;
+
+    const totalReferrals = await this.prisma.referral.count({ where: { tenantId } });
+    const convertedReferrals = await this.prisma.referral.count({ where: { tenantId, convertedToJourney: true } });
+    const referralConversionRate = totalReferrals > 0 ? (convertedReferrals / totalReferrals) * 100 : 0;
+
+    const feedbacks = await this.prisma.patientFeedback.aggregate({
+      where: { tenantId },
+      _avg: { overallRating: true },
+    });
+    const averageSatisfaction = feedbacks._avg.overallRating || 0;
+
+    const completedAppointments = await this.prisma.appointment.count({
+      where: { tenantId, status: AppointmentStatus.COMPLETED }
+    });
+    const nonCancelledAppointments = await this.prisma.appointment.count({
+      where: { tenantId, status: { not: AppointmentStatus.CANCELLED } }
+    });
+    const appointmentCompletionRate = nonCancelledAppointments > 0 ? (completedAppointments / nonCancelledAppointments) * 100 : 0;
+
+    return {
+      newPatientsPerMonth,
+      retentionRate,
+      referralConversionRate,
+      averageSatisfaction,
+      appointmentCompletionRate
+    };
+  }
+
+  async getServiceUtilization(tenantId: string) {
+    const grouped = await this.prisma.appointment.groupBy({
+      by: ['appointmentType'],
+      where: { tenantId },
+      _count: {
+        _all: true,
+      },
+    });
+
+    const results = [];
+    for (const group of grouped) {
+      const type = group.appointmentType;
+      const total = group._count._all;
+      const completed = await this.prisma.appointment.count({
+        where: { tenantId, appointmentType: type, status: AppointmentStatus.COMPLETED }
+      });
+      const cancelled = await this.prisma.appointment.count({
+        where: { tenantId, appointmentType: type, status: AppointmentStatus.CANCELLED }
+      });
+      results.push({
+        serviceType: type,
+        total,
+        completed,
+        cancelled,
+        completionRate: total > 0 ? (completed / total) * 100 : 0,
+      });
+    }
+
+    return results;
+  }
 }

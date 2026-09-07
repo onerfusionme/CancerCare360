@@ -30,4 +30,16 @@ export class AnalyticsController {
     const tenantId = req.tenantId;
     return this.analyticsService.getInvestigationTAT(tenantId);
   }
+
+  @Get('practice-growth')
+  async getPracticeGrowthMetrics(@Request() req: any) {
+    const tenantId = req.tenantId;
+    return this.analyticsService.getPracticeGrowthMetrics(tenantId);
+  }
+
+  @Get('service-utilization')
+  async getServiceUtilization(@Request() req: any) {
+    const tenantId = req.tenantId;
+    return this.analyticsService.getServiceUtilization(tenantId);
+  }
 }

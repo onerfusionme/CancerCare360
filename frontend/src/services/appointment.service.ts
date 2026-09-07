@@ -57,5 +57,10 @@ export const appointmentService = {
   getAvailableSlots: async (doctorId: string, date: string): Promise<TimeSlot[]> => {
     const response = await apiClient.get(`/api/v1/appointments/slots`, { params: { doctorId, date } });
     return response.data;
+  },
+
+  getNoShowRisks: async (date?: string): Promise<{ data: any[] }> => {
+    const response = await apiClient.get('/api/v1/appointments/no-show-risks', { params: { date } });
+    return response.data;
   }
 };
