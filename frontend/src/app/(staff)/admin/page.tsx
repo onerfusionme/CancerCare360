@@ -1,12 +1,15 @@
 'use client';
 
 import React from 'react';
-import { Tabs, Typography, Space, Card, Table, Tag, Badge, Descriptions } from 'antd';
+import { Tabs, Typography, Space, Card, Table, Tag, Badge, Descriptions, Button, Row, Col } from 'antd';
+import { SafetyCertificateOutlined, SettingOutlined, ArrowRightOutlined, RobotOutlined } from '@ant-design/icons';
+import { useRouter } from 'next/navigation';
 
 const { Title, Text } = Typography;
 const { TabPane } = Tabs;
 
 export default function AdminPage() {
+  const router = useRouter();
   
   const depts = [
     { id: 1, name: 'Medical Oncology', clinics: 12, doctors: 45, status: 'Active' },
@@ -42,10 +45,73 @@ export default function AdminPage() {
   return (
     <div style={{ padding: '24px' }}>
       <Space direction="vertical" size="large" style={{ width: '100%' }}>
-        <div>
-          <Title level={2} style={{ margin: 0 }}>System Administration</Title>
-          <Text type="secondary">Manage hospital infrastructure, users, and clinical protocols</Text>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
+          <div>
+            <Title level={2} style={{ margin: 0 }}>System Administration</Title>
+            <Text type="secondary">Manage hospital infrastructure, users, clinical protocols, and AI safety guardrails</Text>
+          </div>
+          <Space>
+            <Button 
+              type="primary" 
+              icon={<SafetyCertificateOutlined />} 
+              onClick={() => router.push('/admin/ai')}
+              style={{ background: '#4f46e5', borderColor: '#4f46e5' }}
+            >
+              AI Governance & Audit Logs
+            </Button>
+            <Button 
+              icon={<SettingOutlined />} 
+              onClick={() => router.push('/gaps/rules')}
+            >
+              Protocol Rules
+            </Button>
+          </Space>
         </div>
+
+        {/* Quick Access Highlights */}
+        <Row gutter={[16, 16]}>
+          <Col xs={24} md={12}>
+            <Card 
+              hoverable 
+              onClick={() => router.push('/admin/ai')}
+              style={{ borderLeft: '4px solid #4f46e5' }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <RobotOutlined style={{ color: '#4f46e5', fontSize: 18 }} />
+                    <span style={{ fontWeight: 700, fontSize: 15, color: '#0f172a' }}>AI Clinical Governance Console</span>
+                  </div>
+                  <Text type="secondary" style={{ display: 'block', marginTop: 4 }}>
+                    Audit §30 non-autonomous decision support, confidence thresholds, and acceptance logs.
+                  </Text>
+                </div>
+                <ArrowRightOutlined style={{ color: '#4f46e5' }} />
+              </div>
+            </Card>
+          </Col>
+
+          <Col xs={24} md={12}>
+            <Card 
+              hoverable 
+              onClick={() => router.push('/gaps/rules')}
+              style={{ borderLeft: '4px solid #0284c7' }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <SettingOutlined style={{ color: '#0284c7', fontSize: 18 }} />
+                    <span style={{ fontWeight: 700, fontSize: 15, color: '#0f172a' }}>Care Gap Rules Manager</span>
+                  </div>
+                  <Text type="secondary" style={{ display: 'block', marginTop: 4 }}>
+                    Configure triggers, days overdue thresholds, and escalation weights for missed milestones.
+                  </Text>
+                </div>
+                <ArrowRightOutlined style={{ color: '#0284c7' }} />
+              </div>
+            </Card>
+          </Col>
+        </Row>
 
         <Card bordered={false}>
           <Tabs defaultActiveKey="1" size="large">

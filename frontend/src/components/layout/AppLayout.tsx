@@ -18,7 +18,10 @@ import {
   BellOutlined,
   GlobalOutlined,
   LogoutOutlined,
-  RiseOutlined
+  RiseOutlined,
+  FolderOpenOutlined,
+  NotificationOutlined,
+  HeartOutlined
 } from '@ant-design/icons';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAppStore } from '@/stores/app.store';
@@ -34,7 +37,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, hasRole } = useAuth();
   const isDark = themeMode === 'dark';
 
-  const menuItems = [
+  const menuItems: any[] = [
     { key: '/dashboard', icon: <DashboardOutlined />, label: 'Dashboard' },
     { key: '/registry', icon: <TeamOutlined />, label: 'Patient Registry' },
     { key: '/patients', icon: <UserOutlined />, label: 'Patients' },
@@ -43,6 +46,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     { key: '/appointments', icon: <CalendarOutlined />, label: 'Appointments & Clinic Flow' },
     { key: '/investigations', icon: <ExperimentOutlined />, label: 'Investigations' },
     { key: '/journey', icon: <MedicineBoxOutlined />, label: 'Treatment Journey' },
+    { key: '/documents', icon: <FolderOpenOutlined />, label: 'Clinical Documents' },
+    { key: '/campaigns', icon: <NotificationOutlined />, label: 'Patient Campaigns' },
     { key: '/education', icon: <ReadOutlined />, label: 'Education & Engagement' },
     { 
       key: 'analytics-group', 
@@ -57,11 +62,20 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   ];
 
   if (hasRole('ADMIN' as any)) {
-    menuItems.push({ key: '/admin', icon: <SettingOutlined />, label: 'Administration' });
+    menuItems.push({
+      key: 'admin-group',
+      icon: <SettingOutlined />,
+      label: 'Administration',
+      children: [
+        { key: '/admin', label: 'System Overview' },
+        { key: '/admin/ai', label: 'AI Governance & Safety' },
+        { key: '/gaps/rules', label: 'Care Gap Rules' }
+      ]
+    });
   }
 
   // Find active key based on pathname
-  const activeKey = menuItems.find(item => pathname.startsWith(item.key))?.key || '/dashboard';
+  const activeKey = pathname;
 
   return (
     <Layout style={{ minHeight: '100vh', background: isDark ? '#060911' : '#f8fafc' }}>
@@ -144,7 +158,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           mode="inline"
           selectedKeys={[activeKey]}
           items={menuItems}
-          onClick={({ key }) => router.push(key)}
+          onClick={({ key }) => {
+            if (key.startsWith('/')) {
+              router.push(key);
+            }
+          }}
           style={{ 
             background: 'transparent', 
             borderRight: 0, 
@@ -160,6 +178,23 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             borderTop: isDark ? '1px solid #1e293b' : '1px solid #1e293b',
             background: isDark ? '#05070d' : '#090d16',
           }}>
+            <Button
+              block
+              ghost
+              icon={<HeartOutlined style={{ color: '#0d9488' }} />}
+              onClick={() => router.push('/portal')}
+              style={{
+                borderColor: '#0d9488',
+                color: '#2dd4bf',
+                marginBottom: 12,
+                fontSize: 12,
+                fontWeight: 600,
+                height: 34,
+                borderRadius: 6
+              }}
+            >
+              Patient Portal Companion
+            </Button>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
               <span style={{ 
                 width: 7, 
@@ -174,7 +209,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               </span>
             </div>
             <div style={{ fontSize: 10, color: '#64748b' }}>
-              DPDP Act 2023 Non-Autonomous Guardrails Active
+              DPDP Act 2023 Clinical Guardrails
             </div>
           </div>
         )}

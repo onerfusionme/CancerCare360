@@ -333,14 +333,22 @@ export default function AppointmentsPage() {
           <Title level={3} style={{ margin: 0 }}>Appointments & Clinic Flow</Title>
           <Text type="secondary">Scheduling, wait-time orchestration & clinic flow lifecycle</Text>
         </div>
-        <Button 
-          type="primary" 
-          icon={<PlusOutlined />} 
-          onClick={() => setBookModalOpen(true)}
-          style={{ background: '#0284c7', borderColor: '#0284c7' }}
-        >
-          Book Appointment
-        </Button>
+        <Space>
+          <Button 
+            icon={<CalendarOutlined />} 
+            onClick={() => router.push('/appointments/book')}
+          >
+            4-Step Booking Wizard
+          </Button>
+          <Button 
+            type="primary" 
+            icon={<PlusOutlined />} 
+            onClick={() => setBookModalOpen(true)}
+            style={{ background: '#0284c7', borderColor: '#0284c7' }}
+          >
+            Quick Book
+          </Button>
+        </Space>
       </div>
 
       <Tabs 

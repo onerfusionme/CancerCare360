@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Table, Button, Select, Space, Typography, Card, Row, Col, Statistic, Modal, Form, Input, DatePicker } from 'antd';
-import { FilterOutlined, SettingOutlined } from '@ant-design/icons';
+import { Table, Button, Select, Space, Typography, Card, Row, Col, Statistic, Modal, Form, Input, DatePicker, Dropdown } from 'antd';
+import { FilterOutlined, SettingOutlined, EyeOutlined } from '@ant-design/icons';
+import { useRouter } from 'next/navigation';
 import { usePatients } from '@/hooks/use-patients';
 import { useRegistryStats } from '@/hooks/use-analytics';
 import StatusBadge from '@/components/ui/StatusBadge';
@@ -12,6 +13,7 @@ const { Title } = Typography;
 const { Option } = Select;
 
 export default function RegistryPage() {
+  const router = useRouter();
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState<PatientStatus | undefined>(undefined);
   const [department, setDepartment] = useState<string | undefined>(undefined);
@@ -23,13 +25,48 @@ export default function RegistryPage() {
   const { data, isLoading } = usePatients({ page, limit: 15, status, department, careStage, ...advancedFilters });
   const { data: stats } = useRegistryStats();
 
+  const savedViewsMenu = {
+    items: [
+      { key: 'all', label: 'All Registered Patients', onClick: () => { setCareStage(undefined); setStatus(undefined); } },
+      { key: 'chemo', label: 'Active Chemotherapy Cohort', onClick: () => setCareStage('ACTIVE_TREATMENT') },
+      { key: 'followup', label: 'Surveillance & Follow-up Due', onClick: () => setCareStage('FOLLOW_UP') },
+      { key: 'screening', label: 'Screening & New Ingest', onClick: () => setCareStage('SCREENING') },
+    ]
+  };
+
   const columns = [
-    { title: 'MRN', dataIndex: 'mrn', key: 'mrn' },
-    { title: 'Name', key: 'name', render: (_: any, record: any) => `${record.firstName} ${record.lastName}` },
+    { 
+      title: 'MRN', 
+      dataIndex: 'mrn', 
+      key: 'mrn',
+      render: (mrn: string, record: any) => (
+        <a onClick={() => router.push(`/patients/${record.id}`)} style={{ fontWeight: 600, color: '#4f46e5' }}>
+          {mrn}
+        </a>
+      )
+    },
+    { 
+      title: 'Name', 
+      key: 'name', 
+      render: (_: any, record: any) => (
+        <a onClick={() => router.push(`/patients/${record.id}`)} style={{ fontWeight: 600, color: '#0f172a' }}>
+          {record.firstName} {record.lastName}
+        </a>
+      ) 
+    },
     { title: 'Diagnosis', dataIndex: 'diagnosis', key: 'diagnosis', render: (d: string) => d || 'Not Specified' },
     { title: 'Care Stage', dataIndex: 'careStage', key: 'stage', render: (s: string) => <StatusBadge status={s} /> },
     { title: 'Status', dataIndex: 'status', key: 'status', render: (s: string) => <StatusBadge status={s} /> },
-    { title: 'Doctor', dataIndex: 'primaryDoctorName', key: 'doctor' }
+    { title: 'Doctor', dataIndex: 'primaryDoctorName', key: 'doctor' },
+    {
+      title: 'Action',
+      key: 'action',
+      render: (_: any, record: any) => (
+        <Button size="small" type="link" icon={<EyeOutlined />} onClick={() => router.push(`/patients/${record.id}`)}>
+          View Dossier
+        </Button>
+      )
+    }
   ];
 
   return (
@@ -37,7 +74,9 @@ export default function RegistryPage() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Title level={3} style={{ margin: 0 }}>Patient Registry</Title>
         <Space>
-          <Button icon={<SettingOutlined />}>Saved Views</Button>
+          <Dropdown menu={savedViewsMenu}>
+            <Button icon={<SettingOutlined />}>Saved Cohort Views</Button>
+          </Dropdown>
           <Button type="primary" icon={<FilterOutlined />} onClick={() => setIsAdvancedFiltersOpen(true)}>Advanced Filters</Button>
         </Space>
       </div>

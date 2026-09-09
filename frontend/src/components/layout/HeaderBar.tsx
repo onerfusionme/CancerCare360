@@ -1,5 +1,5 @@
-import React from 'react';
-import { Layout, Button, Avatar, Dropdown, Space, Badge, Tooltip } from 'antd';
+import React, { useState } from 'react';
+import { Layout, Button, Avatar, Dropdown, Space, Badge, Tooltip, Drawer, List, Tag } from 'antd';
 import {
   MenuUnfoldOutlined,
   MenuFoldOutlined,
@@ -10,7 +10,10 @@ import {
   BulbFilled,
   MoonOutlined,
   SwapOutlined,
-  CheckOutlined
+  CheckOutlined,
+  HeartOutlined,
+  AlertOutlined,
+  ClockCircleOutlined
 } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/stores/app.store';
@@ -24,6 +27,7 @@ export default function HeaderBar() {
   const router = useRouter();
   const { sidebarCollapsed, toggleSidebar, language, setLanguage, themeMode, toggleThemeMode } = useAppStore();
   const { user, logout, initializeDemoUser } = useAuth();
+  const [notifDrawerOpen, setNotifDrawerOpen] = useState(false);
 
   const isDark = themeMode === 'dark';
 
@@ -44,6 +48,12 @@ export default function HeaderBar() {
         label: `${user?.firstName || 'Dr. Jane'} ${user?.lastName || 'Smith'}`,
         icon: <UserOutlined />,
         disabled: true,
+      },
+      {
+        key: 'portal-preview',
+        label: 'View Patient Portal',
+        icon: <HeartOutlined style={{ color: '#0d9488' }} />,
+        onClick: () => router.push('/portal'),
       },
       {
         type: 'divider' as const,
@@ -126,37 +136,53 @@ export default function HeaderBar() {
           fontSize: 12,
           color: isDark ? '#cbd5e1' : '#334155',
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span style={{ 
-              width: 8, 
-              height: 8, 
-              borderRadius: '50%', 
-              background: '#10b981', 
-              boxShadow: '0 0 8px #10b981',
-              display: 'inline-block' 
-            }} />
-            <span style={{ fontWeight: 600 }}>Active Clinic:</span>
-            <span>6 Today</span>
-          </div>
+          <Tooltip title="View Clinic Roster & Appointments">
+            <div 
+              onClick={() => router.push('/appointments')}
+              style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}
+            >
+              <span style={{ 
+                width: 8, 
+                height: 8, 
+                borderRadius: '50%', 
+                background: '#10b981', 
+                boxShadow: '0 0 8px #10b981',
+                display: 'inline-block' 
+              }} />
+              <span style={{ fontWeight: 600 }}>Active Clinic:</span>
+              <span style={{ textDecoration: 'underline', textUnderlineOffset: 3 }}>6 Today</span>
+            </div>
+          </Tooltip>
           <span style={{ color: isDark ? '#334155' : '#cbd5e1' }}>|</span>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-            <span style={{ color: '#818cf8', fontWeight: 600 }}>1</span>
-            <span style={{ color: isDark ? '#94a3b8' : '#64748b' }}>In Consult</span>
-          </div>
+          <Tooltip title="View In-Consultation Queue">
+            <div 
+              onClick={() => router.push('/appointments')}
+              style={{ display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer' }}
+            >
+              <span style={{ color: '#818cf8', fontWeight: 600 }}>1</span>
+              <span style={{ color: isDark ? '#94a3b8' : '#64748b' }}>In Consult</span>
+            </div>
+          </Tooltip>
           <span style={{ color: isDark ? '#334155' : '#cbd5e1' }}>|</span>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-            <span style={{ 
-              background: isDark ? 'rgba(244, 63, 94, 0.2)' : '#fee2e2', 
-              color: isDark ? '#fb7185' : '#dc2626', 
-              padding: '1px 6px', 
-              borderRadius: 10, 
-              fontWeight: 700, 
-              fontSize: 11,
-              border: isDark ? '1px solid rgba(244, 63, 94, 0.3)' : 'none'
-            }}>
-              2 Urgent Gaps
-            </span>
-          </div>
+          <Tooltip title="View Open Care Gaps & Escalations">
+            <div 
+              onClick={() => router.push('/gaps')}
+              style={{ display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer' }}
+            >
+              <span style={{ 
+                background: isDark ? 'rgba(244, 63, 94, 0.2)' : '#fee2e2', 
+                color: isDark ? '#fb7185' : '#dc2626', 
+                padding: '2px 8px', 
+                borderRadius: 10, 
+                fontWeight: 700, 
+                fontSize: 11,
+                border: isDark ? '1px solid rgba(244, 63, 94, 0.3)' : 'none',
+                transition: 'transform 0.1s'
+              }}>
+                2 Urgent Gaps
+              </span>
+            </div>
+          </Tooltip>
         </div>
       </div>
 
@@ -200,13 +226,16 @@ export default function HeaderBar() {
           </Button>
         </Dropdown>
         
-        <Badge count={2} size="small" offset={[-2, 4]} color="#f43f5e">
-          <Button 
-            type="text" 
-            icon={<BellOutlined style={{ fontSize: 19, color: isDark ? '#94a3b8' : '#475569' }} />} 
-            style={{ width: 40, height: 40, borderRadius: 8 }}
-          />
-        </Badge>
+        <Tooltip title="Clinical Priority Alerts">
+          <Badge count={2} size="small" offset={[-2, 4]} color="#f43f5e">
+            <Button 
+              type="text" 
+              icon={<BellOutlined style={{ fontSize: 19, color: isDark ? '#94a3b8' : '#475569' }} />} 
+              style={{ width: 40, height: 40, borderRadius: 8 }}
+              onClick={() => setNotifDrawerOpen(true)}
+            />
+          </Badge>
+        </Tooltip>
         
         <div style={{ width: 1, height: 28, background: isDark ? '#1e293b' : '#e2e8f0', margin: '0 4px' }} />
 
@@ -241,6 +270,77 @@ export default function HeaderBar() {
           </div>
         </Dropdown>
       </Space>
+
+      {/* Clinical Notifications Drawer */}
+      <Drawer
+        title="Clinical Priority Alerts & Tasks"
+        placement="right"
+        width={380}
+        onClose={() => setNotifDrawerOpen(false)}
+        open={notifDrawerOpen}
+      >
+        <List
+          itemLayout="vertical"
+          dataSource={[
+            {
+              id: 'n1',
+              title: 'Priya Sharma — Chemo Cycle 4 Overdue',
+              desc: 'Absolute Neutrophil Count recovered (1,650 /uL). Ready to resume AC chemotherapy regimen.',
+              tag: 'CRITICAL CARE GAP',
+              color: 'red',
+              actionRoute: '/gaps',
+              actionLabel: 'Open Gap Desk'
+            },
+            {
+              id: 'n2',
+              title: 'Rajesh Patel — Pathology Biopsy Overdue (SLA 48h)',
+              desc: 'Histopathology specimen processing pending from Central Lab. Expected SLA breached by 14h.',
+              tag: 'INVESTIGATION SLA',
+              color: 'orange',
+              actionRoute: '/investigations',
+              actionLabel: 'View Investigations'
+            },
+            {
+              id: 'n3',
+              title: 'OPD Queue Flow Status',
+              desc: 'Average outpatient wait time is currently 14 minutes. 1 patient in active consultation.',
+              tag: 'CLINIC FLOW',
+              color: 'blue',
+              actionRoute: '/appointments',
+              actionLabel: 'Open Clinic Flow'
+            }
+          ]}
+          renderItem={(item) => (
+            <List.Item
+              style={{
+                padding: '16px 0',
+                borderBottom: '1px solid #f1f5f9'
+              }}
+            >
+              <div style={{ marginBottom: 6 }}>
+                <Tag color={item.color} style={{ fontWeight: 700, fontSize: 10 }}>{item.tag}</Tag>
+              </div>
+              <div style={{ fontWeight: 600, fontSize: 14, color: '#0f172a', marginBottom: 4 }}>
+                {item.title}
+              </div>
+              <div style={{ fontSize: 13, color: '#64748b', lineHeight: 1.4, marginBottom: 10 }}>
+                {item.desc}
+              </div>
+              <Button 
+                size="small" 
+                type="primary" 
+                ghost
+                onClick={() => {
+                  setNotifDrawerOpen(false);
+                  router.push(item.actionRoute);
+                }}
+              >
+                {item.actionLabel}
+              </Button>
+            </List.Item>
+          )}
+        />
+      </Drawer>
     </Header>
   );
 }

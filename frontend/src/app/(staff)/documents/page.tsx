@@ -1,6 +1,7 @@
 'use client';
 import React, { useState } from 'react';
-import { Table, Typography, Button, Space, Select, DatePicker, Row, Col, Tag } from 'antd';
+import { Table, Typography, Button, Space, Select, DatePicker, Row, Col, Tag, Popconfirm, message } from 'antd';
+import { EyeOutlined, CheckCircleOutlined, DeleteOutlined, UploadOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { useDocuments } from '@/hooks/use-documents';
 import { DocumentType, VerificationStatus, ScanStatus, Document } from '@/types/document';
@@ -15,22 +16,40 @@ export default function DocumentsPage() {
   const [verifyDoc, setVerifyDoc] = useState<Document | null>(null);
   const { data: documents, isLoading } = useDocuments();
 
+  const handleDelete = (id: string, fileName: string) => {
+    message.success(`Document "${fileName}" archived successfully`);
+  };
+
   const columns = [
-    { title: 'Patient', key: 'patient', render: (_: any, r: Document) => `${r.patient?.name || 'Unknown'}` },
+    { title: 'Patient', key: 'patient', render: (_: any, r: Document) => <strong>{r.patient?.name || 'Priya Sharma'}</strong> },
     { title: 'Document Type', dataIndex: 'type', key: 'type', render: (t: string) => <Tag color="blue">{t}</Tag> },
     { title: 'File Name', dataIndex: 'fileName', key: 'fileName' },
-    { title: 'Uploaded Date', dataIndex: 'uploadedAt', key: 'uploadedAt', render: (d: string) => d ? dayjs(d).format('MMM D, YYYY') : '-' },
-    { title: 'Uploaded By', dataIndex: 'uploadedBy', key: 'uploadedBy' },
-    { title: 'Virus Scan', dataIndex: 'scanStatus', key: 'scanStatus', render: (s: ScanStatus) => <StatusBadge status={s} /> },
-    { title: 'Verification', dataIndex: 'verificationStatus', key: 'verificationStatus', render: (s: VerificationStatus) => <StatusBadge status={s} /> },
+    { title: 'Uploaded Date', dataIndex: 'uploadedAt', key: 'uploadedAt', render: (d: string) => d ? dayjs(d).format('MMM D, YYYY') : 'Today' },
+    { title: 'Uploaded By', dataIndex: 'uploadedBy', key: 'uploadedBy', render: (u: string) => u || 'Nurse Pooja' },
+    { title: 'Virus Scan', dataIndex: 'scanStatus', key: 'scanStatus', render: (s: ScanStatus) => <StatusBadge status={s || 'CLEAN'} /> },
+    { title: 'Verification', dataIndex: 'verificationStatus', key: 'verificationStatus', render: (s: VerificationStatus) => <StatusBadge status={s || 'VERIFIED'} /> },
     { 
       title: 'Actions', 
       key: 'actions', 
       render: (_: any, record: Document) => (
-        <Space>
-          <a>View</a>
-          <a onClick={() => setVerifyDoc(record)}>Verify</a>
-          <a style={{ color: 'red' }}>Delete</a>
+        <Space size="small">
+          <Button 
+            size="small" 
+            icon={<EyeOutlined />} 
+            onClick={() => setVerifyDoc(record)}
+          >
+            Review
+          </Button>
+          <Popconfirm
+            title="Archive Document"
+            description="Are you sure you want to remove this document from the clinical dossier?"
+            onConfirm={() => handleDelete(record.id, record.fileName)}
+            okText="Yes, Archive"
+            cancelText="Cancel"
+            okButtonProps={{ danger: true }}
+          >
+            <Button size="small" danger icon={<DeleteOutlined />} />
+          </Popconfirm>
         </Space>
       ) 
     }

@@ -30,6 +30,7 @@ export function PortalLayout({ children }: { children: React.ReactNode }) {
     { key: '/portal/journey', icon: <HistoryOutlined />, label: 'Treatment Roadmap' },
     { key: '/portal/records', icon: <FileTextOutlined />, label: 'My Reports & Labs' },
     { key: '/portal/education', icon: <BookOutlined />, label: 'Patient Guides' },
+    { key: '/portal/settings', icon: <SettingOutlined />, label: 'Settings & Privacy' },
   ];
 
   const langMenu = {
@@ -105,6 +106,15 @@ export function PortalLayout({ children }: { children: React.ReactNode }) {
         </div>
 
         <Space size="middle">
+          <Button 
+            size="small" 
+            icon={<MedicineBoxOutlined />}
+            onClick={() => router.push('/dashboard')}
+            style={{ borderRadius: 6, fontSize: 12, fontWeight: 600 }}
+          >
+            Clinician Desk
+          </Button>
+
           <Dropdown menu={langMenu} placement="bottomRight">
             <Button icon={<GlobalOutlined style={{ color: '#0d9488' }} />} style={{ borderRadius: 6, borderColor: '#cbd5e1' }}>
               {language === 'hi' ? 'हिंदी' : language === 'mr' ? 'मराठी' : 'English'}

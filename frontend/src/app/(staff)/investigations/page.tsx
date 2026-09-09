@@ -204,14 +204,22 @@ export default function InvestigationsPage() {
           <Title level={3} style={{ margin: 0 }}>Diagnostic Investigations & Pathology</Title>
           <Text type="secondary">Turnaround time (TAT) tracking, LIS integration & specimen status</Text>
         </div>
-        <Button 
-          type="primary" 
-          icon={<PlusOutlined />} 
-          onClick={() => setOrderModalOpen(true)}
-          style={{ background: '#0284c7', borderColor: '#0284c7' }}
-        >
-          Order Investigation
-        </Button>
+        <Space>
+          <Button 
+            icon={<ExperimentOutlined />} 
+            onClick={() => router.push('/investigations/new')}
+          >
+            New Order Form
+          </Button>
+          <Button 
+            type="primary" 
+            icon={<PlusOutlined />} 
+            onClick={() => setOrderModalOpen(true)}
+            style={{ background: '#0284c7', borderColor: '#0284c7' }}
+          >
+            Quick Order
+          </Button>
+        </Space>
       </div>
 
       <Card>

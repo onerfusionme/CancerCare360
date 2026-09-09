@@ -28,8 +28,10 @@ import {
   PhoneOutlined, 
   AlertOutlined,
   ReloadOutlined,
-  RobotOutlined
+  RobotOutlined,
+  SettingOutlined
 } from '@ant-design/icons';
+import { useRouter } from 'next/navigation';
 import { useTasks, useTaskStats, useCreateTask, useUpdateTask, useDeleteTask } from '@/hooks/use-follow-up';
 import { useDetectGaps, useGenerateTasks } from '@/hooks/use-care-gaps';
 import { outreachService } from '@/services/outreach.service';
@@ -45,6 +47,7 @@ const { Option } = Select;
 const { Title, Text } = Typography;
 
 export default function CareGapsPage() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState('1');
   const [outreachModalOpen, setOutreachModalOpen] = useState(false);
   const [selectedTaskId, setSelectedTaskId] = useState<string | undefined>();
@@ -226,14 +229,22 @@ export default function CareGapsPage() {
           <Title level={3} style={{ margin: 0 }}>Care Gaps & Follow-up Desk</Title>
           <Text type="secondary">Automated detection, SLA escalation & multi-channel patient outreach</Text>
         </div>
-        <Button 
-          type="primary" 
-          icon={<PlusOutlined />} 
-          onClick={() => setCreateGapModalOpen(true)}
-          style={{ background: '#0284c7', borderColor: '#0284c7' }}
-        >
-          Create Gap Alert
-        </Button>
+        <Space>
+          <Button 
+            icon={<SettingOutlined />} 
+            onClick={() => router.push('/gaps/rules')}
+          >
+            Configure Protocol Rules
+          </Button>
+          <Button 
+            type="primary" 
+            icon={<PlusOutlined />} 
+            onClick={() => setCreateGapModalOpen(true)}
+            style={{ background: '#0284c7', borderColor: '#0284c7' }}
+          >
+            Create Gap Alert
+          </Button>
+        </Space>
       </div>
       
       {stats && <TaskStatsCards stats={stats} />}

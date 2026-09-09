@@ -60,7 +60,7 @@ export const appointmentService = {
     return response.data;
   },
 
-  getNoShowRisks: async (date?: string): Promise<{ data: any[] }> => {
+  getNoShowRisks: async (date?: string): Promise<any[]> => {
     const response = await apiClient.get('/api/v1/appointments/no-show-risks', { params: { date } });
     return response.data;
   }

@@ -231,14 +231,22 @@ export default function PatientsPage() {
           <Title level={3} style={{ margin: 0 }}>Patient Directory</Title>
           <Text type="secondary">Centralized oncology cohort registry with complete longitudinal records</Text>
         </div>
-        <Button 
-          type="primary" 
-          icon={<PlusOutlined />} 
-          onClick={() => setCreateModalOpen(true)}
-          style={{ background: '#0284c7', borderColor: '#0284c7' }}
-        >
-          Register New Patient
-        </Button>
+        <Space>
+          <Button 
+            icon={<UserOutlined />} 
+            onClick={() => router.push('/patients/new')}
+          >
+            Full Registration Form
+          </Button>
+          <Button 
+            type="primary" 
+            icon={<PlusOutlined />} 
+            onClick={() => setCreateModalOpen(true)}
+            style={{ background: '#0284c7', borderColor: '#0284c7' }}
+          >
+            Quick Register
+          </Button>
+        </Space>
       </div>
 
       {/* Cohort Search & Filter Toolbar */}
