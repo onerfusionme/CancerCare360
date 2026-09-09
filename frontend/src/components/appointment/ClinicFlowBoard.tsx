@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Card, Button, Typography, Space, Tag, Row, Col, Badge, Tooltip } from 'antd';
+import { Card, Button, Typography, Space, Tag, Row, Col, Badge, Tooltip, Empty } from 'antd';
 import { 
   ClockCircleOutlined, 
   UserOutlined, 
@@ -23,71 +23,7 @@ interface ClinicFlowBoardProps {
 }
 
 export default function ClinicFlowBoard({ appointments, doctorId, onStatusChange }: ClinicFlowBoardProps) {
-  // If appointments from backend is empty, provide a rich clinical cohort
-  const defaultAppointments: any[] = [
-    {
-      id: 'apt-1',
-      patient: { name: 'Priya Sharma', mrn: 'MRN-ONC-2026-001' },
-      cancerSite: 'Breast (Stage IIB)',
-      appointmentType: 'Chemotherapy Cycle 4 Review',
-      scheduledAt: new Date(Date.now() - 35 * 60 * 1000).toISOString(),
-      waitingDurationMinutes: 32,
-      status: AppointmentStatus.CHECKED_IN,
-      room: 'OPD Room 3',
-      alert: 'ANC 1,100 /uL Critical',
-    },
-    {
-      id: 'apt-2',
-      patient: { name: 'Rajesh Patel', mrn: 'MRN-ONC-2026-042' },
-      cancerSite: 'Lung NSCLC (Stage IIIA)',
-      appointmentType: 'Biopsy Pathology Review',
-      scheduledAt: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
-      waitingDurationMinutes: 14,
-      status: AppointmentStatus.CHECKED_IN,
-      room: 'Waiting Bay B',
-    },
-    {
-      id: 'apt-3',
-      patient: { name: 'Sunita Mehra', mrn: 'MRN-ONC-2026-055' },
-      cancerSite: 'Ovarian (Stage IC)',
-      appointmentType: 'Cycle 2 Carboplatin Review',
-      scheduledAt: new Date(Date.now() - 40 * 60 * 1000).toISOString(),
-      waitingDurationMinutes: 8,
-      status: AppointmentStatus.IN_PROGRESS,
-      room: 'Consultation Suite 1',
-      doctor: 'Dr. Jane Smith',
-    },
-    {
-      id: 'apt-4',
-      patient: { name: 'Amitabh Joshi', mrn: 'MRN-ONC-2026-061' },
-      cancerSite: 'Head & Neck (SCC)',
-      appointmentType: 'Radiation Restaging Follow-up',
-      scheduledAt: new Date(Date.now() + 20 * 60 * 1000).toISOString(),
-      status: AppointmentStatus.SCHEDULED,
-      doctor: 'Dr. Jane Smith',
-    },
-    {
-      id: 'apt-5',
-      patient: { name: 'Kavita Rao', mrn: 'MRN-ONC-2026-074' },
-      cancerSite: 'Colorectal (Stage II)',
-      appointmentType: 'Post-Op Follow-up & CEA Lab',
-      scheduledAt: new Date(Date.now() + 50 * 60 * 1000).toISOString(),
-      status: AppointmentStatus.SCHEDULED,
-      doctor: 'Dr. Jane Smith',
-    },
-    {
-      id: 'apt-6',
-      patient: { name: 'Vikram Malhotra', mrn: 'MRN-ONC-2026-018' },
-      cancerSite: 'Colon (Stage III)',
-      appointmentType: 'Pre-Chemo Evaluation',
-      scheduledAt: new Date(Date.now() - 90 * 60 * 1000).toISOString(),
-      status: AppointmentStatus.COMPLETED,
-      room: 'Infusion Bay 4',
-      doctor: 'Dr. Jane Smith',
-    },
-  ];
-
-  const effectiveAppointments = appointments && appointments.length > 0 ? appointments : defaultAppointments;
+  const effectiveAppointments = appointments || [];
 
   const scheduled = effectiveAppointments.filter(a => a.status === AppointmentStatus.SCHEDULED || a.status === AppointmentStatus.CONFIRMED);
   const waiting = effectiveAppointments.filter(a => a.status === AppointmentStatus.CHECKED_IN);
@@ -246,17 +182,21 @@ export default function ClinicFlowBoard({ appointments, doctorId, onStatusChange
             </span>
           </div>
 
-          {scheduled.map(a => renderCard(a, (
-            <Button 
-              size="small" 
-              type="primary" 
-              block 
-              style={{ background: '#4f46e5', height: 32, fontWeight: 600 }}
-              onClick={() => onStatusChange(a.id, AppointmentStatus.CHECKED_IN)}
-            >
-              Check In Patient
-            </Button>
-          )))}
+          {scheduled.length === 0 ? (
+            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No scheduled patients" style={{ marginTop: 80 }} />
+          ) : (
+            scheduled.map(a => renderCard(a, (
+              <Button 
+                size="small" 
+                type="primary" 
+                block 
+                style={{ background: '#4f46e5', height: 32, fontWeight: 600 }}
+                onClick={() => onStatusChange(a.id, AppointmentStatus.CHECKED_IN)}
+              >
+                Check In Patient
+              </Button>
+            )))
+          )}
         </div>
       </Col>
 
@@ -285,20 +225,24 @@ export default function ClinicFlowBoard({ appointments, doctorId, onStatusChange
             </span>
           </div>
 
-          {waiting.map(a => renderCard(a, (
-            <Space direction="vertical" style={{ width: '100%' }} size={6}>
-              <Button 
-                size="small" 
-                type="primary" 
-                icon={<PlayCircleOutlined />}
-                block 
-                style={{ background: '#0284c7', height: 32, fontWeight: 600 }}
-                onClick={() => onStatusChange(a.id, AppointmentStatus.IN_PROGRESS)}
-              >
-                Call In / Start Consult
-              </Button>
-            </Space>
-          )))}
+          {waiting.length === 0 ? (
+            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="Waiting room empty" style={{ marginTop: 80 }} />
+          ) : (
+            waiting.map(a => renderCard(a, (
+              <Space direction="vertical" style={{ width: '100%' }} size={6}>
+                <Button 
+                  size="small" 
+                  type="primary" 
+                  icon={<PlayCircleOutlined />}
+                  block 
+                  style={{ background: '#0284c7', height: 32, fontWeight: 600 }}
+                  onClick={() => onStatusChange(a.id, AppointmentStatus.IN_PROGRESS)}
+                >
+                  Call In / Start Consult
+                </Button>
+              </Space>
+            )))
+          )}
         </div>
       </Col>
 
@@ -327,18 +271,22 @@ export default function ClinicFlowBoard({ appointments, doctorId, onStatusChange
             </span>
           </div>
 
-          {inConsultation.map(a => renderCard(a, (
-            <Button 
-              size="small" 
-              type="primary" 
-              icon={<CheckCircleOutlined />}
-              block 
-              style={{ background: '#059669', height: 32, fontWeight: 600 }}
-              onClick={() => onStatusChange(a.id, AppointmentStatus.COMPLETED)}
-            >
-              Complete & Sign Off
-            </Button>
-          )))}
+          {inConsultation.length === 0 ? (
+            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No active consults" style={{ marginTop: 80 }} />
+          ) : (
+            inConsultation.map(a => renderCard(a, (
+              <Button 
+                size="small" 
+                type="primary" 
+                icon={<CheckCircleOutlined />}
+                block 
+                style={{ background: '#059669', height: 32, fontWeight: 600 }}
+                onClick={() => onStatusChange(a.id, AppointmentStatus.COMPLETED)}
+              >
+                Complete & Sign Off
+              </Button>
+            )))
+          )}
         </div>
       </Col>
 
@@ -367,13 +315,17 @@ export default function ClinicFlowBoard({ appointments, doctorId, onStatusChange
             </span>
           </div>
 
-          {completed.map(a => renderCard(a, (
-            <div style={{ textAlign: 'center', padding: '4px 0' }}>
-              <Tag color="green" style={{ fontWeight: 600 }}>
-                Consultation Finalized
-              </Tag>
-            </div>
-          )))}
+          {completed.length === 0 ? (
+            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No consults completed yet" style={{ marginTop: 80 }} />
+          ) : (
+            completed.map(a => renderCard(a, (
+              <div style={{ textAlign: 'center', padding: '4px 0' }}>
+                <Tag color="green" style={{ fontWeight: 600 }}>
+                  Consultation Finalized
+                </Tag>
+              </div>
+            )))
+          )}
         </div>
       </Col>
     </Row>

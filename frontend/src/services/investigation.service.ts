@@ -26,7 +26,7 @@ export const investigationService = {
       patient: item.patient ? {
         id: item.patient.id,
         name: item.patient.name || `${item.patient.firstName || ''} ${item.patient.lastName || ''}`.trim() || 'Patient',
-        mrn: item.patient.mrn || 'MRN-ONC-001'
+        mrn: item.patient.mrn || '—'
       } : null
     }));
   },
@@ -53,7 +53,7 @@ export const investigationService = {
       patient: item.patient ? {
         id: item.patient.id,
         name: item.patient.name || `${item.patient.firstName || ''} ${item.patient.lastName || ''}`.trim() || 'Patient',
-        mrn: item.patient.mrn || 'MRN-ONC-001'
+        mrn: item.patient.mrn || '—'
       } : null
     };
   },

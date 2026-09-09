@@ -3,6 +3,7 @@ import React from 'react';
 import { Form, Select, DatePicker, Input, Button, Typography, message, Card } from 'antd';
 import { useRouter } from 'next/navigation';
 import { useCreateInvestigation } from '@/hooks/use-investigations';
+import { usePatients } from '@/hooks/use-patients';
 import { InvestigationType } from '@/types/investigation';
 
 const { Title } = Typography;
@@ -11,6 +12,8 @@ export default function NewInvestigationPage() {
   const router = useRouter();
   const [form] = Form.useForm();
   const { mutateAsync: createInvestigation, isPending } = useCreateInvestigation();
+  const { data: patientData } = usePatients();
+  const patientList = Array.isArray(patientData?.data) ? patientData.data : (Array.isArray(patientData) ? patientData : []);
 
   const onFinish = async (values: any) => {
     try {
@@ -34,10 +37,16 @@ export default function NewInvestigationPage() {
       <Card style={{ maxWidth: 600 }}>
         <Form form={form} layout="vertical" onFinish={onFinish}>
           <Form.Item name="patientId" label="Patient" rules={[{ required: true }]}>
-            <Select placeholder="Search Patient" options={[{ value: 'p1', label: 'John Doe' }]} />
+            <Select 
+              placeholder={patientList.length > 0 ? "Select Patient" : "No patients found"} 
+              options={patientList.map((p: any) => ({
+                value: p.id,
+                label: `${p.name || `${p.firstName || ''} ${p.lastName || ''}`.trim() || 'Patient'} (${p.mrn})`
+              }))} 
+            />
           </Form.Item>
-          <Form.Item name="journeyId" label="Journey" rules={[{ required: true }]}>
-            <Select placeholder="Select Journey" options={[{ value: 'j1', label: 'Breast Cancer Treatment' }]} />
+          <Form.Item name="journeyId" label="Journey ID (Optional)">
+            <Input placeholder="Enter or link to Care Journey ID" />
           </Form.Item>
           <Form.Item name="type" label="Investigation Type" rules={[{ required: true }]}>
             <Select placeholder="Select Type">

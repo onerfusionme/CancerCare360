@@ -36,6 +36,7 @@ import {
   useUpdateInvestigation, 
   useDeleteInvestigation 
 } from '@/hooks/use-investigations';
+import { usePatients } from '@/hooks/use-patients';
 import { InvestigationType, InvestigationStatus, Investigation } from '@/types/investigation';
 import StatusBadge from '@/components/ui/StatusBadge';
 import { InvestigationStatusFlow } from '@/components/investigation/InvestigationStatusFlow';
@@ -60,6 +61,9 @@ export default function InvestigationsPage() {
     type: filterType,
     status: filterStatus
   });
+
+  const { data: patientData } = usePatients();
+  const patientList = Array.isArray(patientData?.data) ? patientData.data : (Array.isArray(patientData) ? patientData : []);
 
   const investigationList: Investigation[] = React.useMemo(() => {
     if (Array.isArray(investigations)) return investigations;
@@ -133,8 +137,8 @@ export default function InvestigationsPage() {
       key: 'patient', 
       render: (_: any, r: Investigation) => (
         <div>
-          <div style={{ fontWeight: 600 }}>{r.patient?.name || 'Priya Sharma'}</div>
-          <div style={{ fontSize: '11px', color: '#64748b' }}>MRN: {r.patient?.mrn || 'MRN-ONC-2026-001'}</div>
+          <div style={{ fontWeight: 600 }}>{r.patient?.name || 'Patient'}</div>
+          <div style={{ fontSize: '11px', color: '#64748b' }}>MRN: {r.patient?.mrn || '—'}</div>
         </div>
       )
     },
@@ -144,7 +148,7 @@ export default function InvestigationsPage() {
       key: 'type',
       render: (t: string) => <Tag color="blue" style={{ fontWeight: 600 }}>{t}</Tag>
     },
-    { title: 'Ordered By', dataIndex: 'orderedBy', key: 'orderedBy', render: (o: string) => o || 'Dr. Jane Smith' },
+    { title: 'Ordered By', dataIndex: 'orderedBy', key: 'orderedBy', render: (o: string) => o || 'Clinical Staff' },
     { 
       title: 'Ordered Date', 
       dataIndex: 'orderedDate', 
@@ -301,10 +305,12 @@ export default function InvestigationsPage() {
       >
         <Form form={orderForm} layout="vertical" onFinish={handleOrder} initialValues={{ type: InvestigationType.BLOOD_WORK, priority: 'ROUTINE' }}>
           <Form.Item name="patientId" label="Patient" rules={[{ required: true, message: 'Please select patient' }]}>
-            <Select placeholder="Select Patient">
-              <Option value="pat1">Priya Sharma (MRN-ONC-2026-001)</Option>
-              <Option value="pat2">Rajesh Patel (MRN-ONC-2026-002)</Option>
-              <Option value="pat3">Anita Desai (MRN-ONC-2026-003)</Option>
+            <Select placeholder={patientList.length > 0 ? "Select Patient" : "No registered patients"}>
+              {patientList.map((p: any) => (
+                <Option key={p.id} value={p.id}>
+                  {p.name || `${p.firstName || ''} ${p.lastName || ''}`.trim() || 'Patient'} ({p.mrn})
+                </Option>
+              ))}
             </Select>
           </Form.Item>
 
@@ -330,7 +336,7 @@ export default function InvestigationsPage() {
           </Row>
 
           <Form.Item name="notes" label="Clinical Indication / Notes">
-            <Input.TextArea rows={3} placeholder="e.g. Check for Grade 3/4 Neutropenia prior to administering Chemo Cycle 4" />
+            <Input.TextArea rows={3} placeholder="e.g. CBC or staging scan" />
           </Form.Item>
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
@@ -354,7 +360,7 @@ export default function InvestigationsPage() {
           <div style={{ marginBottom: 16, padding: 12, background: '#f8fafc', borderRadius: 8 }}>
             <Text strong>Order Details:</Text>
             <div>Test: <Tag color="blue">{selectedInv?.type}</Tag></div>
-            <div>Patient: {selectedInv?.patient?.name || 'Priya Sharma'}</div>
+            <div>Patient: {selectedInv?.patient?.name || 'Patient'}</div>
           </div>
 
           <Form.Item name="status" label="Workflow Status" rules={[{ required: true }]}>

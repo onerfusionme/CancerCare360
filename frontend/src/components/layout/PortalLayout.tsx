@@ -16,6 +16,7 @@ import {
   MedicineBoxOutlined
 } from '@ant-design/icons';
 import { useAppStore } from '@/stores/app.store';
+import { useAuth } from '@/hooks/use-auth';
 
 const { Header, Content, Footer } = Layout;
 
@@ -23,6 +24,7 @@ export function PortalLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const { language, setLanguage } = useAppStore();
+  const { user } = useAuth();
 
   const items = [
     { key: '/portal', icon: <HomeOutlined />, label: 'My Care Home' },
@@ -122,10 +124,14 @@ export function PortalLayout({ children }: { children: React.ReactNode }) {
           </Dropdown>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '4px 8px' }}>
-            <Avatar style={{ backgroundColor: '#0d9488', fontWeight: 600 }}>PS</Avatar>
+            <Avatar style={{ backgroundColor: '#0d9488', fontWeight: 600 }}>
+              {user?.firstName ? user.firstName[0].toUpperCase() : 'P'}
+            </Avatar>
             <div style={{ lineHeight: 1.2 }}>
-              <div style={{ fontSize: 13, fontWeight: 600, color: '#0f172a' }}>Priya Sharma</div>
-              <div style={{ fontSize: 11, color: '#64748b' }}>MRN-ONC-2026-001</div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: '#0f172a' }}>
+                {user?.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : 'Patient Portal'}
+              </div>
+              <div style={{ fontSize: 11, color: '#64748b' }}>Digital Health ID (ABHA)</div>
             </div>
           </div>
         </Space>

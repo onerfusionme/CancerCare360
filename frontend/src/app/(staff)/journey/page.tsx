@@ -19,7 +19,8 @@ import {
   Popconfirm, 
   message, 
   Tag, 
-  Timeline 
+  Timeline,
+  Empty
 } from 'antd';
 import { 
   PlusOutlined, 
@@ -33,6 +34,7 @@ import {
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import StatusBadge from '@/components/ui/StatusBadge';
+import { usePatients } from '@/hooks/use-patients';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -55,31 +57,19 @@ interface JourneyEventItem {
 }
 
 export default function JourneyPage() {
-  const [patientId, setPatientId] = useState<string>('p1');
+  const [patientId, setPatientId] = useState<string | undefined>(undefined);
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedMilestone, setSelectedMilestone] = useState<MilestoneItem | null>(null);
 
+  const { data: patientData } = usePatients();
+  const patientList = Array.isArray(patientData?.data) ? patientData.data : (Array.isArray(patientData) ? patientData : []);
+
   const [form] = Form.useForm();
   const [editForm] = Form.useForm();
 
-  // In-memory clinical milestones with CRUD capability
-  const [milestones, setMilestones] = useState<MilestoneItem[]>([
-    { id: 'm1', type: 'Baseline Staging PET-CT', expectedDate: '2026-06-10', actualDate: '2026-06-10', status: 'COMPLETED', notes: 'cT2 N1 M0 confirmed' },
-    { id: 'm2', type: 'AC Neoadjuvant Cycle 1', expectedDate: '2026-06-25', actualDate: '2026-06-25', status: 'COMPLETED', notes: 'Doxorubicin + Cyclophosphamide tolerated' },
-    { id: 'm3', type: 'AC Neoadjuvant Cycle 2', expectedDate: '2026-07-16', actualDate: '2026-07-17', status: 'COMPLETED', notes: 'Mild nausea Grade 1' },
-    { id: 'm4', type: 'AC Neoadjuvant Cycle 3', expectedDate: '2026-08-06', actualDate: '2026-08-06', status: 'COMPLETED', notes: 'Partial clinical response noted' },
-    { id: 'm5', type: 'AC Neoadjuvant Cycle 4', expectedDate: '2026-08-27', status: 'DELAYED', notes: 'Paused due to ANC 1,100 /uL (CTCAE Gr 2 Nadir)' },
-    { id: 'm6', type: 'Post-Chemo Mid-Assessment MRI', expectedDate: '2026-09-15', status: 'PENDING', notes: 'Tumor bed marker localization' },
-    { id: 'm7', type: 'Breast Conserving Surgery (BCS)', expectedDate: '2026-10-05', status: 'PENDING', notes: 'Dr. Sarah Jenkins team' },
-  ]);
-
-  const [events, setEvents] = useState<JourneyEventItem[]>([
-    { id: 'e1', date: '2026-06-05', title: 'Multidisciplinary Tumor Board', status: 'COMPLETED', description: 'Recommended Neoadjuvant AC-T followed by BCS.' },
-    { id: 'e2', date: '2026-06-25', title: 'Cycle 1 Infusion Administered', status: 'COMPLETED', description: 'Administered in Infusion Bay 3 without hypersensitivity.' },
-    { id: 'e3', date: '2026-08-06', title: 'Cycle 3 Infusion & Biomarker Audit', status: 'COMPLETED', description: 'Significant reduction in primary breast mass palpable diameter.' },
-    { id: 'e4', date: '2026-08-27', title: 'Cycle 4 Chemo Hold Alert', status: 'ALERT', description: 'Nadir ANC dropped below 1,500 /uL cutoff. Repeat lab ordered.' },
-  ]);
+  const [milestones, setMilestones] = useState<MilestoneItem[]>([]);
+  const [events, setEvents] = useState<JourneyEventItem[]>([]);
 
   // CRUD: Create Milestone
   const handleCreateMilestone = (values: any) => {
@@ -207,10 +197,18 @@ export default function JourneyPage() {
           <Text type="secondary">Multidisciplinary longitudinal milestone orchestration & protocol adherence</Text>
         </div>
         <Space>
-          <Select value={patientId} onChange={setPatientId} style={{ width: 300 }}>
-            <Option value="p1">Priya Sharma (MRN-ONC-2026-001) - Breast Ca</Option>
-            <Option value="p2">Rajesh Patel (MRN-ONC-2026-002) - Colon Ca</Option>
-            <Option value="p3">Anita Desai (MRN-ONC-2026-003) - Cervical Ca</Option>
+          <Select 
+            value={patientId} 
+            onChange={setPatientId} 
+            placeholder={patientList.length > 0 ? "Select Patient to View Journey" : "No registered patients"}
+            style={{ width: 320 }}
+            allowClear
+          >
+            {patientList.map((p: any) => (
+              <Option key={p.id} value={p.id}>
+                {p.name || `${p.firstName || ''} ${p.lastName || ''}`.trim() || 'Patient'} ({p.mrn})
+              </Option>
+            ))}
           </Select>
           <Button 
             type="primary" 
@@ -223,68 +221,65 @@ export default function JourneyPage() {
         </Space>
       </div>
 
-      {/* Patient Protocol Header */}
-      <Card>
-        <Row gutter={24} align="middle">
-          <Col xs={24} md={16}>
-            <Descriptions title="Priya Sharma, 44F — Invasive Ductal Carcinoma" column={{ xs: 1, sm: 2, md: 3 }}>
-              <Descriptions.Item label="Staging">Stage IIB (cT2 N1 M0)</Descriptions.Item>
-              <Descriptions.Item label="Biomarkers">ER+ (80%), PR+ (60%), HER2-</Descriptions.Item>
-              <Descriptions.Item label="Intent">Curative Neoadjuvant</Descriptions.Item>
-              <Descriptions.Item label="Regimen">AC-T (Dose-Dense)</Descriptions.Item>
-              <Descriptions.Item label="Lead Oncologist">Dr. Jane Smith</Descriptions.Item>
-              <Descriptions.Item label="ECOG Status">1 (Symptomatic, Ambulatory)</Descriptions.Item>
-            </Descriptions>
-          </Col>
-          <Col xs={24} md={8} style={{ borderLeft: '1px solid #f1f5f9', paddingLeft: 24 }}>
-            <Row gutter={16}>
-              <Col span={12}>
-                <Statistic title="Chemo Completed" value={3} suffix="/ 4 AC" valueStyle={{ color: '#0284c7' }} />
-              </Col>
-              <Col span={12}>
-                <Statistic title="Adherence Score" value={82} suffix="%" valueStyle={{ color: '#e11d48' }} />
-              </Col>
-            </Row>
-          </Col>
-        </Row>
-      </Card>
-
-      {/* Milestones Table */}
-      <Card 
-        title={
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span>Clinical Milestones & Protocol Checkpoints ({milestones.length})</span>
-            <Button size="small" type="dashed" icon={<PlusOutlined />} onClick={() => setCreateModalOpen(true)}>
-              New Checkpoint
-            </Button>
-          </div>
-        }
-      >
-        <Table 
-          columns={columns} 
-          dataSource={milestones} 
-          rowKey="id" 
-          pagination={false}
-        />
-      </Card>
-
-      {/* Longitudinal Journey Timeline */}
-      <Card title="Longitudinal Care Stream">
-        <Timeline
-          mode="left"
-          items={milestones.map(m => ({
-            color: m.status === 'COMPLETED' ? 'green' : m.status === 'DELAYED' ? 'red' : 'blue',
-            label: dayjs(m.actualDate || m.expectedDate).format('DD MMM YYYY'),
-            children: (
-              <div>
-                <div style={{ fontWeight: 600 }}>{m.type}</div>
-                <div style={{ fontSize: 12, color: '#64748b' }}>{m.notes}</div>
-                <div style={{ marginTop: 4 }}>{getStatusTag(m.status)}</div>
+      {patientId ? (
+        <>
+          {/* Milestones Table */}
+          <Card 
+            title={
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span>Clinical Milestones & Protocol Checkpoints ({milestones.length})</span>
+                <Button size="small" type="dashed" icon={<PlusOutlined />} onClick={() => setCreateModalOpen(true)}>
+                  New Checkpoint
+                </Button>
               </div>
-            )
-          }))}
-        />
-      </Card>
+            }
+          >
+            <Table 
+              columns={columns} 
+              dataSource={milestones} 
+              rowKey="id" 
+              pagination={false}
+              locale={{ emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No care protocol milestones configured for this patient" /> }}
+            />
+          </Card>
+
+          {/* Longitudinal Journey Timeline */}
+          <Card title="Longitudinal Care Stream">
+            {milestones.length > 0 ? (
+              <Timeline
+                mode="left"
+                items={milestones.map(m => ({
+                  color: m.status === 'COMPLETED' ? 'green' : m.status === 'DELAYED' ? 'red' : 'blue',
+                  label: dayjs(m.actualDate || m.expectedDate).format('DD MMM YYYY'),
+                  children: (
+                    <div>
+                      <div style={{ fontWeight: 600 }}>{m.type}</div>
+                      <div style={{ fontSize: 12, color: '#64748b' }}>{m.notes}</div>
+                      <div style={{ marginTop: 4 }}>{getStatusTag(m.status)}</div>
+                    </div>
+                  )
+                }))}
+              />
+            ) : (
+              <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No journey timeline events on record" />
+            )}
+          </Card>
+        </>
+      ) : (
+        <Card style={{ textAlign: 'center', padding: '48px 24px' }}>
+          <Empty 
+            image={Empty.PRESENTED_IMAGE_SIMPLE} 
+            description={
+              <div>
+                <Text strong style={{ fontSize: 16 }}>No Patient Selected</Text>
+                <div style={{ color: '#64748b', marginTop: 4 }}>
+                  Select a patient from the dropdown above to view, orchestrate, and audit their multidisciplinary oncology care journey.
+                </div>
+              </div>
+            }
+          />
+        </Card>
+      )}
 
       {/* CRUD: Add Milestone Modal */}
       <Modal

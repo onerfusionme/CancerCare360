@@ -34,6 +34,7 @@ import {
 import { useRouter } from 'next/navigation';
 import { useTasks, useTaskStats, useCreateTask, useUpdateTask, useDeleteTask } from '@/hooks/use-follow-up';
 import { useDetectGaps, useGenerateTasks } from '@/hooks/use-care-gaps';
+import { usePatients } from '@/hooks/use-patients';
 import { outreachService } from '@/services/outreach.service';
 import { useQuery } from '@tanstack/react-query';
 import TaskStatsCards from '@/components/follow-up/TaskStatsCards';
@@ -62,6 +63,8 @@ export default function CareGapsPage() {
   const { data: stats } = useTaskStats();
   const { data: tasks, isLoading: tasksLoading } = useTasks();
   const { data: gaps, refetch: detectGaps, isFetching: detectingGaps } = useDetectGaps();
+  const { data: patientData } = usePatients();
+  const patientList = Array.isArray(patientData?.data) ? patientData.data : (Array.isArray(patientData) ? patientData : []);
 
   // Mutations
   const generateTasksMutation = useGenerateTasks();
@@ -136,8 +139,8 @@ export default function CareGapsPage() {
       key: 'patient',
       render: (_: any, record: any) => (
         <div>
-          <div style={{ fontWeight: 600 }}>{record.patient?.name || 'Priya Sharma'}</div>
-          <div style={{ fontSize: '11px', color: '#64748b' }}>MRN: {record.patient?.mrn || 'MRN-ONC-2026-001'}</div>
+          <div style={{ fontWeight: 600 }}>{record.patient?.name || (record.patient?.firstName ? `${record.patient.firstName} ${record.patient.lastName || ''}`.trim() : 'Patient')}</div>
+          <div style={{ fontSize: '11px', color: '#64748b' }}>MRN: {record.patient?.mrn || '—'}</div>
         </div>
       )
     },
@@ -214,12 +217,12 @@ export default function CareGapsPage() {
   ];
 
   const outreachColumns = [
-    { title: 'Patient', key: 'patient', render: (_: any, record: any) => record.patient?.name || 'Priya Sharma' },
+    { title: 'Patient', key: 'patient', render: (_: any, record: any) => record.patient?.name || (record.patient?.firstName ? `${record.patient.firstName} ${record.patient.lastName || ''}`.trim() : 'Patient') },
     { title: 'Channel', dataIndex: 'channel', key: 'channel', render: (c: string) => <Tag color="blue">{c || 'WhatsApp'}</Tag> },
-    { title: 'Outcome', dataIndex: 'outcome', key: 'outcome', render: (o: string) => o || 'Patient Confirmed Visit' },
-    { title: 'Date', dataIndex: 'contactedAt', key: 'date', render: (d: string) => d ? new Date(d).toLocaleString() : 'Today' },
-    { title: 'Notes', dataIndex: 'notes', key: 'notes', render: (n: string) => n || 'Follow-up lab repeat confirmed with family caregiver.' },
-    { title: 'Next Action', dataIndex: 'nextAction', key: 'nextAction', render: (na: string) => na || 'Schedule ANC CBC Test' }
+    { title: 'Outcome', dataIndex: 'outcome', key: 'outcome', render: (o: string) => o || 'Logged' },
+    { title: 'Date', dataIndex: 'contactedAt', key: 'date', render: (d: string) => d ? new Date(d).toLocaleString() : 'Recent' },
+    { title: 'Notes', dataIndex: 'notes', key: 'notes', render: (n: string) => n || '—' },
+    { title: 'Next Action', dataIndex: 'nextAction', key: 'nextAction', render: (na: string) => na || '—' }
   ];
 
   return (
@@ -328,10 +331,12 @@ export default function CareGapsPage() {
       >
         <Form form={createForm} layout="vertical" onFinish={handleCreateGap} initialValues={{ priority: 'HIGH', taskType: 'MISSED_APPOINTMENT' }}>
           <Form.Item name="patientId" label="Patient" rules={[{ required: true, message: 'Please select patient' }]}>
-            <Select placeholder="Select Patient">
-              <Option value="pat1">Priya Sharma (MRN-ONC-2026-001)</Option>
-              <Option value="pat2">Rajesh Patel (MRN-ONC-2026-002)</Option>
-              <Option value="pat3">Anita Desai (MRN-ONC-2026-003)</Option>
+            <Select placeholder={patientList.length > 0 ? "Select Patient" : "No registered patients"}>
+              {patientList.map((p: any) => (
+                <Option key={p.id} value={p.id}>
+                  {p.name || `${p.firstName || ''} ${p.lastName || ''}`.trim() || 'Patient'} ({p.mrn})
+                </Option>
+              ))}
             </Select>
           </Form.Item>
 

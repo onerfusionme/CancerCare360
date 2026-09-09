@@ -27,9 +27,9 @@ export default function AiGovernancePage() {
     { title: 'Timestamp', dataIndex: 'createdAt', key: 'createdAt', render: (d: string) => new Date(d).toLocaleString() },
     { title: 'Capability', dataIndex: 'capability', key: 'capability', render: (c: string) => <Tag color="blue">{c}</Tag> },
     { title: 'Model', dataIndex: 'modelProvider', key: 'modelProvider' },
-    { title: 'User', key: 'user', render: (_: any, r: any) => r.user?.name || r.userId || 'Dr. Priya Mehta' },
-    { title: 'Confidence', dataIndex: 'confidenceScore', key: 'confidenceScore', render: (s: number) => `${s || 92}%` },
-    { title: 'Review Status', dataIndex: 'reviewStatus', key: 'reviewStatus', render: (s: string) => <Tag color={getStatusColor(s)}>{s || 'ACCEPTED'}</Tag> },
+    { title: 'User', key: 'user', render: (_: any, r: any) => r.user?.name || r.userId || 'Clinical Staff' },
+    { title: 'Confidence', dataIndex: 'confidenceScore', key: 'confidenceScore', render: (s: number) => s ? `${s}%` : '—' },
+    { title: 'Review Status', dataIndex: 'reviewStatus', key: 'reviewStatus', render: (s: string) => <Tag color={getStatusColor(s)}>{s || 'PENDING'}</Tag> },
     {
       title: 'Actions',
       key: 'actions',
@@ -45,10 +45,10 @@ export default function AiGovernancePage() {
     { title: 'Total Interactions', value: stats?.totalInteractions || 0, prefix: <ExperimentOutlined /> },
     { 
       title: 'Acceptance Rate', 
-      value: stats && stats.totalInteractions > 0 ? Math.round((stats.acceptedCount / stats.totalInteractions) * 100) : 100, 
+      value: stats && stats.totalInteractions > 0 ? Math.round((stats.acceptedCount / stats.totalInteractions) * 100) : 0, 
       suffix: '%' 
     },
-    { title: 'Avg Confidence', value: stats?.averageConfidence || 94, suffix: '%' },
+    { title: 'Avg Confidence', value: stats?.averageConfidence || 0, suffix: '%' },
     { title: 'Safety Violations', value: 0, prefix: <SafetyOutlined />, valueStyle: { color: '#3f8600' } }
   ];
 

@@ -30,12 +30,12 @@ export const useAuthStore = create<AuthState>()(
         const isAdmin = role === UserRole.ADMIN;
         set({
           user: {
-            id: isDoc ? 'u-demo-doc' : isAdmin ? 'u-demo-admin' : 'u-demo-coord',
-            email: isDoc ? 'doctor@cityhospital.com' : isAdmin ? 'admin@cancercare360.com' : 'coordinator@cityhospital.com',
-            firstName: isDoc ? 'Jane' : isAdmin ? 'System' : 'Sarah',
-            lastName: isDoc ? 'Smith' : isAdmin ? 'Admin' : 'Jenkins',
+            id: isDoc ? 'u-staff-doc' : isAdmin ? 'u-staff-admin' : 'u-staff-nurse',
+            email: isDoc ? 'oncologist@cancercare.com' : isAdmin ? 'admin@cancercare.com' : 'nurse@cancercare.com',
+            firstName: isDoc ? 'Clinical' : isAdmin ? 'System' : 'Care',
+            lastName: isDoc ? 'Oncologist' : isAdmin ? 'Administrator' : 'Coordinator',
             roles: [role],
-            tenantId: 't-city-general',
+            tenantId: 'city-cancer-center',
             isActive: true,
           },
           tokens: {

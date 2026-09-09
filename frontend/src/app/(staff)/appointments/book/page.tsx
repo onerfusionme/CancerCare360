@@ -5,6 +5,7 @@ import { Card, Steps, Button, message, Form, Select, DatePicker, Input, Result }
 import { useRouter } from 'next/navigation';
 import TimeSlotPicker from '@/components/appointment/TimeSlotPicker';
 import { useAvailableSlots, useCreateAppointment } from '@/hooks/use-appointments';
+import { usePatients } from '@/hooks/use-patients';
 import { CreateAppointmentDto } from '@/types/appointment';
 
 const { Step } = Steps;
@@ -15,6 +16,9 @@ export default function BookAppointmentPage() {
   const [current, setCurrent] = useState(0);
   const [form] = Form.useForm();
   
+  const { data: patientData } = usePatients();
+  const patientList = Array.isArray(patientData?.data) ? patientData.data : (Array.isArray(patientData) ? patientData : []);
+
   const [selectedDoctor, setSelectedDoctor] = useState<string>('');
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [selectedTime, setSelectedTime] = useState<string>('');
@@ -52,15 +56,20 @@ export default function BookAppointmentPage() {
         return (
           <Form form={form} layout="vertical">
             <Form.Item name="patientId" label="Patient" rules={[{ required: true, message: 'Please select a patient' }]}>
-              <Select placeholder="Search patient...">
-                <Option value="pat1">John Doe (MRN: 12345)</Option>
-                <Option value="pat2">Jane Smith (MRN: 67890)</Option>
+              <Select placeholder={patientList.length > 0 ? "Search patient..." : "No registered patients found — please register first"}>
+                {patientList.map((p: any) => (
+                  <Option key={p.id} value={p.id}>
+                    {p.name || `${p.firstName || ''} ${p.lastName || ''}`.trim() || 'Patient'} ({p.mrn})
+                  </Option>
+                ))}
               </Select>
             </Form.Item>
             <Form.Item name="appointmentType" label="Appointment Type" rules={[{ required: true }]}>
               <Select placeholder="Select type">
-                <Option value="FOLLOW_UP">Follow Up</Option>
                 <Option value="INITIAL_CONSULT">Initial Consultation</Option>
+                <Option value="FOLLOW_UP">Follow Up Review</Option>
+                <Option value="CHEMOTHERAPY">Chemotherapy Session</Option>
+                <Option value="RADIATION">Radiation Planning</Option>
               </Select>
             </Form.Item>
           </Form>
@@ -70,8 +79,9 @@ export default function BookAppointmentPage() {
           <Form form={form} layout="vertical">
             <Form.Item name="doctorId" label="Doctor" rules={[{ required: true }]}>
               <Select placeholder="Select doctor" onChange={val => setSelectedDoctor(val)}>
-                <Option value="doc1">Dr. Smith</Option>
-                <Option value="doc2">Dr. Jones</Option>
+                <Option value="doc-med">Consultant Oncologist (Medical Oncology)</Option>
+                <Option value="doc-rad">Consultant Oncologist (Radiation Oncology)</Option>
+                <Option value="doc-surg">Consultant Surgeon (Surgical Oncology)</Option>
               </Select>
             </Form.Item>
             <Form.Item name="date" label="Date" rules={[{ required: true }]}>

@@ -35,15 +35,6 @@ export default function PatientDetailPage({ params }: { params: { id: string } }
     { title: 'Status', dataIndex: 'verificationStatus', key: 'verificationStatus', render: (s: string) => <StatusBadge status={s} /> }
   ];
 
-  const treatmentMilestones = [
-    { id: 'tm1', step: 'Cycle 1 AC Chemotherapy', protocol: 'Doxorubicin + Cyclophosphamide', date: '2026-06-25', status: 'COMPLETED', adherence: '100%' },
-    { id: 'tm2', step: 'Cycle 2 AC Chemotherapy', protocol: 'Doxorubicin + Cyclophosphamide', date: '2026-07-16', status: 'COMPLETED', adherence: '100%' },
-    { id: 'tm3', step: 'Cycle 3 AC Chemotherapy', protocol: 'Doxorubicin + Cyclophosphamide', date: '2026-08-06', status: 'COMPLETED', adherence: '95%' },
-    { id: 'tm4', step: 'Cycle 4 AC Chemotherapy', protocol: 'Doxorubicin + Cyclophosphamide', date: '2026-08-27', status: 'DELAYED', adherence: 'Neutropenia Hold' },
-    { id: 'tm5', step: 'Restaging PET-CT Scan', protocol: 'Response Evaluation RECIST 1.1', date: '2026-09-18', status: 'PENDING', adherence: 'Scheduled' },
-    { id: 'tm6', step: 'Breast Conserving Surgery (BCS)', protocol: 'Surgical Oncology Wing', date: '2026-10-10', status: 'PENDING', adherence: 'Upcoming' },
-  ];
-
   const milestoneColumns = [
     { title: 'Treatment Step', dataIndex: 'step', key: 'step', render: (t: string) => <Text strong>{t}</Text> },
     { title: 'Regimen / Protocol', dataIndex: 'protocol', key: 'protocol' },
@@ -59,12 +50,8 @@ export default function PatientDetailPage({ params }: { params: { id: string } }
     { title: 'Adherence / Note', dataIndex: 'adherence', key: 'adherence' }
   ];
 
-  const activityAuditLogs = [
-    { time: 'Today, 11:20 AM', title: 'Care Coordinator Contact', desc: 'Nurse Pooja called patient regarding ANC repeat test schedule.', user: 'Pooja Verma (RN)' },
-    { time: 'Yesterday, 04:45 PM', title: 'Lab Result Uploaded', desc: 'Complete Blood Count (CBC) uploaded via hospital LIS sync.', user: 'LIS Interface Engine' },
-    { time: '02 Sep 2026, 10:15 AM', title: 'Consultation Completed', desc: 'Dr. Jane Smith held neoadjuvant mid-treatment assessment.', user: 'Dr. Jane Smith' },
-    { time: '27 Aug 2026, 09:00 AM', title: 'Chemotherapy Hold Flagged', desc: 'Cycle 4 paused due to CTCAE Grade 2 neutropenia (ANC 1,100 /uL).', user: 'Care Gap Engine' }
-  ];
+  const treatmentMilestones: any[] = [];
+  const activityAuditLogs: any[] = [];
 
   return (
     <div style={{ padding: 24 }}>
@@ -111,10 +98,12 @@ export default function PatientDetailPage({ params }: { params: { id: string } }
           label: 'Treatment Milestones & Adherence',
           children: (
             <Card title="Chemotherapy & Surgical Protocol Adherence">
-              <div style={{ marginBottom: 16 }}>
-                <Text type="secondary">Protocol: AC-T Dose-Dense Neoadjuvant Regimen (4 Cycles AC + 4 Cycles Paclitaxel)</Text>
-              </div>
-              <Table dataSource={treatmentMilestones} columns={milestoneColumns} rowKey="id" pagination={false} />
+              <Table 
+                dataSource={treatmentMilestones} 
+                columns={milestoneColumns} 
+                rowKey="id" 
+                pagination={false} 
+              />
             </Card>
           )
         },
@@ -123,21 +112,27 @@ export default function PatientDetailPage({ params }: { params: { id: string } }
           label: 'Clinical Activity & Audit Trail',
           children: (
             <Card title="DPDP & ABDM Compliant Activity Audit Trail">
-              <Timeline
-                items={activityAuditLogs.map(log => ({
-                  color: 'blue',
-                  children: (
-                    <div style={{ paddingBottom: 12 }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <Text strong>{log.title}</Text>
-                        <Text type="secondary" style={{ fontSize: 12 }}>{log.time}</Text>
+              {activityAuditLogs.length > 0 ? (
+                <Timeline
+                  items={activityAuditLogs.map(log => ({
+                    color: 'blue',
+                    children: (
+                      <div style={{ paddingBottom: 12 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <Text strong>{log.title}</Text>
+                          <Text type="secondary" style={{ fontSize: 12 }}>{log.time}</Text>
+                        </div>
+                        <div style={{ color: '#475569', fontSize: 13, marginTop: 2 }}>{log.desc}</div>
+                        <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 2 }}>Logged by: {log.user}</div>
                       </div>
-                      <div style={{ color: '#475569', fontSize: 13, marginTop: 2 }}>{log.desc}</div>
-                      <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 2 }}>Logged by: {log.user}</div>
-                    </div>
-                  )
-                }))}
-              />
+                    )
+                  }))}
+                />
+              ) : (
+                <div style={{ padding: '24px 0', textAlign: 'center', color: '#64748b' }}>
+                  No recent audit logs on record for this patient.
+                </div>
+              )}
             </Card>
           )
         }

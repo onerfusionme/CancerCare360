@@ -156,7 +156,7 @@ export default function PatientsPage() {
       title: 'Age', 
       key: 'age', 
       width: 80,
-      render: (_: any, record: Patient) => dayjs().diff(dayjs(record.dateOfBirth), 'year') || 45
+      render: (_: any, record: Patient) => record.dateOfBirth ? dayjs().diff(dayjs(record.dateOfBirth), 'year') : '—'
     },
     { title: 'Gender', dataIndex: 'gender', key: 'gender', width: 100 },
     { 
@@ -169,7 +169,7 @@ export default function PatientsPage() {
       title: 'Primary Oncologist', 
       dataIndex: 'primaryDoctorName', 
       key: 'doctor',
-      render: (doc: string) => doc || 'Dr. Jane Smith'
+      render: (doc: string) => doc || 'Oncologist'
     },
     { 
       title: 'Status', 
@@ -418,7 +418,7 @@ export default function PatientsPage() {
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item name="primaryDoctorName" label="Assigned Oncologist">
-                <Input placeholder="Dr. Jane Smith" />
+                <Input placeholder="e.g. Dr. Oncologist Name" />
               </Form.Item>
             </Col>
             <Col span={12}>

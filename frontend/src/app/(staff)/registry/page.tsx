@@ -163,9 +163,10 @@ export default function RegistryPage() {
             <DatePicker.RangePicker style={{ width: '100%' }} />
           </Form.Item>
           <Form.Item name="doctorId" label="Doctor">
-            <Select placeholder="Select Doctor" allowClear>
-              <Option value="doc1">Dr. Jane Smith</Option>
-              <Option value="doc2">Dr. Ramesh Rao</Option>
+            <Select placeholder="Filter by Doctor" allowClear>
+              <Option value="doc-med">Medical Oncologist</Option>
+              <Option value="doc-surg">Surgical Oncologist</Option>
+              <Option value="doc-rad">Radiation Oncologist</Option>
             </Select>
           </Form.Item>
         </Form>

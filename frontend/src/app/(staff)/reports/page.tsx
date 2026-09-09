@@ -11,10 +11,7 @@ const { RangePicker } = DatePicker;
 export default function ReportsPage() {
   const [form] = Form.useForm();
   const generateReport = useGenerateReport();
-  const [auditLogs, setAuditLogs] = useState([
-    { id: '1', report: 'PATIENT_CENSUS', date: '2026-09-07 09:30 AM', user: 'Dr. Smith', format: 'CSV' },
-    { id: '2', report: 'CARE_GAPS', date: '2026-09-06 14:15 PM', user: 'Nurse Joy', format: 'JSON' },
-  ]);
+  const [auditLogs, setAuditLogs] = useState<any[]>([]);
 
   const onFinish = (values: any) => {
     const dto = {

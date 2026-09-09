@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Card, Typography, Button, List, Tag, Space, Modal, Form, DatePicker, Select } from 'antd';
+import { Card, Typography, Button, List, Tag, Space, Modal, Form, DatePicker, Select, Empty } from 'antd';
 import { CalendarOutlined, ClockCircleOutlined, EnvironmentOutlined } from '@ant-design/icons';
 import { usePortalAppointments } from '@/hooks/use-engagement';
 
@@ -11,12 +11,6 @@ export default function PortalAppointments() {
   const { data: appointments = [], isLoading } = usePortalAppointments();
   const [isModalVisible, setIsModalVisible] = useState(false);
 
-  // Mock data since API might be empty initially
-  const upcomingAppointments = [
-    { id: '1', date: '2026-10-15', time: '10:00 AM', doctor: 'Dr. Sharma', location: 'Main Building, Floor 2', type: 'Consultation' },
-    { id: '2', date: '2026-10-22', time: '09:00 AM', doctor: 'Infusion Center', location: 'Chemo Ward, Floor 3', type: 'Treatment' },
-  ];
-
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
@@ -25,26 +19,30 @@ export default function PortalAppointments() {
       </div>
 
       <Card title="Upcoming Appointments" style={{ marginBottom: 24 }}>
-        <List
-          itemLayout="horizontal"
-          dataSource={upcomingAppointments}
-          renderItem={item => (
-            <List.Item
-              actions={[<Button key="reschedule" type="link">Reschedule</Button>]}
-            >
-              <List.Item.Meta
-                avatar={<CalendarOutlined style={{ fontSize: 24, color: '#1890ff', marginTop: 8 }} />}
-                title={<Space><Text strong>{item.type}</Text> <Tag color="blue">{item.doctor}</Tag></Space>}
-                description={
-                  <Space direction="vertical" size={2}>
-                    <Text type="secondary"><ClockCircleOutlined /> {item.date} at {item.time}</Text>
-                    <Text type="secondary"><EnvironmentOutlined /> {item.location}</Text>
-                  </Space>
-                }
-              />
-            </List.Item>
-          )}
-        />
+        {appointments.length > 0 ? (
+          <List
+            itemLayout="horizontal"
+            dataSource={appointments}
+            renderItem={(item: any) => (
+              <List.Item
+                actions={[<Button key="reschedule" type="link">Reschedule</Button>]}
+              >
+                <List.Item.Meta
+                  avatar={<CalendarOutlined style={{ fontSize: 24, color: '#1890ff', marginTop: 8 }} />}
+                  title={<Space><Text strong>{item.appointmentType || 'Consultation'}</Text> <Tag color="blue">{item.doctor?.name || 'Oncologist'}</Tag></Space>}
+                  description={
+                    <Space direction="vertical" size={2}>
+                      <Text type="secondary"><ClockCircleOutlined /> {item.scheduledAt ? new Date(item.scheduledAt).toLocaleString() : 'Scheduled'}</Text>
+                      <Text type="secondary"><EnvironmentOutlined /> {item.room || 'Consultation Suite'}</Text>
+                    </Space>
+                  }
+                />
+              </List.Item>
+            )}
+          />
+        ) : (
+          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="You have no upcoming appointments scheduled" />
+        )}
       </Card>
 
       <Modal

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Layout, Button, Avatar, Dropdown, Space, Badge, Tooltip, Drawer, List, Tag } from 'antd';
+import { Layout, Button, Avatar, Dropdown, Space, Badge, Tooltip, Drawer, List, Tag, Empty } from 'antd';
 import {
   MenuUnfoldOutlined,
   MenuFoldOutlined,
@@ -18,6 +18,7 @@ import {
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/stores/app.store';
 import { useAuth } from '@/hooks/use-auth';
+import { useAppointments } from '@/hooks/use-appointments';
 import { UserRole } from '@/types/auth';
 import GlobalSearch from '../ui/GlobalSearch';
 
@@ -28,6 +29,11 @@ export default function HeaderBar() {
   const { sidebarCollapsed, toggleSidebar, language, setLanguage, themeMode, toggleThemeMode } = useAppStore();
   const { user, logout, initializeDemoUser } = useAuth();
   const [notifDrawerOpen, setNotifDrawerOpen] = useState(false);
+  const { data: appointments } = useAppointments();
+
+  const apptList = Array.isArray(appointments) ? appointments : ((appointments as any)?.data || []);
+  const todayCount = apptList.length;
+  const inConsultCount = apptList.filter((a: any) => a.status === 'IN_PROGRESS').length;
 
   const isDark = themeMode === 'dark';
 
@@ -60,19 +66,19 @@ export default function HeaderBar() {
       },
       {
         key: 'switch-doc',
-        label: 'Switch to Dr. Jane Smith (Oncologist)',
+        label: 'Switch to Consultant Oncologist',
         icon: <SwapOutlined />,
         onClick: () => initializeDemoUser(UserRole.ONCOLOGIST),
       },
       {
         key: 'switch-coord',
-        label: 'Switch to Sarah Jenkins (Coordinator)',
+        label: 'Switch to Care Coordinator',
         icon: <SwapOutlined />,
         onClick: () => initializeDemoUser(UserRole.CARE_COORDINATOR),
       },
       {
         key: 'switch-admin',
-        label: 'Switch to System Admin',
+        label: 'Switch to System Administrator',
         icon: <SwapOutlined />,
         onClick: () => initializeDemoUser(UserRole.ADMIN),
       },
@@ -150,7 +156,7 @@ export default function HeaderBar() {
                 display: 'inline-block' 
               }} />
               <span style={{ fontWeight: 600 }}>Active Clinic:</span>
-              <span style={{ textDecoration: 'underline', textUnderlineOffset: 3 }}>6 Today</span>
+              <span style={{ textDecoration: 'underline', textUnderlineOffset: 3 }}>{todayCount} Today</span>
             </div>
           </Tooltip>
           <span style={{ color: isDark ? '#334155' : '#cbd5e1' }}>|</span>
@@ -159,7 +165,7 @@ export default function HeaderBar() {
               onClick={() => router.push('/appointments')}
               style={{ display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer' }}
             >
-              <span style={{ color: '#818cf8', fontWeight: 600 }}>1</span>
+              <span style={{ color: '#818cf8', fontWeight: 600 }}>{inConsultCount}</span>
               <span style={{ color: isDark ? '#94a3b8' : '#64748b' }}>In Consult</span>
             </div>
           </Tooltip>
@@ -179,7 +185,7 @@ export default function HeaderBar() {
                 border: isDark ? '1px solid rgba(244, 63, 94, 0.3)' : 'none',
                 transition: 'transform 0.1s'
               }}>
-                2 Urgent Gaps
+                0 Urgent Gaps
               </span>
             </div>
           </Tooltip>
@@ -261,7 +267,7 @@ export default function HeaderBar() {
             />
             <div style={{ lineHeight: '1.25', display: 'flex', flexDirection: 'column' }}>
               <span style={{ fontWeight: 600, fontSize: 13, color: isDark ? '#f8fafc' : '#0f172a' }}>
-                {user?.firstName ? `${user?.firstName} ${user?.lastName || ''}` : 'Dr. Jane Smith'}
+                {user?.firstName ? `${user?.firstName} ${user?.lastName || ''}` : 'Clinical Staff'}
               </span>
               <span style={{ fontSize: 11, color: isDark ? '#94a3b8' : '#64748b', fontWeight: 500 }}>
                 {user?.roles?.[0] === UserRole.ONCOLOGIST || user?.roles?.[0] === UserRole.MEDICAL_ONCOLOGIST ? 'Consultant Oncologist' : (user?.roles?.[0] || 'Care Coordinator')}
@@ -279,66 +285,10 @@ export default function HeaderBar() {
         onClose={() => setNotifDrawerOpen(false)}
         open={notifDrawerOpen}
       >
-        <List
-          itemLayout="vertical"
-          dataSource={[
-            {
-              id: 'n1',
-              title: 'Priya Sharma — Chemo Cycle 4 Overdue',
-              desc: 'Absolute Neutrophil Count recovered (1,650 /uL). Ready to resume AC chemotherapy regimen.',
-              tag: 'CRITICAL CARE GAP',
-              color: 'red',
-              actionRoute: '/gaps',
-              actionLabel: 'Open Gap Desk'
-            },
-            {
-              id: 'n2',
-              title: 'Rajesh Patel — Pathology Biopsy Overdue (SLA 48h)',
-              desc: 'Histopathology specimen processing pending from Central Lab. Expected SLA breached by 14h.',
-              tag: 'INVESTIGATION SLA',
-              color: 'orange',
-              actionRoute: '/investigations',
-              actionLabel: 'View Investigations'
-            },
-            {
-              id: 'n3',
-              title: 'OPD Queue Flow Status',
-              desc: 'Average outpatient wait time is currently 14 minutes. 1 patient in active consultation.',
-              tag: 'CLINIC FLOW',
-              color: 'blue',
-              actionRoute: '/appointments',
-              actionLabel: 'Open Clinic Flow'
-            }
-          ]}
-          renderItem={(item) => (
-            <List.Item
-              style={{
-                padding: '16px 0',
-                borderBottom: '1px solid #f1f5f9'
-              }}
-            >
-              <div style={{ marginBottom: 6 }}>
-                <Tag color={item.color} style={{ fontWeight: 700, fontSize: 10 }}>{item.tag}</Tag>
-              </div>
-              <div style={{ fontWeight: 600, fontSize: 14, color: '#0f172a', marginBottom: 4 }}>
-                {item.title}
-              </div>
-              <div style={{ fontSize: 13, color: '#64748b', lineHeight: 1.4, marginBottom: 10 }}>
-                {item.desc}
-              </div>
-              <Button 
-                size="small" 
-                type="primary" 
-                ghost
-                onClick={() => {
-                  setNotifDrawerOpen(false);
-                  router.push(item.actionRoute);
-                }}
-              >
-                {item.actionLabel}
-              </Button>
-            </List.Item>
-          )}
+        <Empty 
+          image={Empty.PRESENTED_IMAGE_SIMPLE} 
+          description="No priority clinical alerts" 
+          style={{ marginTop: 60 }} 
         />
       </Drawer>
     </Header>

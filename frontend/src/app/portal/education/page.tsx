@@ -11,16 +11,13 @@ export default function PortalEducation() {
   const [selectedArticle, setSelectedArticle] = useState<any>(null);
 
   const categories = [
-    { id: '1', title: 'Managing Chemotherapy', tag: 'Treatment' },
-    { id: '2', title: 'Dietary Advice in India', tag: 'Nutrition' },
-    { id: '3', title: 'Palliative Care', tag: 'Care' },
-    { id: '4', title: 'Financial Assistance (PMJAY)', tag: 'Finance' }
+    { id: '1', title: 'Managing Chemotherapy Side Effects', tag: 'Treatment' },
+    { id: '2', title: 'Nutrition & Dietary Support During Oncology Care', tag: 'Nutrition' },
+    { id: '3', title: 'Palliative & Supportive Oncology Care', tag: 'Care' },
+    { id: '4', title: 'Financial & Insurance Assistance (PMJAY)', tag: 'Finance' }
   ];
 
-  const recommended = [
-    { id: '1', title: 'Managing Chemotherapy', tag: 'Treatment' },
-    { id: '2', title: 'Dietary Advice in India', tag: 'Nutrition' }
-  ];
+  const recommended: any[] = [];
 
   return (
     <div>

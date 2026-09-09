@@ -12,80 +12,67 @@ import {
 } from '@ant-design/icons';
 import { useConsultationReadiness } from '@/hooks/use-consultation';
 import { useAiConsultationSummary } from '@/hooks/use-ai';
+import { usePatients } from '@/hooks/use-patients';
 import { ReadinessCard } from '@/components/consultation/ReadinessCard';
 import { AiSummaryCard } from '@/components/ai/AiSummaryCard';
+import { useRouter } from 'next/navigation';
 
 const { Title, Text } = Typography;
 
-const patientOptions = [
-  { 
-    value: 'p1', 
-    label: 'Priya Sharma (MRN: MRN-ONC-2026-001) — Breast Stage IIB (Chemo Overdue)',
-    mrn: 'MRN-ONC-2026-001',
-    name: 'Priya Sharma',
-    age: 42,
-    gender: 'Female',
-    bloodGroup: 'B+',
-    abha: '91-5544-3322-1100',
-    cancerSite: 'Breast (Left Upper Outer Quadrant)',
-    diagnosis: 'Infiltrating Ductal Carcinoma',
-    tnm: 'cT2 N1 M0 — Stage IIB',
-    ecog: 'ECOG 1',
-    biomarkers: 'ER+ (80%) | PR+ (65%) | HER2 Negative',
-    regimen: 'AC-T Neoadjuvant Protocol',
-    cycle: 'Cycle 4 Paused (ANC 1,100)',
-    allergies: 'Sulfa Drugs (Severe Rash)',
-    doctor: 'Dr. Jane Smith',
-    status: 'ACTIVE_TREATMENT'
-  },
-  { 
-    value: 'p2', 
-    label: 'Rajesh Patel (MRN: MRN-ONC-2026-042) — Lung NSCLC Stage IIIA (Pending Biopsy)',
-    mrn: 'MRN-ONC-2026-042',
-    name: 'Rajesh Patel',
-    age: 58,
-    gender: 'Male',
-    bloodGroup: 'O+',
-    abha: '91-8877-6655-4433',
-    cancerSite: 'Right Lower Lobe Lung',
-    diagnosis: 'Non-Small Cell Lung Carcinoma (Adenocarcinoma)',
-    tnm: 'cT3 N2 M0 — Stage IIIA',
-    ecog: 'ECOG 1',
-    biomarkers: 'EGFR Pending | ALK Pending',
-    regimen: 'Carboplatin + Pemetrexed Planned',
-    cycle: 'Pre-Treatment Workup',
-    allergies: 'None Known',
-    doctor: 'Dr. Jane Smith',
-    status: 'DIAGNOSTIC_WORKUP'
-  },
-  { 
-    value: 'p3', 
-    label: 'Ananya Desai (MRN: MRN-ONC-2026-089) — Cervical Stage II (Concurrent Chemo-RT)',
-    mrn: 'MRN-ONC-2026-089',
-    name: 'Ananya Desai',
-    age: 49,
-    gender: 'Female',
-    bloodGroup: 'A+',
-    abha: '91-3322-1144-5566',
-    cancerSite: 'Cervix Uteri',
-    diagnosis: 'Squamous Cell Carcinoma of Cervix',
-    tnm: 'cT2b N0 M0 — Stage IIB',
-    ecog: 'ECOG 0',
-    biomarkers: 'High-risk HPV Positive (HPV-16)',
-    regimen: 'Weekly Cisplatin + External Beam Radiotherapy',
-    cycle: 'Week 3 of 5 In Progress',
-    allergies: 'Penicillin (Mild Hives)',
-    doctor: 'Dr. Jane Smith',
-    status: 'ACTIVE_TREATMENT'
-  }
-];
-
 export default function ConsultationsPage() {
-  const [selectedPatientValue, setSelectedPatientValue] = useState<string>('p1');
-  const activePatient = patientOptions.find(p => p.value === selectedPatientValue) || patientOptions[0];
+  const router = useRouter();
+  const { data: patientData, isLoading: isPatientsLoading } = usePatients();
+  const patientList = Array.isArray(patientData?.data) ? patientData.data : (Array.isArray(patientData) ? patientData : []);
+  
+  const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
 
-  const { data: readiness, isLoading } = useConsultationReadiness(activePatient.mrn);
-  const { data: aiSummary, isLoading: aiLoading } = useAiConsultationSummary(activePatient.mrn);
+  const activePatient = patientList.find((p: any) => p.id === selectedPatientId || p.mrn === selectedPatientId) || patientList[0] || null;
+
+  const { data: readiness, isLoading } = useConsultationReadiness(activePatient?.id || activePatient?.mrn || '');
+  const { data: aiSummary, isLoading: aiLoading } = useAiConsultationSummary(activePatient?.id || activePatient?.mrn || '');
+
+  if (isPatientsLoading) {
+    return (
+      <div style={{ padding: 40, textAlign: 'center' }}>
+        <Spin size="large" tip="Loading clinic patients..." />
+      </div>
+    );
+  }
+
+  if (patientList.length === 0 || !activePatient) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+        <div>
+          <Title level={3} style={{ margin: 0, color: '#0f172a', fontWeight: 700 }}>
+            Consultation Readiness Briefing
+          </Title>
+          <Text type="secondary" style={{ fontSize: 13 }}>
+            Pre-consultation synthesis: lab deltas, toxicities, treatment progress & actionable care gaps
+          </Text>
+        </div>
+        <Card style={{ textAlign: 'center', padding: '60px 20px', borderRadius: 12 }}>
+          <Empty 
+            description={
+              <div>
+                <Title level={4} style={{ marginTop: 16 }}>No Patients Registered</Title>
+                <Text type="secondary">
+                  There are currently no patients in the clinic register. Please register a patient in the Patients Directory to generate an automated consultation readiness briefing.
+                </Text>
+              </div>
+            }
+          >
+            <Button type="primary" onClick={() => router.push('/patients/new')} style={{ marginTop: 16, background: '#4f46e5' }}>
+              Register Patient
+            </Button>
+          </Empty>
+        </Card>
+      </div>
+    );
+  }
+
+  const patientName = activePatient.name || `${activePatient.firstName || ''} ${activePatient.lastName || ''}`.trim() || 'Patient';
+  const patientAge = activePatient.dateOfBirth ? (new Date().getFullYear() - new Date(activePatient.dateOfBirth).getFullYear()) : (activePatient.age || '—');
+  const initials = patientName.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() || 'PT';
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
@@ -97,7 +84,7 @@ export default function ConsultationsPage() {
               Consultation Readiness Briefing
             </Title>
             <Tag color="indigo" style={{ background: '#e0e7ff', color: '#4338ca', border: '1px solid #c7d2fe', fontWeight: 600 }}>
-              AI-SYNTHESIZED CLINICAL BRIEF
+              CLINICAL BRIEF
             </Tag>
           </div>
           <Text type="secondary" style={{ fontSize: 13 }}>
@@ -109,12 +96,12 @@ export default function ConsultationsPage() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <Text style={{ fontSize: 12, fontWeight: 600, color: '#64748b' }}>SELECT CLINIC PATIENT:</Text>
           <Select
-            value={selectedPatientValue}
-            style={{ width: 440 }}
-            onChange={setSelectedPatientValue}
-            options={patientOptions.map(p => ({
-              value: p.value,
-              label: p.label
+            value={activePatient.id}
+            style={{ width: 380 }}
+            onChange={setSelectedPatientId}
+            options={patientList.map((p: any) => ({
+              value: p.id,
+              label: `${p.name || `${p.firstName || ''} ${p.lastName || ''}`.trim() || 'Patient'} (${p.mrn})`
             }))}
             size="large"
           />
@@ -154,33 +141,33 @@ export default function ConsultationsPage() {
               color: '#ffffff',
               boxShadow: '0 4px 12px rgba(79, 70, 229, 0.35)',
             }}>
-              {activePatient.name.split(' ').map(n => n[0]).join('')}
+              {initials}
             </div>
 
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
                 <span style={{ fontSize: 20, fontWeight: 700, color: '#ffffff', letterSpacing: '-0.02em' }}>
-                  {activePatient.name}
+                  {patientName}
                 </span>
                 <span style={{ fontSize: 13, color: '#94a3b8' }}>
-                  ({activePatient.age} Y • {activePatient.gender} • Blood Group: {activePatient.bloodGroup})
+                  ({patientAge} Y • {activePatient.gender || 'Unknown'} • Blood Group: {activePatient.bloodGroup || '—'})
                 </span>
                 <Tag color="success" style={{ background: '#064e3b', color: '#34d399', border: '1px solid #059669', fontWeight: 600 }}>
-                  <CheckCircleOutlined /> ABHA VERIFIED: {activePatient.abha}
+                  <CheckCircleOutlined /> ABHA: {activePatient.abhaId || activePatient.abhaNumber || 'Verified'}
                 </Tag>
               </div>
               <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 2 }}>
-                MRN: <strong style={{ color: '#f8fafc', fontFamily: 'monospace' }}>{activePatient.mrn}</strong> • Facility: City General Hospital • Dept: Medical Oncology
+                MRN: <strong style={{ color: '#f8fafc', fontFamily: 'monospace' }}>{activePatient.mrn}</strong> • Facility: City Cancer Center
               </div>
             </div>
           </div>
 
           <div style={{ display: 'flex', gap: 8 }}>
             <Tag color="magenta" style={{ fontSize: 12, padding: '4px 10px', fontWeight: 700, margin: 0 }}>
-              {activePatient.tnm}
+              {activePatient.tnmStaging || activePatient.careStage || 'Staged'}
             </Tag>
             <Tag color="purple" style={{ fontSize: 12, padding: '4px 10px', fontWeight: 700, margin: 0 }}>
-              {activePatient.ecog}
+              {activePatient.ecogScore ? `ECOG ${activePatient.ecogScore}` : 'ECOG Evaluated'}
             </Tag>
           </div>
         </div>
@@ -189,71 +176,49 @@ export default function ConsultationsPage() {
         <Row gutter={[16, 12]} style={{ paddingTop: 16 }}>
           <Col xs={24} sm={12} md={6}>
             <div style={{ fontSize: 11, color: '#94a3b8', textTransform: 'uppercase', fontWeight: 600 }}>
-              Primary Malignancy
+              Primary Diagnosis
             </div>
             <div style={{ fontSize: 13, color: '#f8fafc', fontWeight: 600, marginTop: 2 }}>
-              {activePatient.diagnosis}
+              {activePatient.primaryDiagnosis || activePatient.cancerSite || 'Oncology Workup'}
             </div>
-            <div style={{ fontSize: 11, color: '#cbd5e1' }}>{activePatient.cancerSite}</div>
+            <div style={{ fontSize: 11, color: '#cbd5e1' }}>{activePatient.subsite || 'Clinical Diagnosis'}</div>
           </Col>
 
           <Col xs={24} sm={12} md={6}>
             <div style={{ fontSize: 11, color: '#94a3b8', textTransform: 'uppercase', fontWeight: 600 }}>
-              Receptor Biomarkers
+              Current Care Stage
             </div>
             <div style={{ fontSize: 13, color: '#c7d2fe', fontWeight: 600, marginTop: 2 }}>
-              {activePatient.biomarkers}
+              {activePatient.careStage || 'Evaluation'}
             </div>
-            <div style={{ fontSize: 11, color: '#cbd5e1' }}>Immunohistochemistry (IHC)</div>
+            <div style={{ fontSize: 11, color: '#cbd5e1' }}>Multidisciplinary Protocol</div>
           </Col>
 
           <Col xs={24} sm={12} md={6}>
             <div style={{ fontSize: 11, color: '#94a3b8', textTransform: 'uppercase', fontWeight: 600 }}>
-              Active Chemotherapy Regimen
+              Status
             </div>
             <div style={{ fontSize: 13, color: '#fed7aa', fontWeight: 600, marginTop: 2 }}>
-              {activePatient.regimen}
+              {activePatient.status || 'Active'}
             </div>
-            <div style={{ fontSize: 11, color: '#fca5a5', fontWeight: 600 }}>{activePatient.cycle}</div>
+            <div style={{ fontSize: 11, color: '#fca5a5', fontWeight: 600 }}>In Care Continuity</div>
           </Col>
 
           <Col xs={24} sm={12} md={6}>
             <div style={{ fontSize: 11, color: '#94a3b8', textTransform: 'uppercase', fontWeight: 600 }}>
-              Known Drug Allergies
+              Primary Physician
             </div>
-            <div style={{ fontSize: 13, color: '#fca5a5', fontWeight: 700, marginTop: 2 }}>
-              {activePatient.allergies}
+            <div style={{ fontSize: 13, color: '#f8fafc', fontWeight: 700, marginTop: 2 }}>
+              {activePatient.primaryDoctorName || 'Consultant Oncologist'}
             </div>
-            <div style={{ fontSize: 11, color: '#cbd5e1' }}>Treating Oncologist: {activePatient.doctor}</div>
+            <div style={{ fontSize: 11, color: '#cbd5e1' }}>Department of Medical Oncology</div>
           </Col>
         </Row>
       </div>
 
       {/* AI Pre-Consultation Summary Card */}
       <AiSummaryCard 
-        summary={aiSummary || {
-          confidenceScore: 94,
-          clinicalTrajectory: 'Partial radiological response achieved post-Cycles 1–3 (primary lesion reduced from 3.4cm to 2.1cm). Recent treatment interruption of 7 days due to isolated Grade 2 Neutropenia.',
-          currentStatus: 'Clinically stable, afebrile, reporting mild Grade 2 peripheral sensory neuropathy. Chemo Cycle 4 pending ANC recovery.',
-          attentionPoints: [
-            'ANC dropped to 1,100 /uL (CTCAE Grade 2). Below safe threshold for AC chemotherapy (requires > 1,500 /uL).',
-            'Chemotherapy Cycle 4 overdue by 7 days — risk of dose-intensity reduction.',
-            'Patient reported mild peripheral neuropathy (tingling in digits); assess prior to taxane phase.',
-            'Two phone outreach attempts uncompleted; verify home support and temperature logs.'
-          ],
-          pendingInvestigations: [
-            'Repeat Complete Blood Count with ANC differential (Stat Priority)',
-            'Mid-Treatment Restaging PET-CT Scan (Scheduled in 3 weeks)',
-            'Echocardiogram LVEF re-evaluation prior to cumulative Doxorubicin dose threshold'
-          ],
-          recommendedAgenda: [
-            'Review ANC trend and determine if G-CSF support (Filgrastim 300 mcg) is indicated.',
-            'Assess peripheral neuropathy grade and perform neurological touch sensation exam.',
-            'Confirm absence of fever/chills or occult signs of neutropenic sepsis.',
-            'Reschedule Daycare Infusion Bay 4 for Cycle 4 once ANC confirms > 1,500 /uL.'
-          ],
-          clinicalDisclaimer: 'CLINICAL DECISION SUPPORT ONLY (§30 COMPLIANT) — All AI recommendations must be verified by the treating oncologist before clinical enactment.'
-        }} 
+        summary={aiSummary} 
         isLoading={aiLoading} 
       />
 

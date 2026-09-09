@@ -21,11 +21,11 @@ export default function DocumentsPage() {
   };
 
   const columns = [
-    { title: 'Patient', key: 'patient', render: (_: any, r: Document) => <strong>{r.patient?.name || 'Priya Sharma'}</strong> },
+    { title: 'Patient', key: 'patient', render: (_: any, r: Document) => <strong>{r.patient?.name || (r.patient?.firstName ? `${r.patient.firstName} ${r.patient.lastName || ''}`.trim() : 'Patient')}</strong> },
     { title: 'Document Type', dataIndex: 'type', key: 'type', render: (t: string) => <Tag color="blue">{t}</Tag> },
     { title: 'File Name', dataIndex: 'fileName', key: 'fileName' },
     { title: 'Uploaded Date', dataIndex: 'uploadedAt', key: 'uploadedAt', render: (d: string) => d ? dayjs(d).format('MMM D, YYYY') : 'Today' },
-    { title: 'Uploaded By', dataIndex: 'uploadedBy', key: 'uploadedBy', render: (u: string) => u || 'Nurse Pooja' },
+    { title: 'Uploaded By', dataIndex: 'uploadedBy', key: 'uploadedBy', render: (u: string) => u || 'Clinical Staff' },
     { title: 'Virus Scan', dataIndex: 'scanStatus', key: 'scanStatus', render: (s: ScanStatus) => <StatusBadge status={s || 'CLEAN'} /> },
     { title: 'Verification', dataIndex: 'verificationStatus', key: 'verificationStatus', render: (s: VerificationStatus) => <StatusBadge status={s || 'VERIFIED'} /> },
     { 

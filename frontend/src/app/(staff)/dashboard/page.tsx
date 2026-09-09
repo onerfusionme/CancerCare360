@@ -18,7 +18,8 @@ import {
   Progress, 
   Divider, 
   Tooltip,
-  Dropdown
+  Dropdown,
+  Empty
 } from 'antd';
 import { 
   ArrowUpOutlined, 
@@ -572,49 +573,10 @@ export default function DashboardPage() {
               height: '100%' 
             }}
           >
-            <List
-              itemLayout="horizontal"
-              dataSource={[
-                { id: '1', time: '5 mins ago', description: 'Patient Priya Sharma checked in at OPD Room 3 for consultation prep', type: 'info', path: '/appointments' },
-                { id: '2', time: '18 mins ago', description: 'Automated Care Gap Engine identified overdue cycle for 2 cohort patients', type: 'alert', path: '/gaps' },
-                { id: '3', time: '42 mins ago', description: 'Biopsy Pathology Report uploaded via LIS integration for MRN-ONC-2026-042', type: 'success', path: '/investigations' },
-                { id: '4', time: '1 hour ago', description: 'ABDM Consent Artefact renewed for digital health records exchange', type: 'success', path: '/portal/settings' },
-                { id: '5', time: '2 hours ago', description: 'Multidisciplinary Tumor Board note finalized by Dr. Jane Smith', type: 'info', path: '/reports' },
-              ]}
-              renderItem={(item) => (
-                <List.Item 
-                  onClick={() => router.push(item.path)}
-                  style={{ 
-                    padding: '12px 10px', 
-                    borderBottom: `1px solid ${isDark ? '#1e293b' : '#f1f5f9'}`,
-                    cursor: 'pointer',
-                    borderRadius: 8,
-                    transition: 'background 0.2s ease',
-                  }}
-                  className="stream-item-hover"
-                >
-                  <List.Item.Meta
-                    avatar={
-                      item.type === 'alert' ? <AlertOutlined style={{ color: '#e11d48', fontSize: 18 }} /> :
-                      item.type === 'success' ? <CheckCircleOutlined style={{ color: '#059669', fontSize: 18 }} /> :
-                      <InfoCircleOutlined style={{ color: '#4f46e5', fontSize: 18 }} />
-                    }
-                    title={
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <span style={{ fontSize: 13, fontWeight: 500, color: textPrimary }}>{item.description}</span>
-                        <RightOutlined style={{ fontSize: 11, color: textSecondary, marginLeft: 8 }} />
-                      </div>
-                    }
-                    description={<span style={{ fontSize: 11, color: textSecondary }}>{item.time} • Click to open</span>}
-                  />
-                  <Tag color={
-                    item.type === 'alert' ? 'red' : 
-                    item.type === 'success' ? 'green' : 'blue'
-                  } style={{ borderRadius: 4, fontWeight: 600, fontSize: 11 }}>
-                    {item.type.toUpperCase()}
-                  </Tag>
-                </List.Item>
-              )}
+            <Empty 
+              image={Empty.PRESENTED_IMAGE_SIMPLE} 
+              description="No recent clinical stream events" 
+              style={{ margin: '60px 0' }} 
             />
           </Card>
         </Col>

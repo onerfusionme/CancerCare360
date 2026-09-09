@@ -45,6 +45,7 @@ import {
 import { AppointmentStatus, Appointment } from '@/types/appointment';
 import { waitlistService } from '@/services/waitlist.service';
 import { useQuery } from '@tanstack/react-query';
+import { usePatients } from '@/hooks/use-patients';
 import ClinicFlowBoard from '@/components/appointment/ClinicFlowBoard';
 import dayjs from 'dayjs';
 
@@ -66,6 +67,8 @@ export default function AppointmentsPage() {
 
   // Queries
   const { data: appointments, isLoading: appointmentsLoading } = useAppointments();
+  const { data: patientData } = usePatients();
+  const patientList = Array.isArray(patientData?.data) ? patientData.data : (Array.isArray(patientData) ? patientData : []);
   const { data: todaysAppointments, isLoading: todaysLoading } = useTodaysAppointments(selectedDoctor);
   const { data: waitlist, isLoading: waitlistLoading } = useQuery({
     queryKey: ['waitlist'],
@@ -167,8 +170,8 @@ export default function AppointmentsPage() {
       key: 'patient',
       render: (_: any, record: any) => (
         <div>
-          <div style={{ fontWeight: 600 }}>{record.patient?.name || 'Priya Sharma'}</div>
-          <div style={{ fontSize: '11px', color: '#64748b' }}>MRN: {record.patient?.mrn || 'MRN-ONC-2026-001'}</div>
+          <div style={{ fontWeight: 600 }}>{record.patient?.name || (record.patient?.firstName ? `${record.patient.firstName} ${record.patient.lastName || ''}`.trim() : 'Patient')}</div>
+          <div style={{ fontSize: '11px', color: '#64748b' }}>MRN: {record.patient?.mrn || '—'}</div>
         </div>
       )
     },
@@ -181,19 +184,19 @@ export default function AppointmentsPage() {
     { 
       title: 'Doctor', 
       key: 'doctor',
-      render: (_: any, record: any) => record.doctor?.name || 'Dr. Jane Smith'
+      render: (_: any, record: any) => record.doctor?.name || (record.doctor?.firstName ? `Dr. ${record.doctor.firstName} ${record.doctor.lastName || ''}`.trim() : 'Oncologist')
     },
     { 
       title: 'Room', 
       dataIndex: 'room', 
       key: 'room',
-      render: (r: string) => r || 'OPD Room 1'
+      render: (r: string) => r || 'Consultation Room'
     },
     { 
       title: 'Scheduled Time', 
       dataIndex: 'scheduledAt', 
       key: 'scheduledAt',
-      render: (val: string) => val ? dayjs(val).format('DD MMM YYYY, hh:mm A') : 'Today, 10:30 AM'
+      render: (val: string) => val ? dayjs(val).format('DD MMM YYYY, hh:mm A') : '—'
     },
     {
       title: 'Status',
@@ -260,7 +263,7 @@ export default function AppointmentsPage() {
     { 
       title: 'Doctor', 
       key: 'doctor',
-      render: (_: any, record: any) => record.doctor?.name || 'Dr. Jane Smith'
+      render: (_: any, record: any) => record.doctor?.name || 'Oncologist'
     },
     {
       title: 'Risk Score',
@@ -363,8 +366,9 @@ export default function AppointmentsPage() {
                 <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
                   <Text strong>Filter by Oncologist:</Text>
                   <Select value={selectedDoctor} onChange={setSelectedDoctor} style={{ width: 220 }}>
-                    <Option value="doc1">Dr. Jane Smith (Medical Onco)</Option>
-                    <Option value="doc2">Dr. Ramesh Rao (Radiation Onco)</Option>
+                    <Option value="doc1">Medical Oncology</Option>
+                    <Option value="doc2">Radiation Oncology</Option>
+                    <Option value="doc3">Surgical Oncology</Option>
                   </Select>
                 </div>
                 <ClinicFlowBoard 
@@ -431,19 +435,22 @@ export default function AppointmentsPage() {
         footer={null}
         destroyOnClose
       >
-        <Form form={bookForm} layout="vertical" onFinish={handleBook} initialValues={{ appointmentType: 'CONSULTATION', room: 'OPD Room 1' }}>
+        <Form form={bookForm} layout="vertical" onFinish={handleBook} initialValues={{ appointmentType: 'CONSULTATION', room: 'Consultation Suite 1' }}>
           <Form.Item name="patientId" label="Patient" rules={[{ required: true, message: 'Please select patient' }]}>
-            <Select placeholder="Select Patient">
-              <Option value="pat1">Priya Sharma (MRN-ONC-2026-001)</Option>
-              <Option value="pat2">Rajesh Patel (MRN-ONC-2026-002)</Option>
-              <Option value="pat3">Anita Desai (MRN-ONC-2026-003)</Option>
+            <Select placeholder={patientList.length > 0 ? "Select Patient" : "No registered patients — register patient first"}>
+              {patientList.map((p: any) => (
+                <Option key={p.id} value={p.id}>
+                  {p.name || `${p.firstName || ''} ${p.lastName || ''}`.trim() || 'Patient'} ({p.mrn})
+                </Option>
+              ))}
             </Select>
           </Form.Item>
 
           <Form.Item name="doctorId" label="Consulting Oncologist" rules={[{ required: true, message: 'Please select oncologist' }]}>
             <Select placeholder="Select Doctor">
-              <Option value="doc1">Dr. Jane Smith (Medical Oncology)</Option>
-              <Option value="doc2">Dr. Ramesh Rao (Radiation Oncology)</Option>
+              <Option value="doc-med">Consultant Oncologist (Medical Oncology)</Option>
+              <Option value="doc-rad">Consultant Oncologist (Radiation Oncology)</Option>
+              <Option value="doc-surg">Consultant Surgeon (Surgical Oncology)</Option>
             </Select>
           </Form.Item>
 
@@ -498,7 +505,7 @@ export default function AppointmentsPage() {
         <Form form={rescheduleForm} layout="vertical" onFinish={handleRescheduleSubmit}>
           <div style={{ marginBottom: 16, padding: 12, background: '#f8fafc', borderRadius: 8 }}>
             <Text strong>Current Booking:</Text>
-            <div>Patient: {selectedAppointment?.patient?.name || 'Priya Sharma'}</div>
+            <div>Patient: {selectedAppointment?.patient?.name || (selectedAppointment?.patient?.firstName ? `${selectedAppointment.patient.firstName} ${selectedAppointment.patient.lastName || ''}`.trim() : 'Patient')}</div>
             <div>Time: {selectedAppointment?.scheduledAt ? dayjs(selectedAppointment.scheduledAt).format('DD MMM YYYY, hh:mm A') : 'Today'}</div>
           </div>
 

@@ -12,7 +12,7 @@ export const patientKeys = {
   journey: (id: string) => [...patientKeys.journeys(), id] as const,
 };
 
-export function usePatients(filters: PatientFilter) {
+export function usePatients(filters: PatientFilter = {}) {
   return useQuery({
     queryKey: patientKeys.list(filters),
     queryFn: () => patientService.getPatients(filters),

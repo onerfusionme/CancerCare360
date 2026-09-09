@@ -12,24 +12,19 @@ export default function AdminPage() {
   const router = useRouter();
   
   const depts = [
-    { id: 1, name: 'Medical Oncology', clinics: 12, doctors: 45, status: 'Active' },
-    { id: 2, name: 'Surgical Oncology', clinics: 8, doctors: 28, status: 'Active' },
-    { id: 3, name: 'Radiation Oncology', clinics: 5, doctors: 15, status: 'Active' },
+    { id: 1, name: 'Medical Oncology', clinics: 1, doctors: 1, status: 'Active' },
+    { id: 2, name: 'Surgical Oncology', clinics: 1, doctors: 0, status: 'Active' },
+    { id: 3, name: 'Radiation Oncology', clinics: 1, doctors: 0, status: 'Active' },
   ];
 
   const users = [
-    { id: 'U001', name: 'Dr. Jane Smith', role: 'Oncologist', department: 'Medical Oncology', status: 'Active' },
-    { id: 'U002', name: 'Alice Johnson', role: 'Coordinator', department: 'Patient Services', status: 'Active' },
-    { id: 'U003', name: 'Bob Williams', role: 'Admin', department: 'IT', status: 'Offline' },
-    { id: 'U004', name: 'Dr. Richard Roe', role: 'HOD', department: 'Surgical Oncology', status: 'Active' },
+    { id: 'U001', name: 'Dr. Jane Oncologist', role: 'Oncologist', department: 'Medical Oncology', status: 'Active' },
+    { id: 'U002', name: 'Clinical Nurse', role: 'Nurse', department: 'Medical Oncology', status: 'Active' },
+    { id: 'U003', name: 'Hospital Registrar', role: 'Registrar', department: 'Patient Services', status: 'Active' },
+    { id: 'U004', name: 'System Administrator', role: 'Admin', department: 'Administration', status: 'Active' },
   ];
 
-  const templates = [
-    { id: 'T01', name: 'Breast Cancer (Stage II) Protocol', steps: 12, lastUpdated: '2026-08-15' },
-    { id: 'T02', name: 'Lung Cancer (NSCLC) Pathway', steps: 15, lastUpdated: '2026-08-20' },
-    { id: 'T03', name: 'Colorectal Surgery + Chemo', steps: 18, lastUpdated: '2026-09-01' },
-    { id: 'T04', name: 'Head & Neck Radiotherapy', steps: 9, lastUpdated: '2026-07-30' },
-  ];
+  const templates: any[] = [];
 
   const renderRoleTag = (role: string) => {
     const colors: Record<string, string> = {
