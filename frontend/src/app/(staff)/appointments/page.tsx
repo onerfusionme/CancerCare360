@@ -399,12 +399,12 @@ export default function AppointmentsPage() {
           },
           {
             key: '4',
-            label: `No-Show Risk (${noShowData?.data?.length || 0})`,
+            label: `No-Show Risk (${noShowData?.length || 0})`,
             children: (
               <Card>
                 <Table 
                   columns={noShowColumns} 
-                  dataSource={noShowData?.data || []} 
+                  dataSource={noShowData || []} 
                   rowKey="id" 
                   loading={noShowLoading}
                   pagination={{ pageSize: 8 }}

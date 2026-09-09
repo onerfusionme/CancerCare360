@@ -82,7 +82,7 @@ export default function AnalyticsPage() {
           <Col xs={24} lg={12}>
             <Card title="Cancer Stage Distribution" loading={isLoadingContinuity} bordered={false} style={{ height: '100%' }}>
               <Space direction="vertical" style={{ width: '100%' }} size="middle">
-                {continuityData?.stageDistribution.map(stage => (
+                {continuityData?.stageDistribution?.map(stage => (
                   <div key={stage.stage}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
                       <Text>{stage.stage}</Text>

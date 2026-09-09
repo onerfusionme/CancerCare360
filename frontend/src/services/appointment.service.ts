@@ -4,7 +4,8 @@ import { Appointment, AppointmentFilter, CreateAppointmentDto, UpdateAppointment
 export const appointmentService = {
   getAppointments: async (filter?: AppointmentFilter): Promise<Appointment[]> => {
     const response = await apiClient.get('/api/v1/appointments', { params: filter });
-    return response.data;
+    // Handle paginated response format { data, meta }
+    return response.data?.data || response.data || [];
   },
   
   getAppointment: async (id: string): Promise<Appointment> => {
