@@ -24,6 +24,11 @@ export class RbacGuard implements CanActivate {
       throw new ForbiddenException('No user found');
     }
 
+    // Administrators have full permission across all resources
+    if (user.roles?.includes('ADMIN') || user.roles?.includes('SYSTEM_ADMIN')) {
+      return true;
+    }
+
     if (requiredRoles) {
       const hasRole = () => user.roles?.some((role: string) => requiredRoles.includes(role));
       if (!hasRole()) {

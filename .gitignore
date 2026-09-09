@@ -146,4 +146,5 @@ venv.bak/
 
 # Project specific
 backend/dist/
+backend/uploads/
 frontend/out/

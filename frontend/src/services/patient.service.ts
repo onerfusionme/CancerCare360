@@ -6,7 +6,19 @@ import { PaginatedResponse, ApiResponse } from '@/types/api';
 export const patientService = {
   getPatients: async (filters: PatientFilter): Promise<PaginatedResponse<Patient>> => {
     const response = await apiClient.get('/api/v1/patients', { params: filters });
-    return response.data;
+    if (response.data && response.data.data) {
+      if (Array.isArray(response.data.data)) {
+        return {
+          data: response.data.data,
+          meta: response.data.meta || { itemCount: response.data.data.length, totalItems: response.data.data.length, itemsPerPage: 10, totalPages: 1, currentPage: 1 }
+        };
+      }
+      if (Array.isArray(response.data.data.data)) {
+        return response.data.data;
+      }
+      return response.data.data;
+    }
+    return response.data || { data: [], meta: { itemCount: 0, totalItems: 0, itemsPerPage: 10, totalPages: 0, currentPage: 1 } };
   },
 
   getPatient: async (id: string): Promise<Patient> => {

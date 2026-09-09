@@ -2,6 +2,11 @@
 import * as dotenv from 'dotenv';
 dotenv.config();
 
+// Ensure Prisma BigInt fields serialize smoothly to JSON across all endpoints
+(BigInt.prototype as any).toJSON = function () {
+  return Number(this);
+};
+
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';

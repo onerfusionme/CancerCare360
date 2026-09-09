@@ -38,11 +38,29 @@ export class DocumentService {
 
     const isImageOrPdf = file.mimetype.startsWith('image/') || file.mimetype === 'application/pdf';
 
+    if (dto.patientId) {
+      const patient = await this.prisma.patient.findFirst({
+        where: { id: dto.patientId, tenantId },
+      });
+      if (!patient) {
+        throw new BadRequestException('Selected patient was not found in this organization');
+      }
+    }
+
+    if (dto.journeyId) {
+      const journey = await this.prisma.careJourney.findFirst({
+        where: { id: dto.journeyId, tenantId },
+      });
+      if (!journey) {
+        throw new BadRequestException('Selected care journey was not found in this organization');
+      }
+    }
+
     const document = await this.prisma.document.create({
       data: {
         tenantId,
-        patientId: dto.patientId,
-        journeyId: dto.journeyId,
+        patientId: dto.patientId || null,
+        journeyId: dto.journeyId || null,
         documentType: dto.documentType,
         fileName: file.originalname,
         mimeType: file.mimetype,
@@ -54,11 +72,18 @@ export class DocumentService {
         verificationStatus: VerificationStatus.PENDING,
         source: dto.source,
         provenance: dto.provenance,
-        uploadedById: userId,
+        uploadedById: typeof userId === 'object' && userId !== null ? (userId as any).id : userId,
+      },
+      include: {
+        patient: { select: { id: true, firstName: true, lastName: true, mrn: true } },
+        uploadedBy: { select: { firstName: true, lastName: true } },
       },
     });
 
-    return document;
+    return {
+      ...document,
+      fileSize: Number(document.fileSize),
+    };
   }
 
   async findAll(tenantId: string, filterDto: DocumentFilterDto) {
@@ -87,14 +112,20 @@ export class DocumentService {
         include: {
           uploadedBy: { select: { firstName: true, lastName: true } },
           verifiedBy: { select: { firstName: true, lastName: true } },
+          patient: { select: { id: true, firstName: true, lastName: true, mrn: true } },
         },
         orderBy: { createdAt: 'desc' },
       }),
       this.prisma.document.count({ where }),
     ]);
 
+    const serializedData = data.map((doc) => ({
+      ...doc,
+      fileSize: Number(doc.fileSize),
+    }));
+
     return {
-      data,
+      data: serializedData,
       meta: {
         total,
         page,
@@ -118,7 +149,10 @@ export class DocumentService {
       throw new NotFoundException(`Document with ID ${id} not found`);
     }
 
-    return document;
+    return {
+      ...document,
+      fileSize: Number(document.fileSize),
+    };
   }
 
   async getSignedUrl(tenantId: string, id: string) {
@@ -140,7 +174,7 @@ export class DocumentService {
       where: { id, tenantId },
       data: {
         verificationStatus: status,
-        verifiedById: userId,
+        verifiedById: typeof userId === 'object' && userId !== null ? (userId as any).id : userId,
         verifiedAt: new Date(),
       },
     });

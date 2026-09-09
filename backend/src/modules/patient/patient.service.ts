@@ -28,9 +28,11 @@ export class PatientService {
        console.warn(`Potential duplicate found for new patient ${createPatientDto.firstName} ${createPatientDto.lastName}`);
     }
 
+    const { phoneNumber, ...restDto } = createPatientDto;
     return this.prisma.patient.create({
       data: {
-        ...createPatientDto,
+        ...restDto,
+        phone: createPatientDto.phone || phoneNumber,
         tenantId,
         dateOfBirth: new Date(createPatientDto.dateOfBirth),
         address: createPatientDto.address as any,

@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { Type, Transform } from 'class-transformer';
 import { IsDateString, IsEnum, IsJSON, IsNotEmpty, IsObject, IsOptional, IsString, Matches, ValidateNested } from 'class-validator';
 import { Gender, PatientStatus } from '@prisma/client';
 
@@ -35,9 +35,14 @@ export class CreatePatientDto {
   gender: Gender;
 
   @ApiPropertyOptional({ example: '+1234567890' })
+  @Transform(({ value, obj }: any) => value || obj?.phoneNumber)
   @IsString()
   @IsOptional()
   phone?: string;
+
+  @IsString()
+  @IsOptional()
+  phoneNumber?: string;
 
   @ApiPropertyOptional({ example: 'john.doe@example.com' })
   @IsString()
@@ -45,6 +50,7 @@ export class CreatePatientDto {
   email?: string;
 
   @ApiPropertyOptional({ type: Object, description: 'Address JSON' })
+  @Transform(({ value }: any) => (typeof value === 'string' ? { line: value } : value))
   @IsObject()
   @IsOptional()
   address?: Record<string, any>;
@@ -75,7 +81,8 @@ export class CreatePatientDto {
   externalIds?: Record<string, any>;
 
   @ApiProperty({ enum: PatientStatus, default: PatientStatus.ACTIVE })
+  @Transform(({ value }: any) => value || PatientStatus.ACTIVE)
   @IsEnum(PatientStatus)
-  @IsNotEmpty()
-  status: PatientStatus;
+  @IsOptional()
+  status: PatientStatus = PatientStatus.ACTIVE;
 }

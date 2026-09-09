@@ -27,13 +27,54 @@ export default function DocumentsPage() {
   };
 
   const columns = [
-    { title: 'Patient', key: 'patient', render: (_: any, r: Document) => <strong>{r.patient?.name || (r.patient?.firstName ? `${r.patient.firstName} ${r.patient.lastName || ''}`.trim() : 'Patient')}</strong> },
-    { title: 'Document Type', dataIndex: 'type', key: 'type', render: (t: string) => <Tag color="blue">{t}</Tag> },
+    { 
+      title: 'Patient', 
+      key: 'patient', 
+      render: (_: any, r: any) => {
+        if (r.patient) {
+          const name = r.patient.name || `${r.patient.firstName || ''} ${r.patient.lastName || ''}`.trim();
+          return (
+            <div>
+              <strong>{name || 'Unnamed Patient'}</strong>
+              {r.patient.mrn && (
+                <div style={{ fontSize: 12, color: '#8c8c8c' }}>MRN: {r.patient.mrn}</div>
+              )}
+            </div>
+          );
+        }
+        return <span style={{ color: '#8c8c8c', fontStyle: 'italic' }}>General / Unassigned</span>;
+      }
+    },
+    { 
+      title: 'Document Type', 
+      key: 'type', 
+      render: (_: any, r: any) => {
+        const typeStr = r.documentType || r.type || 'DOCUMENT';
+        return <Tag color="blue">{typeStr.replace(/_/g, ' ')}</Tag>;
+      }
+    },
     { title: 'File Name', dataIndex: 'fileName', key: 'fileName' },
-    { title: 'Uploaded Date', dataIndex: 'uploadedAt', key: 'uploadedAt', render: (d: string) => d ? dayjs(d).format('MMM D, YYYY') : 'Today' },
-    { title: 'Uploaded By', dataIndex: 'uploadedBy', key: 'uploadedBy', render: (u: string) => u || 'Clinical Staff' },
-    { title: 'Virus Scan', dataIndex: 'scanStatus', key: 'scanStatus', render: (s: ScanStatus) => <StatusBadge status={s || 'CLEAN'} /> },
-    { title: 'Verification', dataIndex: 'verificationStatus', key: 'verificationStatus', render: (s: VerificationStatus) => <StatusBadge status={s || 'VERIFIED'} /> },
+    { 
+      title: 'Uploaded Date', 
+      key: 'uploadedAt', 
+      render: (_: any, r: any) => {
+        const d = r.createdAt || r.uploadedAt;
+        return d ? dayjs(d).format('MMM D, YYYY') : 'Today';
+      } 
+    },
+    { 
+      title: 'Uploaded By', 
+      key: 'uploadedBy', 
+      render: (_: any, r: any) => {
+        const u = r.uploadedBy;
+        if (u && typeof u === 'object') {
+          return `${u.firstName || ''} ${u.lastName || ''}`.trim() || 'Clinical Staff';
+        }
+        return u || 'Clinical Staff';
+      } 
+    },
+    { title: 'Virus Scan', key: 'scanStatus', render: (_: any, r: any) => <StatusBadge status={r.virusScanStatus || r.scanStatus || 'CLEAN'} /> },
+    { title: 'Verification', dataIndex: 'verificationStatus', key: 'verificationStatus', render: (s: VerificationStatus) => <StatusBadge status={s || 'PENDING'} /> },
     { 
       title: 'Actions', 
       key: 'actions', 
