@@ -16,6 +16,12 @@ export default function DocumentsPage() {
   const [verifyDoc, setVerifyDoc] = useState<Document | null>(null);
   const { data: documents, isLoading } = useDocuments();
 
+  const documentList = React.useMemo(() => {
+    if (Array.isArray(documents)) return documents;
+    if (documents && Array.isArray((documents as any).data)) return (documents as any).data;
+    return [];
+  }, [documents]);
+
   const handleDelete = (id: string, fileName: string) => {
     message.success(`Document "${fileName}" archived successfully`);
   };
@@ -72,7 +78,12 @@ export default function DocumentsPage() {
         <DatePicker.RangePicker />
       </Space>
 
-      <Table dataSource={documents} columns={columns} rowKey="id" loading={isLoading} />
+      <Table 
+        dataSource={documentList} 
+        columns={columns} 
+        rowKey="id" 
+        loading={isLoading} 
+      />
 
       <DocumentUploadModal open={isUploadOpen} onClose={() => setIsUploadOpen(false)} />
       <DocumentVerifyDrawer open={!!verifyDoc} onClose={() => setVerifyDoc(null)} document={verifyDoc} />

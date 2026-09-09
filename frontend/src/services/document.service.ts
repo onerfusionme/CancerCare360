@@ -2,7 +2,12 @@ import apiClient from './api-client';
 import { UploadDocumentDto, DocumentFilter, VerificationStatus } from '../types/document';
 
 export const documentService = {
-  getDocuments: (filters?: DocumentFilter) => apiClient.get('/api/v1/documents', { params: filters }).then(res => res.data),
+  getDocuments: (filters?: DocumentFilter) => apiClient.get('/api/v1/documents', { params: filters }).then(res => {
+    if (res.data && Array.isArray(res.data.data)) {
+      return res.data.data;
+    }
+    return Array.isArray(res.data) ? res.data : [];
+  }),
   uploadDocument: (file: File, metadata: UploadDocumentDto) => {
     const formData = new FormData();
     formData.append('file', file);
