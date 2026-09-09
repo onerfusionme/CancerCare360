@@ -99,7 +99,7 @@ export default function PatientDetailPage({ params }: { params: { id: string } }
         {
           key: 'investigations',
           label: 'Diagnostic Investigations',
-          children: <Table dataSource={investigations || []} columns={invColumns} rowKey="id" loading={isInvLoading} />
+          children: <Table dataSource={Array.isArray(investigations) ? investigations : ((investigations as any)?.data || [])} columns={invColumns} rowKey="id" loading={isInvLoading} />
         },
         {
           key: 'documents',

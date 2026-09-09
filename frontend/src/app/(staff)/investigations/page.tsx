@@ -61,6 +61,12 @@ export default function InvestigationsPage() {
     status: filterStatus
   });
 
+  const investigationList: Investigation[] = React.useMemo(() => {
+    if (Array.isArray(investigations)) return investigations;
+    if (investigations && Array.isArray((investigations as any).data)) return (investigations as any).data;
+    return [];
+  }, [investigations]);
+
   const createInvMutation = useCreateInvestigation();
   const updateInvMutation = useUpdateInvestigation();
   const deleteInvMutation = useDeleteInvestigation();
@@ -226,7 +232,7 @@ export default function InvestigationsPage() {
         <Tabs items={[
           {
             key: 'all',
-            label: `All Investigations (${investigations?.length || 0})`,
+            label: `All Investigations (${investigationList.length})`,
             children: (
               <>
                 <Space style={{ marginBottom: 16 }} wrap>
@@ -239,7 +245,7 @@ export default function InvestigationsPage() {
                   <DatePicker.RangePicker />
                 </Space>
                 <Table 
-                  dataSource={investigations} 
+                  dataSource={investigationList} 
                   columns={columns} 
                   rowKey="id" 
                   loading={isLoading}
@@ -263,7 +269,7 @@ export default function InvestigationsPage() {
             label: 'Pending Specimen / In-Transit',
             children: (
               <Table 
-                dataSource={(investigations || []).filter(i => i.status === InvestigationStatus.ORDERED || i.status === InvestigationStatus.SAMPLE_COLLECTED)} 
+                dataSource={investigationList.filter(i => i.status === InvestigationStatus.ORDERED || i.status === InvestigationStatus.SAMPLE_COLLECTED)} 
                 columns={columns} 
                 rowKey="id" 
                 loading={isLoading}
@@ -275,7 +281,7 @@ export default function InvestigationsPage() {
             label: 'Completed Findings & Reports',
             children: (
               <Table 
-                dataSource={(investigations || []).filter(i => i.status === InvestigationStatus.REPORT_AVAILABLE || i.status === InvestigationStatus.REVIEWED)} 
+                dataSource={investigationList.filter(i => i.status === InvestigationStatus.REPORT_AVAILABLE || i.status === InvestigationStatus.REVIEWED)} 
                 columns={columns} 
                 rowKey="id" 
                 loading={isLoading}
