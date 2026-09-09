@@ -14,19 +14,19 @@ export default function TaskStatsCards({ stats }: TaskStatsCardsProps) {
     <Row gutter={16} style={{ marginBottom: 24 }}>
       <Col span={4}>
         <Card>
-          <Statistic title="Open" value={stats.open} valueStyle={{ color: '#1890ff' }} />
+          <Statistic title="Open" value={stats?.open ?? 0} valueStyle={{ color: '#1890ff' }} />
         </Card>
       </Col>
       <Col span={5}>
         <Card>
-          <Statistic title="In Progress" value={stats.inProgress} valueStyle={{ color: '#fa8c16' }} />
+          <Statistic title="In Progress" value={stats?.inProgress ?? 0} valueStyle={{ color: '#fa8c16' }} />
         </Card>
       </Col>
       <Col span={5}>
         <Card>
           <Statistic 
             title="Overdue" 
-            value={stats.overdue} 
+            value={stats?.overdue ?? 0} 
             valueStyle={{ color: '#cf1322' }} 
             prefix={<WarningOutlined />} 
           />
@@ -34,12 +34,12 @@ export default function TaskStatsCards({ stats }: TaskStatsCardsProps) {
       </Col>
       <Col span={5}>
         <Card>
-          <Statistic title="Resolved Today" value={stats.resolvedToday} valueStyle={{ color: '#3f8600' }} />
+          <Statistic title="Resolved Today" value={stats?.resolvedToday ?? 0} valueStyle={{ color: '#3f8600' }} />
         </Card>
       </Col>
       <Col span={5}>
         <Card>
-          <Statistic title="Total This Week" value={stats.totalThisWeek} />
+          <Statistic title="Total This Week" value={stats?.totalThisWeek ?? 0} />
         </Card>
       </Col>
     </Row>

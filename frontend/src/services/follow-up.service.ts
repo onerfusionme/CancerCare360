@@ -4,7 +4,10 @@ import { FollowUpTask, CreateTaskDto, UpdateTaskDto, TaskFilter, TaskDashboardSt
 export const followUpService = {
   getTasks: async (filter?: TaskFilter): Promise<FollowUpTask[]> => {
     const response = await apiClient.get('/api/v1/follow-up-tasks', { params: filter });
-    return response.data;
+    if (response.data && Array.isArray(response.data.data)) {
+      return response.data.data;
+    }
+    return Array.isArray(response.data) ? response.data : [];
   },
   
   getTask: async (id: string): Promise<FollowUpTask> => {

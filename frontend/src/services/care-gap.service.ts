@@ -1,30 +1,28 @@
-import axios from 'axios';
+import apiClient from './api-client';
 import { CareGapRule, CareGap, CreateRuleDto } from '@/types/care-gap';
-
-const API_URL = '/api/care-gaps';
 
 export const careGapService = {
   getRules: async (): Promise<CareGapRule[]> => {
-    const { data } = await axios.get(`${API_URL}/rules`);
-    return data;
+    const { data } = await apiClient.get('/api/v1/care-gap-rules');
+    return Array.isArray(data) ? data : (Array.isArray(data?.data) ? data.data : []);
   },
   createRule: async (dto: CreateRuleDto): Promise<CareGapRule> => {
-    const { data } = await axios.post(`${API_URL}/rules`, dto);
+    const { data } = await apiClient.post('/api/v1/care-gap-rules', dto);
     return data;
   },
   updateRule: async (id: string, dto: Partial<CreateRuleDto>): Promise<CareGapRule> => {
-    const { data } = await axios.patch(`${API_URL}/rules/${id}`, dto);
+    const { data } = await apiClient.patch(`/api/v1/care-gap-rules/${id}`, dto);
     return data;
   },
   toggleRule: async (id: string, isActive: boolean): Promise<CareGapRule> => {
-    const { data } = await axios.patch(`${API_URL}/rules/${id}`, { isActive });
+    const { data } = await apiClient.post(`/api/v1/care-gap-rules/${id}/toggle`, { isActive });
     return data;
   },
   detectGaps: async (): Promise<CareGap[]> => {
-    const { data } = await axios.get(`${API_URL}/detect`);
-    return data;
+    const { data } = await apiClient.get('/api/v1/care-gaps/detect');
+    return Array.isArray(data) ? data : (Array.isArray(data?.data) ? data.data : []);
   },
   generateTasks: async (): Promise<void> => {
-    await axios.post(`${API_URL}/generate-tasks`);
+    await apiClient.post('/api/v1/care-gaps/generate-tasks');
   }
 };

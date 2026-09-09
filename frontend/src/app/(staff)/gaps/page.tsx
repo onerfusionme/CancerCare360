@@ -62,7 +62,19 @@ export default function CareGapsPage() {
   // Queries & stats
   const { data: stats } = useTaskStats();
   const { data: tasks, isLoading: tasksLoading } = useTasks();
+  const taskList = React.useMemo(() => {
+    if (Array.isArray(tasks)) return tasks;
+    if (tasks && Array.isArray((tasks as any).data)) return (tasks as any).data;
+    return [];
+  }, [tasks]);
+
   const { data: gaps, refetch: detectGaps, isFetching: detectingGaps } = useDetectGaps();
+  const gapList = React.useMemo(() => {
+    if (Array.isArray(gaps)) return gaps;
+    if (gaps && Array.isArray((gaps as any).data)) return (gaps as any).data;
+    return [];
+  }, [gaps]);
+
   const { data: patientData } = usePatients();
   const patientList = Array.isArray(patientData?.data) ? patientData.data : (Array.isArray(patientData) ? patientData : []);
 
@@ -256,12 +268,12 @@ export default function CareGapsPage() {
         <Tabs activeKey={activeTab} onChange={setActiveTab} items={[
           {
             key: '1',
-            label: `Open Care Gap Tasks (${tasks?.length || 0})`,
+            label: `Open Care Gap Tasks (${taskList.length})`,
             children: (
               <div>
                 <Table 
                   columns={taskColumns} 
-                  dataSource={tasks || []} 
+                  dataSource={taskList} 
                   rowKey="id" 
                   loading={tasksLoading}
                   pagination={{ pageSize: 8 }}
@@ -271,7 +283,7 @@ export default function CareGapsPage() {
           },
           {
             key: '2',
-            label: `AI Gap Detection Engine (${gaps?.length || 0})`,
+            label: `AI Gap Detection Engine (${gapList.length})`,
             children: (
               <div>
                 <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -289,12 +301,12 @@ export default function CareGapsPage() {
                       onClick={handleGenerateTasks}
                       loading={generateTasksMutation.isPending}
                     >
-                      Generate Follow-Up Tasks ({gaps?.length || 0})
+                      Generate Follow-Up Tasks ({gapList.length})
                     </Button>
                   </Space>
                 </div>
                 <GapDetectionResults 
-                  gaps={gaps || []} 
+                  gaps={gapList} 
                   loading={detectingGaps} 
                   onGenerateTasks={handleGenerateTasks}
                   onExplainGap={(gap) => {
