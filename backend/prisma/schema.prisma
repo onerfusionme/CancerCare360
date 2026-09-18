@@ -65,6 +65,7 @@ model Tenant {
   aidApplications     AidApplication[]
   philanthropistDonors PhilanthropistDonor[]
   donorPledges        DonorPledge[]
+  secondOpinionCases  SecondOpinionCase[]
 
   @@index([status])
 }
@@ -176,6 +177,7 @@ model User {
   coordinatedPatients  Patient[]          @relation("PatientCoordinator")
   handoffsFrom         TaskHandoff[]      @relation("HandoffFromUser")
   handoffsTo           TaskHandoff[]      @relation("HandoffToUser")
+  assignedSecondOpinions SecondOpinionCase[] @relation("AssignedDoctorCases")
 
   @@unique([tenantId, email])
   @@index([tenantId])
@@ -323,6 +325,7 @@ model Patient {
   treatmentEstimates  TreatmentCostEstimate[]
   aidApplications     AidApplication[]
   donorPledges        DonorPledge[]
+  secondOpinionCases  SecondOpinionCase[] @relation("PatientSecondOpinions")
 
   @@unique([tenantId, mrn])
   @@index([tenantId])
@@ -1748,5 +1751,93 @@ model DonorPledge {
   @@index([donorId])
   @@index([patientId])
 }
+
+// ----------------------------------------
+// Second Opinion Hub Models
+// ----------------------------------------
+
+enum SecondOpinionStatus {
+  INQUIRY_SUBMITTED
+  DOCUMENTS_PENDING
+  UNDER_TRIAGE
+  PATHOLOGY_REVIEW
+  SPECIALIST_ASSIGNED
+  TUMOR_BOARD_SCHEDULED
+  REPORT_DRAFTED
+  REPORT_DELIVERED
+  PATIENT_ONBOARDED
+  SHARED_CARE_DISPATCHED
+  CLOSED
+}
+
+enum ConcordanceLevel {
+  FULL_CONCORDANCE
+  PARTIAL_CONCORDANCE
+  DISCORDANCE
+}
+
+model SecondOpinionCase {
+  id                    String              @id @default(uuid()) @db.Uuid
+  tenantId              String              @db.Uuid
+  caseNumber            String              @unique
+  patientName           String
+  phone                 String
+  email                 String?
+  age                   Int?
+  gender                String?
+  city                  String?
+  cancerType            String
+  primaryHospital       String?
+  primaryDoctorName     String?
+  primaryDiagnosis      String?
+  primaryTreatmentPlan  String?
+  inquiryReason         String?
+  clinicalUrgency       String              @default("ROUTINE")
+  status                SecondOpinionStatus @default(INQUIRY_SUBMITTED)
+
+  assignedDoctorId      String?             @db.Uuid
+  assignedDoctor        User?               @relation("AssignedDoctorCases", fields: [assignedDoctorId], references: [id])
+
+  concordanceLevel      ConcordanceLevel?
+  discordanceSummary    String?             @db.Text
+  consensusOpinion      String?             @db.Text
+  recommendedRegimen    String?             @db.Text
+  nccnGuidelineCitation String?
+  clinicalTrialOption   String?
+
+  isTumorBoardCase      Boolean             @default(false)
+  tumorBoardDate        DateTime?
+  teleConsultDate       DateTime?
+  teleConsultMeetingUrl String?
+
+  patientId             String?             @db.Uuid
+  patient               Patient?            @relation("PatientSecondOpinions", fields: [patientId], references: [id])
+
+  documents             SecondOpinionDocument[]
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+
+  tenant                Tenant              @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+  @@index([status])
+  @@index([cancerType])
+  @@index([patientId])
+}
+
+model SecondOpinionDocument {
+  id            String            @id @default(uuid()) @db.Uuid
+  caseId        String            @db.Uuid
+  case          SecondOpinionCase @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  documentType  String            // BIOPSY_IHC, PET_CT, GENOMIC_NGS, OPERATIVE_NOTE, CHEMO_FLOWSHEET
+  fileName      String
+  fileUrl       String
+  fileSize      Int?
+  aiExtractedData Json?
+  createdAt     DateTime          @default(now())
+
+  @@index([caseId])
+}
+
 
 

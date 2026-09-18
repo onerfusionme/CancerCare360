@@ -18,7 +18,8 @@ import {
   BankOutlined,
   DashboardOutlined,
   BulbFilled,
-  MoonOutlined
+  MoonOutlined,
+  AuditOutlined
 } from '@ant-design/icons';
 import { useAppStore } from '@/stores/app.store';
 import { useAuth } from '@/hooks/use-auth';
@@ -34,6 +35,7 @@ export function PortalLayout({ children }: { children: React.ReactNode }) {
 
   const items = [
     { key: '/portal', icon: <HomeOutlined />, label: 'My Care Home' },
+    { key: '/portal/second-opinion', icon: <AuditOutlined />, label: 'Expert Second Opinion' },
     { key: '/portal/community', icon: <TeamOutlined />, label: 'CareCircles (Family Connect)' },
     { key: '/portal/relief', icon: <BankOutlined />, label: 'Treatment Aid & Grants' },
     { key: '/portal/appointments', icon: <CalendarOutlined />, label: 'Appointments' },

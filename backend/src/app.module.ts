@@ -42,6 +42,7 @@ import { FeedbackModule } from './modules/feedback/feedback.module';
 import { NavigationModule } from './modules/navigation/navigation.module';
 import { CareCirclesModule } from './modules/care-circles/care-circles.module';
 import { FinancialAidModule } from './modules/financial-aid/financial-aid.module';
+import { SecondOpinionModule } from './modules/second-opinion/second-opinion.module';
 
 @Module({
   imports: [
@@ -95,6 +96,7 @@ import { FinancialAidModule } from './modules/financial-aid/financial-aid.module
     NavigationModule,
     CareCirclesModule,
     FinancialAidModule,
+    SecondOpinionModule,
   ],
 })
 export class AppModule {}

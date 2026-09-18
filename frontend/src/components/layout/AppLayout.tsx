@@ -24,7 +24,8 @@ import {
   NotificationOutlined,
   HeartOutlined,
   TeamOutlined,
-  BankOutlined
+  BankOutlined,
+  AuditOutlined
 } from '@ant-design/icons';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAppStore } from '@/stores/app.store';
@@ -43,6 +44,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const menuItems: any[] = [
     { key: '/dashboard', icon: <DashboardOutlined />, label: 'Dashboard' },
     { key: '/patients', icon: <UserOutlined />, label: 'Patients Directory' },
+    { key: '/second-opinion', icon: <AuditOutlined style={{ color: '#818cf8' }} />, label: 'Second Opinion Hub' },
     { key: '/community', icon: <TeamOutlined style={{ color: '#2dd4bf' }} />, label: 'CareCircles (Family Connect)' },
     { key: '/relief', icon: <BankOutlined style={{ color: '#f59e0b' }} />, label: 'CareRelief (Aid & Grants)' },
     { key: '/gaps', icon: <AlertOutlined />, label: 'Care Gaps & Follow-Up' },
