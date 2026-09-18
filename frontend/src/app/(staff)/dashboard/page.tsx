@@ -44,17 +44,23 @@ import {
 import { useRouter } from 'next/navigation';
 import { useRoleDashboard } from '@/hooks/use-analytics';
 import { useAppStore } from '@/stores/app.store';
+import { useAuth } from '@/hooks/use-auth';
 
 const { Title, Text, Paragraph } = Typography;
 
-const roles = ['Oncologist', 'Care Coordinator', 'HOD', 'Administrator'];
-
 export default function DashboardPage() {
   const router = useRouter();
-  const [activeRole, setActiveRole] = useState(roles[0]);
-  const { data, isLoading, isError } = useRoleDashboard(activeRole);
+  const { user } = useAuth();
   const { themeMode } = useAppStore();
   const isDark = themeMode === 'dark';
+
+  // Automatically determine view based on the authenticated user's actual role
+  const userRoles = user?.roles || [];
+  const isAdmin = userRoles.includes('ADMIN');
+  const isCoordinator = userRoles.includes('CARE_COORDINATOR');
+  const activeRole = isAdmin ? 'Administrator' : isCoordinator ? 'Care Coordinator' : 'Oncologist';
+
+  const { data, isLoading, isError } = useRoleDashboard(activeRole);
 
   const textPrimary = isDark ? '#f8fafc' : '#0f172a';
   const textSecondary = isDark ? '#94a3b8' : '#64748b';
@@ -62,9 +68,15 @@ export default function DashboardPage() {
   const cardBorder = isDark ? '#1e293b' : '#e2e8f0';
   const innerCardBg = isDark ? '#131c2e' : '#f8fafc';
 
+  const roleLabel = isAdmin 
+    ? 'System Administrator' 
+    : isCoordinator 
+      ? 'Care Coordinator' 
+      : 'Consultant Oncologist';
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-      {/* Top Bar: Title, Quick Actions, and Role Switcher */}
+      {/* Top Bar: Title, Quick Actions, and Role Badge */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -85,6 +97,18 @@ export default function DashboardPage() {
           </Text>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <Tag color={isAdmin ? 'purple' : isCoordinator ? 'cyan' : 'blue'} style={{ 
+            borderRadius: 6, 
+            padding: '4px 10px', 
+            fontSize: 12, 
+            fontWeight: 700,
+            border: 'none',
+            letterSpacing: '0.04em',
+            textTransform: 'uppercase'
+          }}>
+            {isAdmin ? '🛡️ Administrator Workspace' : isCoordinator ? '📋 Care Coordinator Desk' : '🩺 Clinical Oncology View'}
+          </Tag>
+
           <Dropdown
             menu={{
               items: [
@@ -99,19 +123,6 @@ export default function DashboardPage() {
               + Quick Action
             </Button>
           </Dropdown>
-
-          <Text style={{ fontSize: 12, fontWeight: 600, color: textSecondary }}>PERSPECTIVE:</Text>
-          <Segmented 
-            options={roles} 
-            value={activeRole} 
-            onChange={(val) => setActiveRole(val as string)} 
-            style={{ 
-              background: isDark ? '#1e293b' : '#e2e8f0', 
-              padding: 3, 
-              borderRadius: 8,
-              fontWeight: 500,
-            }}
-          />
         </div>
       </div>
 
@@ -131,16 +142,18 @@ export default function DashboardPage() {
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '4px 10px', background: '#f1f5f9', border: '1px solid #e2e8f0', borderRadius: 20, marginBottom: 16 }}>
               <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10b981' }} />
               <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.04em', color: '#475569' }}>
-                ACTIVE CLINIC • {data?.departmentName || 'ONCOLOGY WING'}
+                ACTIVE CLINIC • {data?.departmentName || 'CITY CANCER CENTER'}
               </span>
             </div>
             <h2 style={{ fontSize: 24, fontWeight: 700, margin: '0 0 8px 0', color: '#0f172a', letterSpacing: '-0.01em' }}>
-              Welcome back, Dr. {data?.doctorName || 'Oncologist'}
+              Welcome back, {user?.firstName ? `${user.firstName} ${user.lastName}` : roleLabel}
             </h2>
             <p style={{ margin: 0, fontSize: 14, color: '#64748b', lineHeight: 1.5, maxWidth: 640 }}>
-              You have <strong style={{ color: '#0f172a' }}>{data?.patientsToday || 0} patients</strong> on your clinic roster today. 
-              {data?.criticalGaps > 0 && <span style={{ color: '#e11d48', fontWeight: 500 }}> {data?.criticalGaps} patients have critical care gaps.</span>}
-              Average wait time is currently <strong style={{ color: '#0f172a' }}>{data?.avgWaitTime || 0} minutes</strong>.
+              {isAdmin 
+                ? 'Institutional overview of oncology departments, patient census, turnaround SLAs, and system audit logs.'
+                : isCoordinator
+                  ? `Care continuity task queue: monitoring active patient follow-up appointments and overdue milestones.`
+                  : `You have ${data?.patientsToday || 0} patients on your clinic roster today. ${data?.criticalGaps > 0 ? `${data.criticalGaps} patients have critical care gaps.` : ''} Average wait time is currently ${data?.avgWaitTime || 0} minutes.`}
             </p>
           </Col>
 

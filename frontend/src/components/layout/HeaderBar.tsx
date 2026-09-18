@@ -47,49 +47,37 @@ export default function HeaderBar() {
     }
   };
 
-  const handleRoleSwitch = async (role: UserRole) => {
-    try {
-      await initializeDemoUser(role);
-      message.success('Authenticated as ' + (role === UserRole.ONCOLOGIST ? 'Dr. Priya Mehta (Oncologist)' : role === UserRole.CARE_COORDINATOR ? 'Care Coordinator' : 'System Admin'));
-    } catch (err) {
-      message.error('Failed to switch role session');
-    }
-  };
+  const primaryRole = user?.roles?.[0]?.replace(/_/g, ' ') || 'CLINICAL USER';
 
   const userMenu = {
     items: [
       {
         key: 'profile',
-        label: `${user?.firstName || 'Clinical'} ${user?.lastName || 'User'}`,
-        icon: <UserOutlined />,
+        label: (
+          <div style={{ padding: '4px 0' }}>
+            <div style={{ fontWeight: 600, color: isDark ? '#f8fafc' : '#0f172a' }}>
+              {user?.firstName || 'Clinical'} {user?.lastName || 'User'}
+            </div>
+            <div style={{ fontSize: 11, color: '#64748b' }}>
+              {user?.email}
+            </div>
+            <div style={{ marginTop: 4 }}>
+              <Tag color="cyan" style={{ fontSize: 10, fontWeight: 700, borderRadius: 4, textTransform: 'uppercase' }}>
+                {primaryRole}
+              </Tag>
+            </div>
+          </div>
+        ),
         disabled: true,
+      },
+      {
+        type: 'divider' as const,
       },
       {
         key: 'portal-preview',
         label: 'View Patient Portal',
         icon: <HeartOutlined style={{ color: '#0d9488' }} />,
         onClick: () => router.push('/portal'),
-      },
-      {
-        type: 'divider' as const,
-      },
-      {
-        key: 'switch-doc',
-        label: 'Switch to Consultant Oncologist',
-        icon: <SwapOutlined />,
-        onClick: () => handleRoleSwitch(UserRole.ONCOLOGIST),
-      },
-      {
-        key: 'switch-coord',
-        label: 'Switch to Care Coordinator',
-        icon: <SwapOutlined />,
-        onClick: () => handleRoleSwitch(UserRole.CARE_COORDINATOR),
-      },
-      {
-        key: 'switch-admin',
-        label: 'Switch to System Administrator',
-        icon: <SwapOutlined />,
-        onClick: () => handleRoleSwitch(UserRole.ADMIN),
       },
       {
         type: 'divider' as const,

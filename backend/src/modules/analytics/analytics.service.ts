@@ -193,7 +193,7 @@ export class AnalyticsService {
       return { totalDepartmentPatients, avgWaitDuration: Math.round(avgWaitDuration), avgTat: Math.round(avgTat), activeJourneysByDiagnosis };
     }
 
-    if (role === 'ADMINISTRATOR') {
+    if (normalizedRole === 'ADMINISTRATOR' || normalizedRole === 'ADMIN') {
       const totalPatients = await this.prisma.patient.count({ where: { tenantId } });
       const activeUsers = await this.prisma.user.count({ where: { tenantId, status: 'ACTIVE' } });
       
