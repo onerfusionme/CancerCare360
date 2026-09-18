@@ -22,7 +22,8 @@ import {
   RiseOutlined,
   FolderOpenOutlined,
   NotificationOutlined,
-  HeartOutlined
+  HeartOutlined,
+  TeamOutlined
 } from '@ant-design/icons';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAppStore } from '@/stores/app.store';
@@ -41,6 +42,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const menuItems: any[] = [
     { key: '/dashboard', icon: <DashboardOutlined />, label: 'Dashboard' },
     { key: '/patients', icon: <UserOutlined />, label: 'Patients Directory' },
+    { key: '/community', icon: <TeamOutlined style={{ color: '#2dd4bf' }} />, label: 'CareCircles (Family Connect)' },
     { key: '/gaps', icon: <AlertOutlined />, label: 'Care Gaps & Follow-Up' },
     { key: '/appointments', icon: <CalendarOutlined />, label: 'Appointments & Flow' },
     { key: '/consultations', icon: <FileSearchOutlined />, label: 'Consultation Briefing' },
