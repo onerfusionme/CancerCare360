@@ -169,7 +169,7 @@ export const ReadinessCard: React.FC<ReadinessCardProps> = ({ readiness, loading
       key: 'parameter',
       render: (text: string, record: any) => (
         <div>
-          <div style={{ fontWeight: 600, color: '#0f172a' }}>{text}</div>
+          <div style={{ fontWeight: 600 }}>{text}</div>
           <div style={{ fontSize: 11, color: '#64748b' }}>{record.clinicalNote}</div>
         </div>
       ),
@@ -265,20 +265,20 @@ export const ReadinessCard: React.FC<ReadinessCardProps> = ({ readiness, loading
                 strokeColor={statusColor}
                 width={70}
                 strokeWidth={9}
-                format={(p) => <span style={{ fontWeight: 800, fontSize: 16, color: '#0f172a' }}>{p}%</span>}
+                format={(p) => <span style={{ fontWeight: 800, fontSize: 16 }}>{p}%</span>}
               />
             </div>
 
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <span style={{ fontSize: 18, fontWeight: 800, color: '#0f172a' }}>
+                <span style={{ fontSize: 18, fontWeight: 800 }}>
                   Consultation Readiness Score
                 </span>
                 <Tag style={{ background: statusColor, color: '#ffffff', fontWeight: 700, border: 'none' }}>
                   {statusLabel}
                 </Tag>
               </div>
-              <div style={{ fontSize: 12, color: '#475569', marginTop: 4 }}>
+              <div style={{ fontSize: 12, marginTop: 4 }}>
                 Last Visit Completed: <strong>{readiness?.sinceLastVisit?.lastVisitDate ? dayjs(readiness.sinceLastVisit.lastVisitDate).format('MMM D, YYYY') : 'Initial Intake / Baseline Visit'}</strong>
               </div>
 
@@ -364,7 +364,7 @@ export const ReadinessCard: React.FC<ReadinessCardProps> = ({ readiness, loading
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 20, paddingTop: 12 }}>
                   <div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                      <span style={{ fontSize: 15, fontWeight: 700, color: '#0f172a' }}>
+                      <span style={{ fontSize: 15, fontWeight: 700 }}>
                         Biochemical & Hematological Longitudinal Shifts
                       </span>
                       <Text type="secondary" style={{ fontSize: 12 }}>
@@ -449,23 +449,23 @@ export const ReadinessCard: React.FC<ReadinessCardProps> = ({ readiness, loading
                         <div style={{ fontSize: 11, color: '#64748b', textTransform: 'uppercase', fontWeight: 700 }}>
                           ECOG Performance Status
                         </div>
-                        <div style={{ fontSize: 24, fontWeight: 800, color: '#0f172a', marginTop: 4 }}>
+                        <div style={{ fontSize: 24, fontWeight: 800, marginTop: 4 }}>
                           ECOG {readiness?.ecogScore ?? 1}
                         </div>
-                        <div style={{ fontSize: 12, color: '#475569', marginTop: 2 }}>
+                        <div style={{ fontSize: 12, marginTop: 2 }}>
                           Restricted in strenuous activity; ambulatory and capable of light work.
                         </div>
                       </Card>
                     </Col>
 
                     <Col xs={24} md={16}>
-                      <div style={{ fontWeight: 700, fontSize: 14, color: '#0f172a', marginBottom: 8 }}>
+                      <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 8 }}>
                         CTCAE Toxicity Screening (Since Last Visit)
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                         <div style={{ padding: 12, background: '#f8fafc', borderRadius: 8, border: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                           <div>
-                            <div style={{ fontWeight: 600, color: '#0f172a' }}>Peripheral Sensory Neuropathy</div>
+                            <div style={{ fontWeight: 600 }}>Peripheral Sensory Neuropathy</div>
                             <div style={{ fontSize: 12, color: '#64748b' }}>Bilateral numbness & tingling in toes; no motor impairment</div>
                           </div>
                           <Tag color="orange" style={{ fontWeight: 700 }}>Grade 1 (Mild)</Tag>
@@ -473,7 +473,7 @@ export const ReadinessCard: React.FC<ReadinessCardProps> = ({ readiness, loading
 
                         <div style={{ padding: 12, background: '#f8fafc', borderRadius: 8, border: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                           <div>
-                            <div style={{ fontWeight: 600, color: '#0f172a' }}>Nausea & Vomiting (CINV)</div>
+                            <div style={{ fontWeight: 600 }}>Nausea & Vomiting (CINV)</div>
                             <div style={{ fontSize: 12, color: '#64748b' }}>Controlled on Ondansetron; adequate caloric oral intake</div>
                           </div>
                           <Tag color="green" style={{ fontWeight: 700 }}>Grade 0 (Resolved)</Tag>
@@ -481,7 +481,7 @@ export const ReadinessCard: React.FC<ReadinessCardProps> = ({ readiness, loading
 
                         <div style={{ padding: 12, background: '#f8fafc', borderRadius: 8, border: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                           <div>
-                            <div style={{ fontWeight: 600, color: '#0f172a' }}>Cancer-Related Fatigue</div>
+                            <div style={{ fontWeight: 600 }}>Cancer-Related Fatigue</div>
                             <div style={{ fontSize: 12, color: '#64748b' }}>Mild late afternoon fatigue relieved by rest; ADLs intact</div>
                           </div>
                           <Tag color="blue" style={{ fontWeight: 700 }}>Grade 1 (Mild)</Tag>
@@ -504,7 +504,7 @@ export const ReadinessCard: React.FC<ReadinessCardProps> = ({ readiness, loading
               children: (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 16, paddingTop: 12 }}>
                   {/* Screened Social Barriers from Use Case 1 */}
-                  <div style={{ fontWeight: 700, fontSize: 14, color: '#0f172a' }}>
+                  <div style={{ fontWeight: 700, fontSize: 14 }}>
                     Screened Patient Barriers & Interventions
                   </div>
                   {readiness?.barriers?.length ? (
@@ -513,14 +513,14 @@ export const ReadinessCard: React.FC<ReadinessCardProps> = ({ readiness, loading
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                           <div>
                             <Tag color="magenta" style={{ fontWeight: 700 }}>{b.category}</Tag>
-                            <span style={{ fontWeight: 600, color: '#0f172a' }}>{b.barrierDetail}</span>
+                            <span style={{ fontWeight: 600 }}>{b.barrierDetail}</span>
                           </div>
                           <Tag color={b.status === 'RESOLVED' ? 'green' : 'gold'} style={{ fontWeight: 700 }}>
                             {b.status}
                           </Tag>
                         </div>
                         {b.interventionNotes && (
-                          <div style={{ fontSize: 12, color: '#475569', marginTop: 6 }}>
+                          <div style={{ fontSize: 12, marginTop: 6 }}>
                             Intervention: <em>{b.interventionNotes}</em>
                           </div>
                         )}
@@ -531,7 +531,7 @@ export const ReadinessCard: React.FC<ReadinessCardProps> = ({ readiness, loading
                   )}
 
                   {/* Active Care Coordinator Tasks */}
-                  <div style={{ fontWeight: 700, fontSize: 14, color: '#0f172a', marginTop: 10 }}>
+                  <div style={{ fontWeight: 700, fontSize: 14, marginTop: 10 }}>
                     Active Follow-Up Tasks
                   </div>
                   {readiness?.pending?.followUpTasks?.length ? (
@@ -567,11 +567,11 @@ export const ReadinessCard: React.FC<ReadinessCardProps> = ({ readiness, loading
                         dot: m.status === 'COMPLETED' ? <CheckCircleOutlined style={{ fontSize: 16 }} /> : <ClockCircleOutlined style={{ fontSize: 16 }} />,
                         children: (
                           <div>
-                            <strong style={{ color: '#0f172a' }}>{m.milestoneType || m.name}</strong>
+                            <strong>{m.milestoneType || m.name}</strong>
                             <div style={{ fontSize: 12, color: '#64748b' }}>
                               {m.expectedDate ? dayjs(m.expectedDate).format('MMM D, YYYY') : 'Pending'}
                             </div>
-                            {m.notes && <p style={{ fontSize: 12, color: '#334155', margin: '4px 0 0' }}>{m.notes}</p>}
+                            {m.notes && <p style={{ fontSize: 12, margin: '4px 0 0' }}>{m.notes}</p>}
                           </div>
                         )
                       }))}

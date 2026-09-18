@@ -669,7 +669,7 @@ Cancelled Cheque or Bank Passbook copy of the Hospital`,
                                     </Tag>
                                   )}
                                 </div>
-                                <Title level={5} style={{ margin: '4px 0 2px 0', color: '#0f172a', fontWeight: 700, fontSize: 16 }}>
+                                <Title level={5} style={{ margin: '4px 0 2px 0', fontWeight: 700, fontSize: 16 }}>
                                   {scheme.name}
                                 </Title>
                                 {scheme.nameRegional && (
@@ -727,7 +727,7 @@ Cancelled Cheque or Bank Passbook copy of the Hospital`,
 
                             <Paragraph
                               ellipsis={{ rows: 2 }}
-                              style={{ fontSize: 13, color: '#475569', lineHeight: 1.55, margin: '8px 0 14px 0' }}
+                              style={{ fontSize: 13, lineHeight: 1.55, margin: '8px 0 14px 0' }}
                             >
                               {scheme.benefitDescription}
                             </Paragraph>
@@ -740,7 +740,6 @@ Cancelled Cheque or Bank Passbook copy of the Hospital`,
                                 borderRadius: 10,
                                 padding: '12px 14px',
                                 fontSize: 12,
-                                color: '#334155',
                                 marginBottom: 16,
                                 display: 'flex',
                                 flexDirection: 'column',
@@ -1034,7 +1033,7 @@ Cancelled Cheque or Bank Passbook copy of the Hospital`,
                               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                 <div>
                                   <Tag color="cyan" style={{ fontWeight: 700, borderRadius: 6 }}>{est.estimateNumber}</Tag>
-                                  <div style={{ fontWeight: 700, fontSize: 14, color: '#0f172a', marginTop: 4 }}>
+                                  <div style={{ fontWeight: 700, fontSize: 14, marginTop: 4 }}>
                                     {est.patientName}
                                   </div>
                                   <div style={{ fontSize: 12, color: '#64748b' }}>
@@ -1101,7 +1100,7 @@ Cancelled Cheque or Bank Passbook copy of the Hospital`,
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
-                      <Title level={5} style={{ margin: 0, color: '#0f172a' }}>
+                      <Title level={5} style={{ margin: 0 }}>
                         Live Application Tracking Across Government Funds & Temple Trusts
                       </Title>
                       <Text style={{ fontSize: 12, color: '#64748b' }}>
@@ -1136,7 +1135,7 @@ Cancelled Cheque or Bank Passbook copy of the Hospital`,
                         key: 'applicant',
                         render: (_, record: AidApplication) => (
                           <div>
-                            <div style={{ fontWeight: 700, color: '#0f172a' }}>{record.applicantName}</div>
+                            <div style={{ fontWeight: 700 }}>{record.applicantName}</div>
                             <div style={{ fontSize: 11, color: '#64748b' }}>
                               {record.applicantRelation} • {record.applicantContact}
                             </div>
@@ -1244,7 +1243,7 @@ Cancelled Cheque or Bank Passbook copy of the Hospital`,
                               <Tag color="cyan" style={{ fontWeight: 700, borderRadius: 6 }}>
                                 {donor.donorType.replace(/_/g, ' ')}
                               </Tag>
-                              <Title level={5} style={{ margin: '6px 0 2px 0', color: '#0f172a', fontSize: 16, fontWeight: 700 }}>
+                              <Title level={5} style={{ margin: '6px 0 2px 0', fontSize: 16, fontWeight: 700 }}>
                                 {donor.donorName}
                               </Title>
                               <div style={{ fontSize: 12.5, color: '#64748b' }}>
@@ -1267,7 +1266,7 @@ Cancelled Cheque or Bank Passbook copy of the Hospital`,
                             </Tag>
                           </div>
 
-                          <Paragraph style={{ fontSize: 13, color: '#334155', lineHeight: 1.55, margin: '8px 0 14px 0' }}>
+                          <Paragraph style={{ fontSize: 13, lineHeight: 1.55, margin: '8px 0 14px 0' }}>
                             {donor.bio}
                           </Paragraph>
 
@@ -1278,7 +1277,6 @@ Cancelled Cheque or Bank Passbook copy of the Hospital`,
                               borderRadius: 10,
                               padding: '12px 14px',
                               fontSize: 12,
-                              color: '#334155',
                               marginBottom: 16,
                               backdropFilter: 'blur(8px)',
                               boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.8)',
@@ -1322,7 +1320,7 @@ Cancelled Cheque or Bank Passbook copy of the Hospital`,
         title={
           selectedSchemeModal && (
             <div>
-              <div style={{ fontSize: 16, fontWeight: 800, color: '#0f172a' }}>
+              <div style={{ fontSize: 16, fontWeight: 800 }}>
                 {selectedSchemeModal.name}
               </div>
               {selectedSchemeModal.nameRegional && (
@@ -1397,7 +1395,6 @@ Cancelled Cheque or Bank Passbook copy of the Hospital`,
                 borderRadius: 8,
                 padding: '14px 18px',
                 fontSize: 13,
-                color: '#334155',
                 lineHeight: 1.6,
                 whiteSpace: 'pre-line',
               }}
@@ -1417,7 +1414,7 @@ Cancelled Cheque or Bank Passbook copy of the Hospital`,
                 <List.Item>
                   <Space>
                     <CheckSquareOutlined style={{ color: '#10b981', fontSize: 15 }} />
-                    <span style={{ fontSize: 13, color: '#1e293b' }}>{item}</span>
+                    <span style={{ fontSize: 13 }}>{item}</span>
                   </Space>
                 </List.Item>
               )}
@@ -1449,6 +1446,7 @@ Cancelled Cheque or Bank Passbook copy of the Hospital`,
       >
         {selectedEstimateForView && (
           <div
+            className="print-certificate-paper"
             style={{
               border: '2px solid #0f172a',
               padding: 24,

@@ -181,14 +181,14 @@ export default function PatientStatusBoard({
 
                     {/* Patient info */}
                     <div style={{ marginBottom: 6 }}>
-                      <div style={{ fontWeight: 600, fontSize: 13, color: '#0f172a' }}>
+                      <div style={{ fontWeight: 600, fontSize: 13 }}>
                         {task.patient?.firstName} {task.patient?.lastName}
                       </div>
                       <div style={{ fontSize: 11, color: '#64748b' }}>
                         MRN: <Text code style={{ fontSize: 11 }}>{task.patient?.mrn}</Text>
                       </div>
                       {task.patient?.cancerType && (
-                        <div style={{ fontSize: 11, color: '#475569', marginTop: 2 }}>
+                        <div style={{ fontSize: 11, marginTop: 2 }}>
                           {task.patient.cancerType} ({task.patient.cancerStage || 'Stage II'})
                         </div>
                       )}

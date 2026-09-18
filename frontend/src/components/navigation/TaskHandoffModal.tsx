@@ -171,7 +171,7 @@ export default function TaskHandoffModal({
                       {dayjs(h.handoffDate).format('DD MMM YYYY, HH:mm')}
                     </span>
                   </div>
-                  <div style={{ color: '#475569', marginTop: 2 }}>{h.reason}</div>
+                  <div style={{ marginTop: 2 }}>{h.reason}</div>
                   {h.notes && <div style={{ color: '#64748b', fontStyle: 'italic' }}>&ldquo;{h.notes}&rdquo;</div>}
                 </div>
               ),

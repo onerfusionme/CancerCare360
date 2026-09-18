@@ -75,7 +75,7 @@ export const StatInvestigationModal: React.FC<StatInvestigationModalProps> = ({
             <ThunderboltOutlined />
           </div>
           <div>
-            <div style={{ fontWeight: 700, fontSize: 16, color: '#0f172a' }}>
+            <div style={{ fontWeight: 700, fontSize: 16 }}>
               Order Stat Pre-Consultation Diagnostic
             </div>
             <div style={{ fontSize: 12, color: '#64748b', fontWeight: 400 }}>

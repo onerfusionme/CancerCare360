@@ -75,7 +75,7 @@ export default function AdminPage() {
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <RobotOutlined style={{ color: '#4f46e5', fontSize: 18 }} />
-                    <span style={{ fontWeight: 700, fontSize: 15, color: '#0f172a' }}>AI Clinical Governance Console</span>
+                    <span style={{ fontWeight: 700, fontSize: 15 }}>AI Clinical Governance Console</span>
                   </div>
                   <Text type="secondary" style={{ display: 'block', marginTop: 4 }}>
                     Audit §30 non-autonomous decision support, confidence thresholds, and acceptance logs.
@@ -96,7 +96,7 @@ export default function AdminPage() {
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <SettingOutlined style={{ color: '#0284c7', fontSize: 18 }} />
-                    <span style={{ fontWeight: 700, fontSize: 15, color: '#0f172a' }}>Care Gap Rules Manager</span>
+                    <span style={{ fontWeight: 700, fontSize: 15 }}>Care Gap Rules Manager</span>
                   </div>
                   <Text type="secondary" style={{ display: 'block', marginTop: 4 }}>
                     Configure triggers, days overdue thresholds, and escalation weights for missed milestones.

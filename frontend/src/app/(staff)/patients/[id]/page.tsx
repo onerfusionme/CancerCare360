@@ -186,7 +186,7 @@ export default function PatientDetailPage({ params }: { params: { id: string } }
       key: 'barrierDetail',
       render: (d: string, record: PatientBarrier) => (
         <div>
-          <div style={{ fontSize: 13, color: '#0f172a' }}>{d}</div>
+          <div style={{ fontSize: 13 }}>{d}</div>
           <div style={{ fontSize: 11, color: '#64748b', marginTop: 2 }}>
             Reported by: <Text strong>{record.reportedBy || 'Patient'}</Text> &bull; {dayjs(record.createdAt).format('DD MMM YYYY')}
           </div>
@@ -200,7 +200,7 @@ export default function PatientDetailPage({ params }: { params: { id: string } }
         <div>
           <Tag color="cyan">{(record.interventionType || 'OTHER').replace(/_/g, ' ')}</Tag>
           {record.interventionNotes && (
-            <div style={{ fontSize: 11, color: '#475569', marginTop: 2 }}>
+            <div style={{ fontSize: 11, marginTop: 2 }}>
               &ldquo;{record.interventionNotes}&rdquo;
             </div>
           )}

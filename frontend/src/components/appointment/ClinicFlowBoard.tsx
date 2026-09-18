@@ -98,7 +98,7 @@ export default function ClinicFlowBoard({ appointments, doctorId, onStatusChange
             {appointment.appointmentType}
           </Tag>
           {appointment.room && (
-            <Tag style={{ fontSize: 10, margin: 0, background: '#f1f5f9', color: '#475569' }}>
+            <Tag style={{ fontSize: 10, margin: 0, background: 'var(--glass-pill-bg)', border: '1px solid var(--glass-card-border-subtle)' }}>
               {appointment.room}
             </Tag>
           )}

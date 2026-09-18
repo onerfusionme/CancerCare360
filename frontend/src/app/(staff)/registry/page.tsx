@@ -49,7 +49,7 @@ export default function RegistryPage() {
       title: 'Name', 
       key: 'name', 
       render: (_: any, record: any) => (
-        <a onClick={() => router.push(`/patients/${record.id}`)} style={{ fontWeight: 600, color: '#0f172a' }}>
+        <a onClick={() => router.push(`/patients/${record.id}`)} style={{ fontWeight: 600, color: 'inherit' }}>
           {record.firstName} {record.lastName}
         </a>
       ) 

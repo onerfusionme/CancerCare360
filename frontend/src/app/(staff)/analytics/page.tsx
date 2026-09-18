@@ -140,7 +140,7 @@ export default function AnalyticsPage() {
       key: 'barrierDetail',
       render: (detail: string, record: any) => (
         <div>
-          <div style={{ fontWeight: 600, color: '#0f172a' }}>{detail}</div>
+          <div style={{ fontWeight: 600 }}>{detail}</div>
           <div style={{ fontSize: 11, color: '#64748b' }}>
             Reported: {dayjs(record.createdAt).format('DD MMM YYYY')} &bull; By: {record.reportedBy || 'Staff'}
           </div>
@@ -166,7 +166,7 @@ export default function AnalyticsPage() {
         <div>
           <Tag color="cyan">{(record.interventionType || 'OTHER').replace(/_/g, ' ')}</Tag>
           {record.interventionNotes && (
-            <div style={{ fontSize: 11, color: '#475569', marginTop: 2 }}>&ldquo;{record.interventionNotes}&rdquo;</div>
+            <div style={{ fontSize: 11, marginTop: 2 }}>&ldquo;{record.interventionNotes}&rdquo;</div>
           )}
         </div>
       ),
@@ -229,7 +229,7 @@ export default function AnalyticsPage() {
         <Col xs={24} sm={12} md={6}>
           <Card bodyStyle={{ padding: 18 }}>
             <Statistic
-              title={<span style={{ fontWeight: 600, color: '#475569' }}>Care Continuity Index</span>}
+              title={<span style={{ fontWeight: 600 }}>Care Continuity Index</span>}
               value={(continuityData as any)?.careContinuityIndex ?? 94}
               suffix="%"
               valueStyle={{ color: '#0284c7', fontWeight: 800 }}
@@ -249,7 +249,7 @@ export default function AnalyticsPage() {
         <Col xs={24} sm={12} md={6}>
           <Card bodyStyle={{ padding: 18 }}>
             <Statistic
-              title={<span style={{ fontWeight: 600, color: '#475569' }}>Barrier Resolution Rate</span>}
+              title={<span style={{ fontWeight: 600 }}>Barrier Resolution Rate</span>}
               value={barrierAnalytics?.resolutionRate ?? ((continuityData as any)?.barrierResolutionRate ?? 100)}
               suffix="%"
               valueStyle={{ color: '#16a34a', fontWeight: 800 }}
@@ -269,7 +269,7 @@ export default function AnalyticsPage() {
         <Col xs={24} sm={12} md={6}>
           <Card bodyStyle={{ padding: 18 }}>
             <Statistic
-              title={<span style={{ fontWeight: 600, color: '#475569' }}>Patient Re-engagement Rate</span>}
+              title={<span style={{ fontWeight: 600 }}>Patient Re-engagement Rate</span>}
               value={(continuityData as any)?.reEngagementRate ?? 0}
               suffix="%"
               valueStyle={{ color: '#7c3aed', fontWeight: 800 }}
@@ -289,7 +289,7 @@ export default function AnalyticsPage() {
         <Col xs={24} sm={12} md={6}>
           <Card bodyStyle={{ padding: 18 }}>
             <Statistic
-              title={<span style={{ fontWeight: 600, color: '#475569' }}>Hospital vs Patient Obstacles</span>}
+              title={<span style={{ fontWeight: 600 }}>Hospital vs Patient Obstacles</span>}
               value={bottlenecks?.summary?.ratio ?? '0.0 : 1'}
               valueStyle={{ color: '#ea580c', fontWeight: 800 }}
             />

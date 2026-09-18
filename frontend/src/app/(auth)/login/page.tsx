@@ -133,7 +133,7 @@ export default function LoginPage() {
                 <MedicineBoxOutlined style={{ fontSize: 22, color: '#FFFFFF' }} />
               </div>
               <div>
-                <Title level={4} style={{ margin: 0, fontWeight: 800, color: '#1E293B', letterSpacing: '-0.02em' }}>
+                <Title level={4} style={{ margin: 0, fontWeight: 800, letterSpacing: '-0.02em' }}>
                   CancerCare<span style={{ color: '#2A9D8F' }}>360</span>
                 </Title>
                 <Text style={{ color: '#64748B', fontSize: 12, fontWeight: 500 }}>
@@ -145,7 +145,6 @@ export default function LoginPage() {
             {/* Core Mission */}
             <Title level={3} style={{ 
               fontWeight: 700, 
-              color: '#0F172A', 
               fontSize: 24, 
               lineHeight: 1.35, 
               marginBottom: 12,
@@ -153,7 +152,7 @@ export default function LoginPage() {
             }}>
               Keep patients connected across months of longitudinal care.
             </Title>
-            <Paragraph style={{ color: '#475569', fontSize: 14, lineHeight: 1.6, marginBottom: 32 }}>
+            <Paragraph style={{ fontSize: 14, lineHeight: 1.6, marginBottom: 32 }}>
               Closing the loop before patients fall off treatment protocols through automated care gap detection, multidisciplinary task queues, and proactive barrier navigation.
             </Paragraph>
 
@@ -176,7 +175,7 @@ export default function LoginPage() {
                   <ThunderboltOutlined style={{ fontSize: 16 }} />
                 </div>
                 <div>
-                  <Text strong style={{ color: '#1E293B', fontSize: 13, display: 'block' }}>
+                  <Text strong style={{ fontSize: 13, display: 'block' }}>
                     9-Scenario Care Gap Detection Engine
                   </Text>
                   <Text style={{ color: '#64748B', fontSize: 12 }}>
@@ -202,7 +201,7 @@ export default function LoginPage() {
                   <CompassOutlined style={{ fontSize: 16 }} />
                 </div>
                 <div>
-                  <Text strong style={{ color: '#1E293B', fontSize: 13, display: 'block' }}>
+                  <Text strong style={{ fontSize: 13, display: 'block' }}>
                     360° Longitudinal Oncology Dossier
                   </Text>
                   <Text style={{ color: '#64748B', fontSize: 12 }}>
@@ -228,7 +227,7 @@ export default function LoginPage() {
                   <SafetyCertificateOutlined style={{ fontSize: 16 }} />
                 </div>
                 <div>
-                  <Text strong style={{ color: '#1E293B', fontSize: 13, display: 'block' }}>
+                  <Text strong style={{ fontSize: 13, display: 'block' }}>
                     Closed-Loop Social Navigation
                   </Text>
                   <Text style={{ color: '#64748B', fontSize: 12 }}>
@@ -265,7 +264,7 @@ export default function LoginPage() {
         }}>
           <div>
             <div style={{ marginBottom: 28 }}>
-              <Title level={3} style={{ margin: '0 0 6px', fontWeight: 700, color: '#0F172A', fontSize: 24 }}>
+              <Title level={3} style={{ margin: '0 0 6px', fontWeight: 700, fontSize: 24 }}>
                 Clinical Workspace Login
               </Title>
               <Text style={{ color: '#64748B', fontSize: 14 }}>
@@ -298,14 +297,14 @@ export default function LoginPage() {
                     padding: '10px 8px',
                     borderRadius: 10,
                     border: selectedRole === 'admin' ? '2px solid #2A9D8F' : '1px solid #E2E8F0',
-                    background: selectedRole === 'admin' ? '#F0F9F8' : '#FFFFFF',
+                    background: selectedRole === 'admin' ? '#F0F9F8' : 'var(--glass-card-bg)',
                     cursor: 'pointer',
                     textAlign: 'center',
                     transition: 'all 0.2s ease',
                   }}
                 >
                   <SafetyCertificateOutlined style={{ fontSize: 18, color: selectedRole === 'admin' ? '#2A9D8F' : '#64748B', marginBottom: 4 }} />
-                  <div style={{ fontSize: 12, fontWeight: 700, color: selectedRole === 'admin' ? '#1D7066' : '#1E293B' }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: selectedRole === 'admin' ? '#1D7066' : 'inherit' }}>
                     Admin
                   </div>
                   <div style={{ fontSize: 10, color: '#94A3B8' }}>All Systems</div>
@@ -318,14 +317,14 @@ export default function LoginPage() {
                     padding: '10px 8px',
                     borderRadius: 10,
                     border: selectedRole === 'coord' ? '2px solid #2A9D8F' : '1px solid #E2E8F0',
-                    background: selectedRole === 'coord' ? '#F0F9F8' : '#FFFFFF',
+                    background: selectedRole === 'coord' ? '#F0F9F8' : 'var(--glass-card-bg)',
                     cursor: 'pointer',
                     textAlign: 'center',
                     transition: 'all 0.2s ease',
                   }}
                 >
                   <TeamOutlined style={{ fontSize: 18, color: selectedRole === 'coord' ? '#2A9D8F' : '#64748B', marginBottom: 4 }} />
-                  <div style={{ fontSize: 12, fontWeight: 700, color: selectedRole === 'coord' ? '#1D7066' : '#1E293B' }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: selectedRole === 'coord' ? '#1D7066' : 'inherit' }}>
                     Coordinator
                   </div>
                   <div style={{ fontSize: 10, color: '#94A3B8' }}>Outreach & Gaps</div>
@@ -338,14 +337,14 @@ export default function LoginPage() {
                     padding: '10px 8px',
                     borderRadius: 10,
                     border: selectedRole === 'doc' ? '2px solid #2A9D8F' : '1px solid #E2E8F0',
-                    background: selectedRole === 'doc' ? '#F0F9F8' : '#FFFFFF',
+                    background: selectedRole === 'doc' ? '#F0F9F8' : 'var(--glass-card-bg)',
                     cursor: 'pointer',
                     textAlign: 'center',
                     transition: 'all 0.2s ease',
                   }}
                 >
                   <UserOutlined style={{ fontSize: 18, color: selectedRole === 'doc' ? '#2A9D8F' : '#64748B', marginBottom: 4 }} />
-                  <div style={{ fontSize: 12, fontWeight: 700, color: selectedRole === 'doc' ? '#1D7066' : '#1E293B' }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: selectedRole === 'doc' ? '#1D7066' : 'inherit' }}>
                     Oncologist
                   </div>
                   <div style={{ fontSize: 10, color: '#94A3B8' }}>Consults & OPD</div>
@@ -368,7 +367,7 @@ export default function LoginPage() {
             >
               <Form.Item
                 name="email"
-                label={<span style={{ fontWeight: 600, color: '#334155', fontSize: 13 }}>Institutional Email</span>}
+                label={<span style={{ fontWeight: 600, fontSize: 13 }}>Institutional Email</span>}
                 rules={[
                   { required: true, message: 'Please enter your work email' },
                   { type: 'email', message: 'Please enter a valid email address' }
@@ -389,7 +388,7 @@ export default function LoginPage() {
 
               <Form.Item
                 name="password"
-                label={<span style={{ fontWeight: 600, color: '#334155', fontSize: 13 }}>Password</span>}
+                label={<span style={{ fontWeight: 600, fontSize: 13 }}>Password</span>}
                 rules={[{ required: true, message: 'Please enter your password' }]}
                 style={{ marginBottom: 28 }}
               >

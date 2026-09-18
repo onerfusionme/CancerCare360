@@ -217,12 +217,12 @@ export function PortalLayout({ children }: { children: React.ReactNode }) {
       <Footer style={{ 
         textAlign: 'center', 
         color: '#64748b', 
-        background: 'rgba(241, 245, 249, 0.75)', 
+        background: 'var(--glass-header-bg)', 
         backdropFilter: 'blur(16px)',
-        borderTop: '1px solid rgba(255, 255, 255, 0.6)', 
+        borderTop: '1px solid var(--glass-card-border)', 
         padding: '24px 28px' 
       }}>
-        <div style={{ fontWeight: 600, color: '#334155', marginBottom: 4 }}>
+        <div style={{ fontWeight: 600, marginBottom: 4 }}>
           City General Hospital • Comprehensive Cancer Center
         </div>
         <div style={{ fontSize: 12 }}>

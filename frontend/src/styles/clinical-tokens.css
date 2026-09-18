@@ -317,8 +317,12 @@
 /* Base resets & typography */
 body {
   background-color: var(--onc-canvas-bg) !important;
-  color: #0f172a;
+  color: var(--onc-text-primary) !important;
   font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+}
+
+[data-theme='dark'] body {
+  color: #f8fafc !important;
 }
 
 /* Tabular numbers for clinical lab deltas, countdowns, and timers */
@@ -643,7 +647,7 @@ body {
 }
 
 [data-theme='dark'] .ant-typography:not(.ant-typography-secondary) {
-  color: #f8fafc;
+  color: #f8fafc !important;
 }
 
 .ant-typography.ant-typography-secondary,
@@ -654,6 +658,209 @@ body {
 [data-theme='dark'] .ant-typography.ant-typography-secondary,
 [data-theme='dark'] .text-secondary {
   color: #cbd5e1 !important;
+}
+
+/* Ant Design Headings in Dark Mode */
+[data-theme='dark'] h1,
+[data-theme='dark'] h2,
+[data-theme='dark'] h3,
+[data-theme='dark'] h4,
+[data-theme='dark'] h5,
+[data-theme='dark'] h6,
+[data-theme='dark'] .ant-typography h1,
+[data-theme='dark'] .ant-typography h2,
+[data-theme='dark'] .ant-typography h3,
+[data-theme='dark'] .ant-typography h4,
+[data-theme='dark'] .ant-typography h5,
+[data-theme='dark'] .ant-typography h6 {
+  color: #ffffff !important;
+}
+
+/* Card titles, bodies, and meta in Dark Mode */
+[data-theme='dark'] .ant-card,
+[data-theme='dark'] .ant-card-body,
+[data-theme='dark'] .ant-card-head {
+  color: #f8fafc !important;
+}
+
+[data-theme='dark'] .ant-card-head-title {
+  color: #ffffff !important;
+}
+
+[data-theme='dark'] .ant-card-meta-title {
+  color: #ffffff !important;
+}
+
+[data-theme='dark'] .ant-card-meta-description {
+  color: #cbd5e1 !important;
+}
+
+/* Modals & Popovers in Dark Mode */
+[data-theme='dark'] .ant-modal-title,
+[data-theme='dark'] .ant-modal-header,
+[data-theme='dark'] .ant-modal-confirm-title {
+  color: #ffffff !important;
+}
+
+[data-theme='dark'] .ant-modal-body,
+[data-theme='dark'] .ant-modal-content,
+[data-theme='dark'] .ant-modal-confirm-content {
+  color: #f8fafc !important;
+}
+
+/* Descriptions component in Dark Mode */
+[data-theme='dark'] .ant-descriptions-item-label {
+  color: #94a3b8 !important;
+}
+
+[data-theme='dark'] .ant-descriptions-item-content {
+  color: #f8fafc !important;
+}
+
+/* Form labels in Dark Mode */
+[data-theme='dark'] .ant-form-item-label > label {
+  color: #cbd5e1 !important;
+}
+
+/* Statistics widgets in Dark Mode */
+[data-theme='dark'] .ant-statistic-title {
+  color: #94a3b8 !important;
+}
+
+[data-theme='dark'] .ant-statistic-content,
+[data-theme='dark'] .ant-statistic-content-value {
+  color: #f8fafc !important;
+}
+
+/* Empty states in Dark Mode */
+[data-theme='dark'] .ant-empty-description {
+  color: #94a3b8 !important;
+}
+
+/* Timeline in Dark Mode */
+[data-theme='dark'] .ant-timeline-item-content {
+  color: #f8fafc !important;
+}
+
+/* Lists in Dark Mode */
+[data-theme='dark'] .ant-list-item-meta-title {
+  color: #f8fafc !important;
+}
+
+[data-theme='dark'] .ant-list-item-meta-description {
+  color: #cbd5e1 !important;
+}
+
+/* Alerts in Dark Mode */
+[data-theme='dark'] .ant-alert-message {
+  color: #f8fafc !important;
+}
+
+[data-theme='dark'] .ant-alert-description {
+  color: #cbd5e1 !important;
+}
+
+/* Checkbox & Radio in Dark Mode */
+[data-theme='dark'] .ant-checkbox-wrapper,
+[data-theme='dark'] .ant-radio-wrapper {
+  color: #f8fafc !important;
+}
+
+/* Universal Inline Color Wildcard Overrides for Dark Mode */
+[data-theme='dark'] [style*="color: #0f172a"],
+[data-theme='dark'] [style*="color: #0F172A"],
+[data-theme='dark'] [style*="color:#0f172a"],
+[data-theme='dark'] [style*="color:#0F172A"],
+[data-theme='dark'] [style*="color: rgb(15, 23, 42)"],
+[data-theme='dark'] [style*="color:rgb(15, 23, 42)"],
+[data-theme='dark'] [style*="color: #1e293b"],
+[data-theme='dark'] [style*="color: #1E293B"],
+[data-theme='dark'] [style*="color:#1e293b"],
+[data-theme='dark'] [style*="color:#1E293B"],
+[data-theme='dark'] [style*="color: rgb(30, 41, 59)"],
+[data-theme='dark'] [style*="color:rgb(30, 41, 59)"],
+[data-theme='dark'] [style*="color: #111827"],
+[data-theme='dark'] [style*="color:#111827"],
+[data-theme='dark'] [style*="color: #000"],
+[data-theme='dark'] [style*="color:#000"],
+[data-theme='dark'] [style*="color: black"],
+[data-theme='dark'] [style*="color:black"] {
+  color: #f8fafc !important;
+}
+
+[data-theme='dark'] [style*="color: #334155"],
+[data-theme='dark'] [style*="color:#334155"],
+[data-theme='dark'] [style*="color: rgb(51, 65, 85)"],
+[data-theme='dark'] [style*="color:rgb(51, 65, 85)"],
+[data-theme='dark'] [style*="color: #475569"],
+[data-theme='dark'] [style*="color:#475569"],
+[data-theme='dark'] [style*="color: rgb(71, 85, 105)"],
+[data-theme='dark'] [style*="color:rgb(71, 85, 105)"],
+[data-theme='dark'] [style*="color: #64748b"],
+[data-theme='dark'] [style*="color:#64748b"],
+[data-theme='dark'] [style*="color: rgb(100, 116, 139)"],
+[data-theme='dark'] [style*="color:rgb(100, 116, 139)"],
+[data-theme='dark'] [style*="color: #94a3b8"],
+[data-theme='dark'] [style*="color:#94a3b8"],
+[data-theme='dark'] [style*="color: #94A3B8"],
+[data-theme='dark'] [style*="color:#94A3B8"],
+[data-theme='dark'] [style*="color: rgb(148, 163, 184)"],
+[data-theme='dark'] [style*="color:rgb(148, 163, 184)"] {
+  color: #cbd5e1 !important;
+}
+
+/* Dark mode overrides for nested hardcoded light background containers (e.g. inner cards, list items) */
+[data-theme='dark'] .ant-card [style*="background: #f8fafc"],
+[data-theme='dark'] .ant-card [style*="background:#f8fafc"],
+[data-theme='dark'] .glass-card [style*="background: #f8fafc"],
+[data-theme='dark'] .glass-card [style*="background:#f8fafc"],
+[data-theme='dark'] .clinical-card [style*="background: #f8fafc"],
+[data-theme='dark'] .clinical-card [style*="background:#f8fafc"] {
+  background: rgba(30, 41, 59, 0.55) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  color: #f8fafc !important;
+}
+
+[data-theme='dark'] .ant-card [style*="background: #fffbeb"],
+[data-theme='dark'] .ant-card [style*="background:#fffbeb"],
+[data-theme='dark'] .glass-card [style*="background: #fffbeb"],
+[data-theme='dark'] .glass-card [style*="background:#fffbeb"] {
+  background: rgba(245, 158, 11, 0.14) !important;
+  border-color: rgba(245, 158, 11, 0.3) !important;
+}
+
+[data-theme='dark'] .ant-card [style*="background: #fef3c7"],
+[data-theme='dark'] .ant-card [style*="background:#fef3c7"] {
+  background: rgba(245, 158, 11, 0.15) !important;
+}
+
+[data-theme='dark'] .ant-card [style*="background: #e0e7ff"],
+[data-theme='dark'] .ant-card [style*="background:#e0e7ff"] {
+  background: rgba(99, 102, 241, 0.18) !important;
+  border-color: rgba(99, 102, 241, 0.35) !important;
+}
+
+[data-theme='dark'] .ant-card [style*="background: #ccfbf1"],
+[data-theme='dark'] .ant-card [style*="background:#ccfbf1"] {
+  background: rgba(13, 148, 136, 0.22) !important;
+  border-color: rgba(13, 148, 136, 0.45) !important;
+}
+
+[data-theme='dark'] .ant-tag[style*="background: #f1f5f9"],
+[data-theme='dark'] .ant-tag[style*="background:#f1f5f9"] {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #cbd5e1 !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+/* Printable Certificate Paper Isolation (Keeps Dark Ink on Paper) */
+.print-certificate-paper,
+.print-certificate-paper * {
+  color: #0f172a !important;
+}
+
+.print-certificate-paper {
+  background-color: #ffffff !important;
 }
 
 /* Frosted Drawers */
@@ -722,4 +929,5 @@ body {
   background: transparent !important;
   border-top: none !important;
 }
+
 

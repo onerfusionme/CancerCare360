@@ -261,7 +261,7 @@ export default function FollowUpCommandCenterPage() {
               <Tag color="magenta">Escalation L{record.escalationLevel}</Tag>
             )}
           </div>
-          <div style={{ fontSize: 12, color: '#334155', marginTop: 4 }}>
+          <div style={{ fontSize: 12, marginTop: 4 }}>
             {record.issueDescription}
           </div>
           {record.priorityReason && (
@@ -331,7 +331,7 @@ export default function FollowUpCommandCenterPage() {
       width: 200,
       render: (_: any, record: CommandCenterTask) => (
         <div>
-          <div style={{ fontSize: 12, fontWeight: 600, color: '#1e293b' }}>
+          <div style={{ fontSize: 12, fontWeight: 600 }}>
             <UserOutlined style={{ marginRight: 4 }} />
             {record.assignedTo 
               ? `${record.assignedTo.firstName} ${record.assignedTo.lastName}` 

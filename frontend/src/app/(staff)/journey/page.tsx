@@ -192,7 +192,7 @@ export default function JourneyPage() {
       title: 'Clinical Protocol Notes', 
       dataIndex: 'notes', 
       key: 'notes',
-      render: (n: string) => <span style={{ fontSize: 13, color: '#475569' }}>{n || '-'}</span>
+      render: (n: string) => <span style={{ fontSize: 13 }}>{n || '-'}</span>
     },
     {
       title: 'Actions',

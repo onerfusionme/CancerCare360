@@ -114,7 +114,7 @@ export const FinalizeConsultationModal: React.FC<FinalizeConsultationModalProps>
             <MedicineBoxOutlined />
           </div>
           <div>
-            <div style={{ fontWeight: 700, fontSize: 16, color: '#0f172a' }}>
+            <div style={{ fontWeight: 700, fontSize: 16 }}>
               Finalize Consultation Note & Clinical Treatment Plan
             </div>
             <div style={{ fontSize: 12, color: '#64748b', fontWeight: 400 }}>
@@ -200,7 +200,7 @@ export const FinalizeConsultationModal: React.FC<FinalizeConsultationModalProps>
 
           <Divider style={{ margin: '16px 0' }} />
 
-          <div style={{ fontSize: 13, fontWeight: 700, color: '#1e293b', marginBottom: 12 }}>
+          <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 12 }}>
             Closed-Loop Continuity: Next Milestone & Expected Follow-Up
           </div>
 

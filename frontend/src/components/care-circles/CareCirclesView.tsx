@@ -453,7 +453,7 @@ export default function CareCirclesView() {
                   >
                     <Row gutter={[16, 16]} align="middle">
                       <Col xs={24} sm={12} md={6}>
-                        <label style={{ fontSize: 12, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 4 }}>
+                        <label style={{ fontSize: 12, fontWeight: 700, display: 'block', marginBottom: 4 }}>
                           Cancer Site / Type
                         </label>
                         <Select
@@ -464,7 +464,7 @@ export default function CareCirclesView() {
                         >
                           <Option value="Esophageal Cancer">Esophageal Cancer (ग्रास नलीचा कर्करोग)</Option>
                           <Option value="Breast Cancer">Breast Cancer (स्तनाचा कर्करोग)</Option>
-                          <Option value="Head & Neck Cancer">Head & Neck / Oral Cancer (तोंडाचा कर्करोग)</Option>
+                          <Option value="Head & Neck Cancer">Head & Neck / Oral Cancer ( तोंडाचा कर्करोग)</Option>
                           <Option value="Lung Cancer">Lung Cancer (फुफ्फुसाचा कर्करोग)</Option>
                           <Option value="Gastric / Stomach Cancer">Gastric / Stomach Cancer</Option>
                           <Option value="Colorectal Cancer">Colorectal Cancer</Option>
@@ -473,7 +473,7 @@ export default function CareCirclesView() {
                       </Col>
 
                       <Col xs={24} sm={12} md={6}>
-                        <label style={{ fontSize: 12, fontWeight: 700, color: '#475569', display: 'block', marginBottom: 4 }}>
+                        <label style={{ fontSize: 12, fontWeight: 700, display: 'block', marginBottom: 4 }}>
                           City / Town
                         </label>
                         <Select
@@ -495,7 +495,7 @@ export default function CareCirclesView() {
 
                       <Col xs={24} sm={12} md={8}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                          <label style={{ fontSize: 12, fontWeight: 700, color: '#475569' }}>
+                          <label style={{ fontSize: 12, fontWeight: 700 }}>
                             Distance Radius: {distanceKm} km
                           </label>
                           <span style={{ fontSize: 11, color: '#0d9488', fontWeight: 600 }}>
@@ -613,7 +613,7 @@ export default function CareCirclesView() {
                               </Tag>
                               {peer.cancerSubsite && <Tag color="blue">{peer.cancerSubsite}</Tag>}
                               {peer.cancerStage && <Tag color="orange">{peer.cancerStage}</Tag>}
-                              <Tag style={{ background: '#f1f5f9', color: '#475569' }}>
+                              <Tag style={{ background: 'var(--glass-pill-bg)', border: '1px solid var(--glass-card-border-subtle)' }}>
                                 {peer.treatmentPhase?.replace(/_/g, ' ')}
                               </Tag>
                             </div>
@@ -621,7 +621,7 @@ export default function CareCirclesView() {
                             {/* Bio / Family Journey Story */}
                             <Paragraph
                               ellipsis={{ rows: 2 }}
-                              style={{ fontSize: 13, color: '#334155', lineHeight: 1.5, marginBottom: 12 }}
+                              style={{ fontSize: 13, lineHeight: 1.5, marginBottom: 12 }}
                             >
                               {peer.bio}
                             </Paragraph>
@@ -742,14 +742,14 @@ export default function CareCirclesView() {
                                 marginBottom: 8,
                               }}
                             >
-                              <div style={{ fontWeight: 700, fontSize: 13, color: '#1e293b' }}>
+                              <div style={{ fontWeight: 700, fontSize: 13 }}>
                                 {req.peer.displayName}
                               </div>
                               <div style={{ fontSize: 11, color: '#64748b' }}>
                                 {req.peer.cancerType} • {req.peer.city}
                               </div>
                               {req.note && (
-                                <div style={{ fontSize: 12, color: '#475569', fontStyle: 'italic', margin: '6px 0' }}>
+                                <div style={{ fontSize: 12, fontStyle: 'italic', margin: '6px 0' }}>
                                   &ldquo;{req.note}&rdquo;
                                 </div>
                               )}
@@ -785,7 +785,7 @@ export default function CareCirclesView() {
                           padding: 12,
                         }}
                       >
-                        <div style={{ fontWeight: 700, fontSize: 12, color: '#475569', marginBottom: 10 }}>
+                        <div style={{ fontWeight: 700, fontSize: 12, marginBottom: 10 }}>
                           CONNECTED FAMILIES ({connections.active.length})
                         </div>
 
@@ -811,7 +811,7 @@ export default function CareCirclesView() {
                                 }}
                               >
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                  <span style={{ fontWeight: 700, fontSize: 13, color: '#0f172a' }}>
+                                  <span style={{ fontWeight: 700, fontSize: 13 }}>
                                     {conn.peer.displayName}
                                   </span>
                                   <Tag color="cyan" style={{ fontSize: 10, margin: 0 }}>
@@ -825,7 +825,6 @@ export default function CareCirclesView() {
                                   <div
                                     style={{
                                       fontSize: 11,
-                                      color: '#475569',
                                       marginTop: 4,
                                       whiteSpace: 'nowrap',
                                       overflow: 'hidden',
@@ -876,7 +875,7 @@ export default function CareCirclesView() {
                                 {chatData.peer.displayName.slice(0, 2).toUpperCase()}
                               </Avatar>
                               <div>
-                                <div style={{ fontWeight: 700, fontSize: 14, color: '#0f172a' }}>
+                                <div style={{ fontWeight: 700, fontSize: 14 }}>
                                   {chatData.peer.displayName}
                                 </div>
                                 <div style={{ fontSize: 11, color: '#64748b' }}>
@@ -1091,7 +1090,7 @@ export default function CareCirclesView() {
                               <Tag color="cyan" style={{ fontWeight: 700, fontSize: 11, marginBottom: 6 }}>
                                 {post.category.replace(/_/g, ' ')}
                               </Tag>
-                              <Title level={5} style={{ margin: '0 0 4px 0', color: '#0f172a' }}>
+                              <Title level={5} style={{ margin: '0 0 4px 0' }}>
                                 {post.title}
                               </Title>
                               <div style={{ fontSize: 12, color: '#64748b' }}>
@@ -1101,7 +1100,7 @@ export default function CareCirclesView() {
                             <Tag color="purple">{post.cancerType}</Tag>
                           </div>
 
-                          <Paragraph style={{ fontSize: 13, color: '#334155', lineHeight: 1.6, whiteSpace: 'pre-line', margin: '12px 0' }}>
+                          <Paragraph style={{ fontSize: 13, lineHeight: 1.6, whiteSpace: 'pre-line', margin: '12px 0' }}>
                             {post.content}
                           </Paragraph>
 
@@ -1127,8 +1126,8 @@ export default function CareCirclesView() {
                             <div style={{ marginTop: 12, background: '#f8fafc', padding: 12, borderRadius: 8, display: 'flex', flexDirection: 'column', gap: 8 }}>
                               {post.comments.map((c) => (
                                 <div key={c.id} style={{ fontSize: 12, borderBottom: '1px solid #f1f5f9', paddingBottom: 6 }}>
-                                  <span style={{ fontWeight: 700, color: '#1e293b' }}>{c.author.displayName}: </span>
-                                  <span style={{ color: '#334155' }}>{c.content}</span>
+                                  <span style={{ fontWeight: 700 }}>{c.author.displayName}: </span>
+                                  <span>{c.content}</span>
                                 </div>
                               ))}
                             </div>
@@ -1426,10 +1425,10 @@ export default function CareCirclesView() {
         {selectedPeerModal && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14, paddingTop: 10 }}>
             <div>
-              <Text strong style={{ color: '#475569', fontSize: 12, textTransform: 'uppercase' }}>
+              <Text strong style={{ fontSize: 12, textTransform: 'uppercase' }}>
                 Diagnosis & Stage
               </Text>
-              <div style={{ fontSize: 14, fontWeight: 600, color: '#0f172a', marginTop: 2 }}>
+              <div style={{ fontSize: 14, fontWeight: 600, marginTop: 2 }}>
                 {selectedPeerModal.cancerType} {selectedPeerModal.cancerSubsite ? `(${selectedPeerModal.cancerSubsite})` : ''} • {selectedPeerModal.cancerStage || 'Stage Under Treatment'}
               </div>
               <div style={{ fontSize: 12, color: '#0d9488', fontWeight: 600, marginTop: 2 }}>
@@ -1440,10 +1439,10 @@ export default function CareCirclesView() {
             <Divider style={{ margin: '4px 0' }} />
 
             <div>
-              <Text strong style={{ color: '#475569', fontSize: 12, textTransform: 'uppercase' }}>
+              <Text strong style={{ fontSize: 12, textTransform: 'uppercase' }}>
                 Family Caregiver Journey
               </Text>
-              <div style={{ fontSize: 13, color: '#334155', lineHeight: 1.5, marginTop: 4 }}>
+              <div style={{ fontSize: 13, lineHeight: 1.5, marginTop: 4 }}>
                 {selectedPeerModal.bio}
               </div>
             </div>
@@ -1461,10 +1460,10 @@ export default function CareCirclesView() {
 
             {selectedPeerModal.treatmentExperience && (
               <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 8, padding: 12 }}>
-                <div style={{ fontWeight: 700, color: '#334155', fontSize: 13, marginBottom: 4 }}>
+                <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 4 }}>
                   🩺 Recovery Precautions & Daily Tips:
                 </div>
-                <div style={{ fontSize: 13, color: '#475569', lineHeight: 1.5 }}>
+                <div style={{ fontSize: 13, lineHeight: 1.5 }}>
                   {selectedPeerModal.treatmentExperience}
                 </div>
               </div>

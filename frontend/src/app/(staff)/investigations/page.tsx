@@ -180,7 +180,7 @@ export default function InvestigationsPage() {
       key: 'patient',
       render: (patient: any, record: any) => (
         <div>
-          <div style={{ fontWeight: 700, color: '#0f172a' }}>{patient?.name || 'Oncology Patient'}</div>
+          <div style={{ fontWeight: 700 }}>{patient?.name || 'Oncology Patient'}</div>
           <div style={{ fontSize: 11, color: '#64748b' }}>MRN: <strong style={{ fontFamily: 'monospace' }}>{patient?.mrn || record.patientId}</strong></div>
         </div>
       ),
@@ -193,7 +193,7 @@ export default function InvestigationsPage() {
         const isStat = type?.includes('STAT');
         return (
           <div>
-            <div style={{ fontWeight: 600, color: '#0f172a', display: 'flex', alignItems: 'center', gap: 6 }}>
+            <div style={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6 }}>
               {type ? type.replace(/_/g, ' ') : 'Investigation'}
               {isStat && <Tag color="red" style={{ fontWeight: 700, fontSize: 10 }}>STAT</Tag>}
             </div>
@@ -249,7 +249,7 @@ export default function InvestigationsPage() {
                 <WarningOutlined /> CRITICAL / MALIGNANT
               </Tag>
             )}
-            <div style={{ fontSize: 12, color: '#334155', fontWeight: isCrit ? 600 : 400 }}>
+            <div style={{ fontSize: 12, fontWeight: isCrit ? 600 : 400 }}>
               {summaryText}
             </div>
           </div>
@@ -328,7 +328,7 @@ export default function InvestigationsPage() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <Title level={3} style={{ margin: 0, color: '#0f172a', fontWeight: 700 }}>
+            <Title level={3} style={{ margin: 0, fontWeight: 700 }}>
               Diagnostic Turnaround (TAT) & Investigation Tracking
             </Title>
             <Tag color="cyan" style={{ background: '#cffafe', color: '#0891b2', border: '1px solid #a5f3fc', fontWeight: 700 }}>
@@ -362,7 +362,7 @@ export default function InvestigationsPage() {
             <div style={{ fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>
               Total In-Progress
             </div>
-            <div style={{ fontSize: 24, fontWeight: 800, color: '#0f172a', marginTop: 4 }}>
+            <div style={{ fontSize: 24, fontWeight: 800, marginTop: 4 }}>
               {summary?.totalActive ?? investigations.filter(i => i.status !== 'REVIEWED' && i.status !== 'CANCELLED').length}
             </div>
             <div style={{ fontSize: 11, color: '#0284c7', marginTop: 2 }}>Specimens active in lab</div>
@@ -507,7 +507,7 @@ export default function InvestigationsPage() {
               <ExperimentOutlined />
             </div>
             <div>
-              <div style={{ fontWeight: 700, fontSize: 16, color: '#0f172a' }}>
+              <div style={{ fontWeight: 700, fontSize: 16 }}>
                 Order Oncology Diagnostic Investigation
               </div>
               <div style={{ fontSize: 12, color: '#64748b' }}>
@@ -584,7 +584,7 @@ export default function InvestigationsPage() {
               <FileDoneOutlined />
             </div>
             <div>
-              <div style={{ fontWeight: 700, fontSize: 16, color: '#0f172a' }}>
+              <div style={{ fontWeight: 700, fontSize: 16 }}>
                 Enter Diagnostic Report & Pathology Findings
               </div>
               <div style={{ fontSize: 12, color: '#64748b' }}>

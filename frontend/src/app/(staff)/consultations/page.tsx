@@ -43,7 +43,7 @@ export default function ConsultationsPage() {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
         <div>
-          <Title level={3} style={{ margin: 0, color: '#0f172a', fontWeight: 700 }}>
+          <Title level={3} style={{ margin: 0, fontWeight: 700 }}>
             Consultation Readiness Briefing
           </Title>
           <Text type="secondary" style={{ fontSize: 13 }}>
@@ -80,7 +80,7 @@ export default function ConsultationsPage() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <Title level={3} style={{ margin: 0, color: '#0f172a', fontWeight: 700 }}>
+            <Title level={3} style={{ margin: 0, fontWeight: 700 }}>
               Consultation Readiness Briefing
             </Title>
             <Tag color="indigo" style={{ background: '#e0e7ff', color: '#4338ca', border: '1px solid #c7d2fe', fontWeight: 600 }}>
