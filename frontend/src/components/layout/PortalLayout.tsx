@@ -88,7 +88,7 @@ export function PortalLayout({ children }: { children: React.ReactNode }) {
                 CancerCare<span style={{ color: '#0d9488' }}>Companion</span>
               </div>
               <div style={{ fontSize: 10, color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>
-                City General Hospital Patient Portal
+                City Cancer Center Patient Portal
               </div>
             </div>
           </div>

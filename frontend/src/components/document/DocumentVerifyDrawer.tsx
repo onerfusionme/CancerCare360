@@ -16,14 +16,15 @@ interface DocumentVerifyDrawerProps {
 export const DocumentVerifyDrawer: React.FC<DocumentVerifyDrawerProps> = ({ open, onClose, document }) => {
   const [notes, setNotes] = useState('');
   const { mutateAsync: verifyDoc, isPending } = useVerifyDocument();
-  
   const { mutateAsync: extractDoc, data: extractionResult, isPending: extracting } = useAiExtraction();
+  const [lastDocId, setLastDocId] = useState<string | null>(null);
 
   React.useEffect(() => {
-    if (open && document && !extractionResult) {
+    if (open && document && document.id !== lastDocId) {
+      setLastDocId(document.id);
       extractDoc({ documentId: document.id });
     }
-  }, [open, document, extractionResult, extractDoc]);
+  }, [open, document, lastDocId]);
 
   if (!document) return null;
 
@@ -60,7 +61,7 @@ export const DocumentVerifyDrawer: React.FC<DocumentVerifyDrawerProps> = ({ open
       </Descriptions>
       
       <Tabs
-        defaultActiveKey="1"
+        defaultActiveKey="2"
         items={[
           {
             key: '1',

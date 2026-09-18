@@ -54,8 +54,8 @@ const { Title, Text } = Typography;
 
 export default function AppointmentsPage() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState('2');
-  const [selectedDoctor, setSelectedDoctor] = useState<string>('doc1');
+  const [activeTab, setActiveTab] = useState('1');
+  const [selectedDoctor, setSelectedDoctor] = useState<string>('all');
 
   // Modals for CRUD
   const [bookModalOpen, setBookModalOpen] = useState(false);
@@ -87,8 +87,8 @@ export default function AppointmentsPage() {
   const handleBook = async (values: any) => {
     try {
       await createAppointmentMutation.mutateAsync({
-        patientId: values.patientId || 'pat1',
-        doctorId: values.doctorId || 'doc1',
+        patientId: values.patientId,
+        doctorId: values.doctorId || '3527bd79-ef28-465a-bdb8-a7e4a52273a3',
         appointmentType: values.appointmentType,
         scheduledAt: values.scheduledAt ? values.scheduledAt.toISOString() : new Date().toISOString(),
         room: values.room || 'OPD Room 1',
@@ -365,10 +365,11 @@ export default function AppointmentsPage() {
               <div>
                 <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
                   <Text strong>Filter by Oncologist:</Text>
-                  <Select value={selectedDoctor} onChange={setSelectedDoctor} style={{ width: 220 }}>
-                    <Option value="doc1">Medical Oncology</Option>
-                    <Option value="doc2">Radiation Oncology</Option>
-                    <Option value="doc3">Surgical Oncology</Option>
+                  <Select value={selectedDoctor} onChange={setSelectedDoctor} style={{ width: 280 }}>
+                    <Option value="all">All Clinic Suites / Entire OPD</Option>
+                    <Option value="3527bd79-ef28-465a-bdb8-a7e4a52273a3">Dr. Rajesh Kumar (Medical Oncology)</Option>
+                    <Option value="85d9d88d-d588-4a8c-abfb-c8e741cab162">Dr. Priya Mehta (Surgical Oncology)</Option>
+                    <Option value="31d3d8ee-1011-4a7f-a185-8e0879df002b">Dr. Ananya Desai (Radiation Oncology)</Option>
                   </Select>
                 </div>
                 <ClinicFlowBoard 
@@ -448,9 +449,9 @@ export default function AppointmentsPage() {
 
           <Form.Item name="doctorId" label="Consulting Oncologist" rules={[{ required: true, message: 'Please select oncologist' }]}>
             <Select placeholder="Select Doctor">
-              <Option value="doc-med">Consultant Oncologist (Medical Oncology)</Option>
-              <Option value="doc-rad">Consultant Oncologist (Radiation Oncology)</Option>
-              <Option value="doc-surg">Consultant Surgeon (Surgical Oncology)</Option>
+              <Option value="3527bd79-ef28-465a-bdb8-a7e4a52273a3">Dr. Rajesh Kumar (Medical Oncology)</Option>
+              <Option value="85d9d88d-d588-4a8c-abfb-c8e741cab162">Dr. Priya Mehta (Surgical Oncology)</Option>
+              <Option value="31d3d8ee-1011-4a7f-a185-8e0879df002b">Dr. Ananya Desai (Radiation Oncology)</Option>
             </Select>
           </Form.Item>
 

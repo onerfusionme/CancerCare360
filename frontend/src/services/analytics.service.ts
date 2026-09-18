@@ -9,22 +9,22 @@ import {
 
 export const getRoleDashboard = async (role: string): Promise<RoleDashboardData> => {
   const { data } = await apiClient.get(`/api/v1/analytics/dashboard?role=${role}`);
-  return data;
+  return data?.data !== undefined ? data.data : data;
 };
 
 export const getCareContinuity = async (): Promise<CareContinuityMetrics> => {
   const { data } = await apiClient.get('/api/v1/analytics/care-continuity');
-  return data;
+  return data?.data !== undefined ? data.data : data;
 };
 
 export const getInvestigationTAT = async (): Promise<InvestigationTATMetrics[]> => {
   const { data } = await apiClient.get('/api/v1/analytics/investigation-tat');
-  return data;
+  return data?.data !== undefined ? data.data : data;
 };
 
 export const generateReport = async (dto: ReportRequestDto): Promise<ReportResult> => {
   const { data } = await apiClient.post('/api/v1/analytics/reports', dto);
-  return data;
+  return data?.data !== undefined ? data.data : data;
 };
 
 export const exportPatientFhir = async (patientId: string): Promise<Blob> => {
@@ -34,20 +34,20 @@ export const exportPatientFhir = async (patientId: string): Promise<Blob> => {
 
 export const getRegistryStats = async () => {
   const { data } = await apiClient.get('/api/v1/analytics/registry-stats');
-  return data;
+  return data?.data !== undefined ? data.data : data;
 };
 
 export const getPopulationGaps = async () => {
   const { data } = await apiClient.get('/api/v1/analytics/population-gaps');
-  return data;
+  return data?.data !== undefined ? data.data : data;
 };
 
 export const getPracticeGrowth = async () => {
   const { data } = await apiClient.get('/api/v1/analytics/practice-growth');
-  return data;
+  return data?.data !== undefined ? data.data : data;
 };
 
 export const getServiceUtilization = async () => {
   const { data } = await apiClient.get('/api/v1/analytics/service-utilization');
-  return data;
+  return data?.data !== undefined ? data.data : data;
 };

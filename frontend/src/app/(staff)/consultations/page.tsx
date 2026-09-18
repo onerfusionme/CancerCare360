@@ -28,7 +28,7 @@ export default function ConsultationsPage() {
 
   const activePatient = patientList.find((p: any) => p.id === selectedPatientId || p.mrn === selectedPatientId) || patientList[0] || null;
 
-  const { data: readiness, isLoading } = useConsultationReadiness(activePatient?.id || activePatient?.mrn || '');
+  const { data: readiness, isLoading, refetch } = useConsultationReadiness(activePatient?.id || activePatient?.mrn || '');
   const { data: aiSummary, isLoading: aiLoading } = useAiConsultationSummary(activePatient?.id || activePatient?.mrn || '');
 
   if (isPatientsLoading) {
@@ -223,7 +223,7 @@ export default function ConsultationsPage() {
       />
 
       {/* 3-Tab Consultation Workspace */}
-      <ReadinessCard readiness={readiness} loading={isLoading} />
+      <ReadinessCard readiness={readiness} loading={isLoading} onRefresh={refetch} />
     </div>
   );
 }

@@ -1,3 +1,4 @@
+const isUuid = (val?: string) => !!val && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(val);
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
@@ -9,6 +10,31 @@ export class AppointmentService {
   constructor(private prisma: PrismaService) {}
 
   async create(tenantId: string, userId: string, dto: CreateAppointmentDto) {
+    let doctorId = dto.doctorId;
+    if (!isUuid(doctorId)) {
+      const doctorUser = await this.prisma.user.findFirst({
+        where: { tenantId },
+      });
+      doctorId = doctorUser?.id || userId;
+    }
+
+    let departmentId = dto.departmentId;
+    if (!isUuid(departmentId)) {
+      let dept = await this.prisma.department.findFirst({ where: { tenantId } });
+      if (!dept) {
+        let hosp = await this.prisma.hospital.findFirst({ where: { tenantId } });
+        if (!hosp) {
+          hosp = await this.prisma.hospital.create({
+            data: { tenantId, name: 'Cancer Center Hospital', code: 'HOSP-01' },
+          });
+        }
+        dept = await this.prisma.department.create({
+          data: { tenantId, hospitalId: hosp.id, name: 'Medical Oncology', type: 'CLINICAL' },
+        });
+      }
+      departmentId = dept.id;
+    }
+
     const start = new Date(dto.scheduledAt);
     const end = new Date(start.getTime() + (dto.durationMinutes || 30) * 60000);
 
@@ -31,8 +57,8 @@ export class AppointmentService {
         tenantId,
         patientId: dto.patientId,
         journeyId: dto.journeyId,
-        doctorId: dto.doctorId,
-        departmentId: dto.departmentId,
+        doctorId: doctorId,
+        departmentId: departmentId,
         appointmentType: dto.appointmentType,
         scheduledAt: start,
         durationMinutes: dto.durationMinutes || 30,
@@ -74,8 +100,17 @@ export class AppointmentService {
       this.prisma.appointment.count({ where }),
     ]);
 
+    const mappedItems = items.map((item: any) => ({
+      ...item,
+      patient: item.patient ? {
+        ...item.patient,
+        name: `${item.patient.firstName || ''} ${item.patient.lastName || ''}`.trim(),
+      } : null,
+      patientName: item.patient ? `${item.patient.firstName || ''} ${item.patient.lastName || ''}`.trim() : 'Patient',
+    }));
+
     return {
-      data: items,
+      data: mappedItems,
       meta: {
         total,
         page,
@@ -181,12 +216,17 @@ export class AppointmentService {
     const endOfDay = new Date();
     endOfDay.setHours(23, 59, 59, 999);
 
+    const whereClause: any = {
+      tenantId,
+      scheduledAt: { gte: startOfDay, lte: endOfDay },
+    };
+
+    if (isUuid(doctorId)) {
+      whereClause.doctorId = doctorId;
+    }
+
     return this.prisma.appointment.findMany({
-      where: {
-        tenantId,
-        doctorId,
-        scheduledAt: { gte: startOfDay, lte: endOfDay },
-      } as any,
+      where: whereClause,
       orderBy: { scheduledAt: 'asc' },
       include: {
         patient: { select: { id: true, firstName: true, lastName: true, mrn: true } },

@@ -23,13 +23,14 @@ export class CacheService implements OnModuleInit, OnModuleDestroy {
 
     try {
       const client = redisUrl 
-        ? new Redis(redisUrl, { lazyConnect: true, maxRetriesPerRequest: 1 }) 
+        ? new Redis(redisUrl, { lazyConnect: true, maxRetriesPerRequest: 1, retryStrategy: () => null }) 
         : new Redis({
             host: redisHost,
             port: redisPort,
             lazyConnect: true,
             maxRetriesPerRequest: 1,
             connectTimeout: 2000,
+            retryStrategy: () => null,
           });
 
       client.on('error', (err) => {

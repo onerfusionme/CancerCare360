@@ -64,8 +64,21 @@ describe('CareGapService', () => {
         status: 'OPEN',
       });
 
-      const gaps = [
-        { patientId: 'patient-1', description: 'Missed appointment detected' },
+      const gaps: any[] = [
+        {
+          patientId: 'patient-1',
+          patientName: 'John Doe',
+          mrn: 'MRN-001',
+          gapType: 'MISSED_APPOINTMENT',
+          description: 'Missed appointment detected',
+          priorityScore: 80,
+          priority: 'HIGH',
+          priorityReason: 'HIGH: Missed appointment',
+          suggestedNextAction: 'Call patient',
+          detectedAt: new Date(),
+          dueDate: new Date(),
+          actionableInfo: {},
+        },
       ];
 
       const tasks = await service.autoGenerateTasks('tenant-test', gaps);
@@ -78,8 +91,21 @@ describe('CareGapService', () => {
       mockPrisma.followUpTask.findFirst.mockResolvedValue(null);
       mockPrisma.followUpTask.create.mockImplementation(({ data }: any) => Promise.resolve({ id: 'new-task', ...data }));
 
-      const gaps = [
-        { patientId: 'patient-2', description: 'Missed Chemo Session' },
+      const gaps: any[] = [
+        {
+          patientId: 'patient-2',
+          patientName: 'Jane Smith',
+          mrn: 'MRN-002',
+          gapType: 'OVERDUE_MILESTONE',
+          description: 'Missed Chemo Session',
+          priorityScore: 75,
+          priority: 'HIGH',
+          priorityReason: 'HIGH: Missed Chemo Session',
+          suggestedNextAction: 'Reschedule chemo',
+          detectedAt: new Date(),
+          dueDate: new Date(),
+          actionableInfo: {},
+        },
       ];
 
       const tasks = await service.autoGenerateTasks('tenant-test', gaps);

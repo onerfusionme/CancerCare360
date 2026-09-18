@@ -34,6 +34,13 @@ export default function ClinicFlowBoard({ appointments, doctorId, onStatusChange
     const isUrgentWait = (appointment.waitingDurationMinutes || 0) >= 25;
     const isWarningWait = (appointment.waitingDurationMinutes || 0) >= 15;
 
+    const patientName = appointment.patient?.name || 
+      `${appointment.patient?.firstName || ''} ${appointment.patient?.lastName || ''}`.trim() || 
+      appointment.patientName || 
+      'Patient';
+    const patientMrn = appointment.patient?.mrn || appointment.mrn || 'MRN-ONC-2026';
+    const initials = patientName.split(' ').filter(Boolean).map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() || 'PT';
+
     return (
       <Card 
         size="small" 
@@ -61,14 +68,14 @@ export default function ClinicFlowBoard({ appointments, doctorId, onStatusChange
               fontWeight: 700,
               fontSize: 11
             }}>
-              {(appointment.patient?.name || 'PT').split(' ').map((n: string) => n[0]).join('')}
+              {initials}
             </span>
             <div>
               <span style={{ fontWeight: 700, color: '#0f172a', fontSize: 13, display: 'block', lineHeight: 1.2 }}>
-                {appointment.patient?.name || 'Unknown Patient'}
+                {patientName}
               </span>
               <span style={{ fontSize: 11, color: '#64748b', fontFamily: 'monospace' }}>
-                {appointment.patient?.mrn || 'MRN-ONC-2026-XXX'}
+                {patientMrn}
               </span>
             </div>
           </div>

@@ -11,6 +11,12 @@ import { CreateAppointmentDto } from '@/types/appointment';
 const { Step } = Steps;
 const { Option } = Select;
 
+const DOCTORS = [
+  { id: '85d9d88d-d588-4a8c-abfb-c8e741cab162', name: 'Dr. Priya Mehta', specialty: 'Medical Oncology' },
+  { id: '3527bd79-ef28-465a-bdb8-a7e4a52273a3', name: 'Dr. Rajesh Kumar', specialty: 'Surgical Oncology' },
+  { id: '31d3d8ee-1011-4a7f-a185-8e0879df002b', name: 'Dr. Ananya Desai', specialty: 'Radiation Oncology' },
+];
+
 export default function BookAppointmentPage() {
   const router = useRouter();
   const [current, setCurrent] = useState(0);
@@ -37,10 +43,9 @@ export default function BookAppointmentPage() {
       const dto: CreateAppointmentDto = {
         patientId: values.patientId,
         doctorId: values.doctorId,
-        departmentId: 'dep1', // mock
         appointmentType: values.appointmentType,
         scheduledAt: selectedTime,
-        durationMinutes: 30, // mock
+        durationMinutes: 30,
         notes: values.notes
       };
       await createMutation.mutateAsync(dto);
@@ -77,11 +82,13 @@ export default function BookAppointmentPage() {
       case 1:
         return (
           <Form form={form} layout="vertical">
-            <Form.Item name="doctorId" label="Doctor" rules={[{ required: true }]}>
+            <Form.Item name="doctorId" label="Doctor" rules={[{ required: true, message: 'Please select an oncologist' }]}>
               <Select placeholder="Select doctor" onChange={val => setSelectedDoctor(val)}>
-                <Option value="doc-med">Consultant Oncologist (Medical Oncology)</Option>
-                <Option value="doc-rad">Consultant Oncologist (Radiation Oncology)</Option>
-                <Option value="doc-surg">Consultant Surgeon (Surgical Oncology)</Option>
+                {DOCTORS.map(d => (
+                  <Option key={d.id} value={d.id}>
+                    {d.name} ({d.specialty})
+                  </Option>
+                ))}
               </Select>
             </Form.Item>
             <Form.Item name="date" label="Date" rules={[{ required: true }]}>

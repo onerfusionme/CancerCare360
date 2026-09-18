@@ -54,6 +54,8 @@ model Tenant {
   referrals           Referral[]
   feedbacks           PatientFeedback[]
   serviceUtilizations ServiceUtilization[]
+  patientBarriers     PatientBarrier[]
+  taskHandoffs        TaskHandoff[]
 
   @@index([status])
 }
@@ -162,6 +164,9 @@ model User {
   dataConflictsRev     DataConflict[]     @relation("ConflictResolvedBy")
   referralsReceived    Referral[]         @relation("ReferralReceivedBy")
   feedbacksReceived    PatientFeedback[]  @relation("FeedbackDoctor")
+  coordinatedPatients  Patient[]          @relation("PatientCoordinator")
+  handoffsFrom         TaskHandoff[]      @relation("HandoffFromUser")
+  handoffsTo           TaskHandoff[]      @relation("HandoffToUser")
 
   @@unique([tenantId, email])
   @@index([tenantId])
@@ -280,11 +285,16 @@ model Patient {
   sourceSystem             String?
   externalIds              Json?
   status                   PatientStatus
-  registeredAt             DateTime @default(now())
-  createdAt                DateTime @default(now())
-  updatedAt                DateTime @updatedAt
+  followUpStage            PatientFollowUpStage  @default(UNDER_TREATMENT)
+  careCoordinatorId        String?               @db.Uuid
+  reEngagedAt              DateTime?
+  reEngagementNotes        String?
+  registeredAt             DateTime              @default(now())
+  createdAt                DateTime              @default(now())
+  updatedAt                DateTime              @updatedAt
 
   tenant              Tenant                @relation(fields: [tenantId], references: [id])
+  careCoordinator     User?                 @relation("PatientCoordinator", fields: [careCoordinatorId], references: [id])
   identifiers         PatientIdentifier[]
   mergedAsSurviving   PatientMergeHistory[] @relation("SurvivingPatient")
   mergedAsMerged      PatientMergeHistory[] @relation("MergedPatient")
@@ -300,11 +310,25 @@ model Patient {
   dataConflicts       DataConflict[]
   referrals           Referral[]
   feedbacks           PatientFeedback[]
+  barriers            PatientBarrier[]
 
   @@unique([tenantId, mrn])
   @@index([tenantId])
   @@index([firstName, lastName])
   @@index([phone])
+  @@index([followUpStage])
+}
+
+enum PatientFollowUpStage {
+  UNDER_TREATMENT
+  AWAITING_TREATMENT
+  UNDER_FOLLOW_UP
+  SURVEILLANCE
+  REQUIRING_INVESTIGATION
+  REQUIRING_REVIEW
+  AT_RISK_LTFU
+  RE_ENGAGED
+  LOST_TO_FOLLOW_UP
 }
 
 enum Gender {
@@ -794,34 +818,42 @@ model CareGapRule {
 }
 
 model FollowUpTask {
-  id               String    @id @default(uuid()) @db.Uuid
-  tenantId         String    @db.Uuid
-  patientId        String    @db.Uuid
-  journeyId        String?   @db.Uuid
+  id               String        @id @default(uuid()) @db.Uuid
+  tenantId         String        @db.Uuid
+  patientId        String        @db.Uuid
+  journeyId        String?       @db.Uuid
   taskType         String
   priority         TaskPriority
+  priorityScore    Int           @default(0)
+  priorityReason   String?
   issueDescription String
   dueDate          DateTime
-  assignedToId     String?   @db.Uuid
+  assignedToId     String?       @db.Uuid
   status           TaskStatus
-  escalationLevel  Int       @default(0)
+  escalationLevel  Int           @default(0)
+  careGapType      String?
+  lastAction       String?
+  nextAction       String?
   resolvedAt       DateTime?
-  resolvedById     String?   @db.Uuid
+  resolvedById     String?       @db.Uuid
   resolution       String?
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
 
-  tenant     Tenant       @relation(fields: [tenantId], references: [id])
-  patient    Patient      @relation(fields: [patientId], references: [id])
-  journey    CareJourney? @relation(fields: [journeyId], references: [id])
-  assignedTo User?        @relation("TaskAssignedTo", fields: [assignedToId], references: [id])
-  resolvedBy User?        @relation("TaskResolvedBy", fields: [resolvedById], references: [id])
+  tenant       Tenant           @relation(fields: [tenantId], references: [id])
+  patient      Patient          @relation(fields: [patientId], references: [id])
+  journey      CareJourney?     @relation(fields: [journeyId], references: [id])
+  assignedTo   User?            @relation("TaskAssignedTo", fields: [assignedToId], references: [id])
+  resolvedBy   User?            @relation("TaskResolvedBy", fields: [resolvedById], references: [id])
   outreachLogs OutreachLog[]
+  barriers     PatientBarrier[]
+  handoffs     TaskHandoff[]
 
   @@index([tenantId])
   @@index([patientId])
   @@index([status])
   @@index([tenantId, dueDate, status])
+  @@index([priorityScore])
 }
 
 enum TaskPriority {
@@ -839,24 +871,25 @@ enum TaskStatus {
 }
 
 model OutreachLog {
-  id               String    @id @default(uuid()) @db.Uuid
-  tenantId         String    @db.Uuid
-  taskId           String    @db.Uuid
-  patientId        String    @db.Uuid
-  contactedById    String    @db.Uuid
+  id               String               @id @default(uuid()) @db.Uuid
+  tenantId         String               @db.Uuid
+  taskId           String               @db.Uuid
+  patientId        String               @db.Uuid
+  contactedById    String               @db.Uuid
   contactDate      DateTime
   channel          CommunicationChannel
   outcome          OutreachOutcome
   notes            String?
   nextAction       String?
   nextFollowUpDate DateTime?
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
 
-  tenant      Tenant       @relation(fields: [tenantId], references: [id])
-  task        FollowUpTask @relation(fields: [taskId], references: [id])
-  patient     Patient      @relation(fields: [patientId], references: [id])
-  contactedBy User         @relation("OutreachContactedBy", fields: [contactedById], references: [id])
+  tenant      Tenant           @relation(fields: [tenantId], references: [id])
+  task        FollowUpTask     @relation(fields: [taskId], references: [id])
+  patient     Patient          @relation(fields: [patientId], references: [id])
+  contactedBy User             @relation("OutreachContactedBy", fields: [contactedById], references: [id])
+  barriers    PatientBarrier[]
 
   @@index([tenantId])
   @@index([taskId])
@@ -877,8 +910,102 @@ enum OutreachOutcome {
   LEFT_MESSAGE
   NO_ANSWER
   INVALID_NUMBER
+  WRONG_NUMBER
+  PHONE_SWITCHED_OFF
   PATIENT_DECLINED
+  CALLBACK_REQUESTED
+  APPOINTMENT_SCHEDULED
+  APPOINTMENT_RESCHEDULED
+  TREATMENT_ELSEWHERE
+  TRANSFERRED
   RESOLVED
+}
+
+// ----------------------------------------
+// Patient Navigation & Barrier Assessment
+// ----------------------------------------
+
+model PatientBarrier {
+  id                String           @id @default(uuid()) @db.Uuid
+  tenantId          String           @db.Uuid
+  patientId         String           @db.Uuid
+  taskId            String?          @db.Uuid
+  outreachLogId     String?          @db.Uuid
+  category          BarrierCategory
+  barrierDetail     String
+  isHospitalSide    Boolean          @default(false)
+  reportedBy        String           @default("PATIENT")
+  interventionType  InterventionType
+  interventionNotes String?
+  status            BarrierStatus    @default(IDENTIFIED)
+  resolvedAt        DateTime?
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  tenant      Tenant        @relation(fields: [tenantId], references: [id])
+  patient     Patient       @relation(fields: [patientId], references: [id])
+  task        FollowUpTask? @relation(fields: [taskId], references: [id])
+  outreachLog OutreachLog?  @relation(fields: [outreachLogId], references: [id])
+
+  @@index([tenantId])
+  @@index([patientId])
+  @@index([category])
+  @@index([status])
+}
+
+enum BarrierCategory {
+  COMMUNICATION
+  TRANSPORTATION
+  FINANCIAL
+  FAMILY_CAREGIVER
+  WORK_SCHEDULE
+  UNDERSTANDING_HEALTH_LITERACY
+  HOSPITAL_PROCESS
+  OTHER
+}
+
+enum InterventionType {
+  APPOINTMENT_RESCHEDULED
+  FINANCIAL_AID_REFERRAL
+  TRANSPORT_ASSISTANCE
+  SOCIAL_WORK_REFERRAL
+  LANGUAGE_INTERPRETER
+  CAREGIVER_COUNSELING
+  HOSPITAL_ESCORT
+  DOCTOR_TELECONSULT_CALLBACK
+  PATIENT_EDUCATION
+  OTHER
+}
+
+enum BarrierStatus {
+  IDENTIFIED
+  INTERVENTION_PLANNED
+  INTERVENTION_ACTIVE
+  RESOLVED
+  UNRESOLVED
+}
+
+model TaskHandoff {
+  id          String       @id @default(uuid()) @db.Uuid
+  tenantId    String       @db.Uuid
+  taskId      String       @db.Uuid
+  fromUserId  String       @db.Uuid
+  toUserId    String       @db.Uuid
+  fromRole    String
+  toRole      String
+  reason      String
+  notes       String?
+  handoffDate DateTime     @default(now())
+  createdAt   DateTime     @default(now())
+
+  tenant   Tenant       @relation(fields: [tenantId], references: [id])
+  task     FollowUpTask @relation(fields: [taskId], references: [id])
+  fromUser User         @relation("HandoffFromUser", fields: [fromUserId], references: [id])
+  toUser   User         @relation("HandoffToUser", fields: [toUserId], references: [id])
+
+  @@index([tenantId])
+  @@index([taskId])
+  @@index([toUserId])
 }
 
 // ----------------------------------------

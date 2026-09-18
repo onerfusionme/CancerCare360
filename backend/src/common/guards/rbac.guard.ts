@@ -24,8 +24,19 @@ export class RbacGuard implements CanActivate {
       throw new ForbiddenException('No user found');
     }
 
-    // Administrators have full permission across all resources
-    if (user.roles?.includes('ADMIN') || user.roles?.includes('SYSTEM_ADMIN')) {
+    // Administrators and Clinical Staff (Oncologists, Surgeons, Coordinators) have full clinical access
+    const staffRoles = [
+      'ADMIN',
+      'SYSTEM_ADMIN',
+      'ONCOLOGIST',
+      'SURGICAL_ONCOLOGIST',
+      'RADIATION_ONCOLOGIST',
+      'CARE_COORDINATOR',
+      'NURSE',
+      'NAVIGATOR',
+      'HOD'
+    ];
+    if (user.roles?.some((role: string) => staffRoles.includes(role))) {
       return true;
     }
 

@@ -61,33 +61,8 @@ export class CareGapProcessor {
       const gaps = await this.careGapService.detectGaps(payload.tenantId);
       this.logger.log(`[BullMQ Worker] Detected ${gaps.length} care gaps for tenant ${payload.tenantId}. Generating follow-up tasks...`);
 
-      // Batch convert high-priority gaps into follow-up tasks
-      for (const gap of gaps) {
-        if (!gap.patientId) continue;
-
-        const existingTask = await this.prisma.followUpTask.findFirst({
-          where: {
-            tenantId: payload.tenantId,
-            patientId: gap.patientId,
-            taskType: gap.ruleType || 'CARE_GAP',
-            status: { in: ['OPEN', 'IN_PROGRESS'] as any[] },
-          },
-        });
-
-        if (!existingTask) {
-          await this.prisma.followUpTask.create({
-            data: {
-              tenantId: payload.tenantId,
-              patientId: gap.patientId,
-              taskType: gap.ruleType || 'CARE_GAP',
-              priority: gap.priorityWeight && gap.priorityWeight >= 80 ? ('URGENT' as any) : ('HIGH' as any),
-              issueDescription: gap.description || 'Automated care gap flagged by oncology protocol engine.',
-              dueDate: new Date(Date.now() + 48 * 60 * 60 * 1000), // Due in 48h
-              status: 'OPEN' as any,
-            },
-          });
-        }
-      }
+      // Automatically generate prioritized follow-up tasks with explainable reasons
+      await this.careGapService.autoGenerateTasks(payload.tenantId, gaps);
 
       const elapsed = Date.now() - startTime;
       this.logger.log(`[BullMQ Worker] Care gap evaluation completed in ${elapsed}ms for tenant ${payload.tenantId}`);

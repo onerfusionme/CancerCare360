@@ -17,7 +17,8 @@ import {
   DatePicker, 
   Popconfirm, 
   message, 
-  Tooltip 
+  Tooltip,
+  Badge
 } from 'antd';
 import { 
   PlusOutlined, 
@@ -26,7 +27,9 @@ import {
   EditOutlined, 
   DeleteOutlined, 
   EyeOutlined, 
-  FilterOutlined 
+  FilterOutlined,
+  AlertOutlined,
+  CheckCircleOutlined
 } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
 import dayjs from 'dayjs';
@@ -36,7 +39,7 @@ import {
   useUpdatePatient, 
   useDeletePatient 
 } from '@/hooks/use-patients';
-import { Patient, PatientStatus, Gender } from '@/types/patient';
+import { Patient, PatientStatus, Gender, PatientFollowUpStage } from '@/types/patient';
 import StatusBadge from '@/components/ui/StatusBadge';
 
 const { Title, Text } = Typography;
@@ -46,6 +49,7 @@ export default function PatientsPage() {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState('');
   const [stageFilter, setStageFilter] = useState<string | undefined>(undefined);
+  const [followUpFilter, setFollowUpFilter] = useState<string | undefined>(undefined);
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editingPatient, setEditingPatient] = useState<Patient | null>(null);
@@ -53,10 +57,21 @@ export default function PatientsPage() {
   const [createForm] = Form.useForm();
   const [editForm] = Form.useForm();
 
-  const { data: patients, isLoading } = usePatients({
+  const { data: patientsData, isLoading } = usePatients({
     search: searchTerm,
     careStage: stageFilter,
   });
+
+  const patientList: Patient[] = React.useMemo(() => {
+    let list: Patient[] = [];
+    if (Array.isArray(patientsData)) list = patientsData;
+    else if (patientsData && Array.isArray((patientsData as any).data)) list = (patientsData as any).data;
+
+    if (followUpFilter) {
+      list = list.filter(p => p.followUpStage === followUpFilter);
+    }
+    return list;
+  }, [patientsData, followUpFilter]);
 
   const createPatientMutation = useCreatePatient();
   const updatePatientMutation = useUpdatePatient();
@@ -74,7 +89,8 @@ export default function PatientsPage() {
         email: values.email,
         address: values.address,
         mrn: values.mrn,
-      });
+        followUpStage: values.followUpStage || 'UNDER_TREATMENT',
+      } as any);
       message.success(`Patient ${values.firstName} ${values.lastName} registered successfully`);
       setCreateModalOpen(false);
       createForm.resetFields();
@@ -91,9 +107,10 @@ export default function PatientsPage() {
       lastName: record.lastName,
       gender: record.gender,
       careStage: record.careStage,
+      followUpStage: record.followUpStage || 'UNDER_TREATMENT',
       status: record.status,
       primaryDoctorName: record.primaryDoctorName,
-      phoneNumber: record.phoneNumber || '9876543210',
+      phoneNumber: record.phoneNumber || '',
     });
     setEditModalOpen(true);
   };
@@ -109,10 +126,11 @@ export default function PatientsPage() {
           lastName: values.lastName,
           gender: values.gender,
           careStage: values.careStage,
+          followUpStage: values.followUpStage,
           status: values.status,
           primaryDoctorName: values.primaryDoctorName,
           phoneNumber: values.phoneNumber,
-        }
+        } as any
       });
       message.success('Patient record updated successfully');
       setEditModalOpen(false);
@@ -132,66 +150,100 @@ export default function PatientsPage() {
     }
   };
 
+  const renderFollowUpStage = (stage?: string) => {
+    switch (stage) {
+      case 'AT_RISK_LTFU':
+        return <Tag color="error" icon={<AlertOutlined />}>AT RISK LTFU</Tag>;
+      case 'RE_ENGAGED':
+        return <Tag color="success" icon={<CheckCircleOutlined />}>RE-ENGAGED</Tag>;
+      case 'SURVEILLANCE':
+        return <Tag color="cyan">SURVEILLANCE</Tag>;
+      case 'REQUIRING_INVESTIGATION':
+        return <Tag color="warning">REQ. INVESTIGATION</Tag>;
+      case 'REQUIRING_REVIEW':
+        return <Tag color="gold">REQ. REVIEW</Tag>;
+      case 'UNDER_FOLLOW_UP':
+        return <Tag color="blue">UNDER FOLLOW-UP</Tag>;
+      case 'UNDER_TREATMENT':
+        return <Tag color="processing">UNDER TREATMENT</Tag>;
+      case 'LOST_TO_FOLLOW_UP':
+        return <Tag color="default">LOST TO FOLLOW-UP</Tag>;
+      default:
+        return <Tag color="default">{stage || 'ACTIVE'}</Tag>;
+    }
+  };
+
   const columns = [
     { 
       title: 'MRN', 
       dataIndex: 'mrn', 
       key: 'mrn', 
-      width: 140,
+      width: 130,
       render: (mrn: string) => <Text strong style={{ fontFamily: 'monospace' }}>{mrn}</Text>
     },
     { 
       title: 'Patient Name', 
       key: 'name',
       render: (_: any, record: Patient) => (
-        <a 
-          style={{ fontWeight: 600, color: '#0284c7' }} 
-          onClick={() => router.push(`/patients/${record.id}`)}
-        >
-          {record.firstName} {record.lastName}
-        </a>
+        <div>
+          <a 
+            style={{ fontWeight: 600, color: '#0284c7' }} 
+            onClick={() => router.push(`/patients/${record.id}`)}
+          >
+            {record.firstName} {record.lastName}
+          </a>
+          <div style={{ fontSize: 11, color: '#64748b' }}>
+            {record.gender || '—'} &bull; {record.dateOfBirth ? `${dayjs().diff(dayjs(record.dateOfBirth), 'year')} yrs` : '—'}
+          </div>
+        </div>
       )
     },
     { 
-      title: 'Age', 
-      key: 'age', 
-      width: 80,
-      render: (_: any, record: Patient) => record.dateOfBirth ? dayjs().diff(dayjs(record.dateOfBirth), 'year') : '—'
+      title: 'Follow-Up Stage', 
+      key: 'followUpStage',
+      width: 180,
+      render: (_: any, record: Patient) => renderFollowUpStage(record.followUpStage)
     },
-    { title: 'Gender', dataIndex: 'gender', key: 'gender', width: 100 },
     { 
       title: 'Care Stage', 
       dataIndex: 'careStage', 
       key: 'careStage',
+      width: 140,
       render: (stage: string) => <StatusBadge status={stage || 'ACTIVE_TREATMENT'} />
+    },
+    { 
+      title: 'Care Coordinator', 
+      key: 'coordinator',
+      width: 160,
+      render: (_: any, record: any) => (
+        <span style={{ fontSize: 12 }}>
+          {record.careCoordinator 
+            ? `${record.careCoordinator.firstName} ${record.careCoordinator.lastName}`
+            : <span style={{ color: '#94a3b8' }}>Unassigned</span>}
+        </span>
+      )
     },
     { 
       title: 'Primary Oncologist', 
       dataIndex: 'primaryDoctorName', 
       key: 'doctor',
-      render: (doc: string) => doc || 'Oncologist'
+      width: 160,
+      render: (doc: string) => doc || <span style={{ color: '#94a3b8' }}>Oncologist</span>
     },
     { 
       title: 'Status', 
       dataIndex: 'status', 
       key: 'status', 
-      width: 110,
+      width: 100,
       render: (s: PatientStatus) => <StatusBadge status={s || PatientStatus.ACTIVE} />
-    },
-    { 
-      title: 'Last Visit', 
-      dataIndex: 'lastVisit', 
-      key: 'lastVisit', 
-      width: 120,
-      render: (date: string) => date ? dayjs(date).format('DD MMM YYYY') : 'Recent'
     },
     {
       title: 'Actions',
       key: 'actions',
-      width: 150,
+      width: 140,
       render: (_: any, record: Patient) => (
         <Space size="small">
-          <Tooltip title="View Patient Journey & Dossier">
+          <Tooltip title="View Patient Dossier & Navigation">
             <Button 
               size="small" 
               icon={<EyeOutlined />} 
@@ -229,7 +281,7 @@ export default function PatientsPage() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
         <div>
           <Title level={3} style={{ margin: 0 }}>Patient Directory</Title>
-          <Text type="secondary">Centralized oncology cohort registry with complete longitudinal records</Text>
+          <Text type="secondary">Centralized oncology cohort registry with longitudinal follow-up stages & care coordinators</Text>
         </div>
         <Space>
           <Button 
@@ -244,30 +296,30 @@ export default function PatientsPage() {
             onClick={() => setCreateModalOpen(true)}
             style={{ background: '#0284c7', borderColor: '#0284c7' }}
           >
-            Quick Register
+            Quick Register Patient
           </Button>
         </Space>
       </div>
 
-      {/* Cohort Search & Filter Toolbar */}
-      <Card bodyStyle={{ padding: '16px 24px' }}>
+      {/* Filters Bar */}
+      <Card bodyStyle={{ padding: 16 }}>
         <Row gutter={[16, 16]} align="middle">
-          <Col xs={24} sm={12} md={8}>
+          <Col xs={24} md={8}>
             <Input 
-              placeholder="Search by Name, MRN or Phone..." 
-              prefix={<SearchOutlined style={{ color: '#94a3b8' }} />} 
-              allowClear
+              placeholder="Search by Patient Name or MRN..." 
+              prefix={<SearchOutlined />} 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
+              allowClear
             />
           </Col>
-          <Col xs={24} sm={12} md={6}>
+          <Col xs={12} md={6}>
             <Select 
               placeholder="Filter by Care Stage" 
-              style={{ width: '100%' }} 
+              style={{ width: '100%' }}
               allowClear
               value={stageFilter}
-              onChange={setStageFilter}
+              onChange={(val) => setStageFilter(val)}
             >
               <Option value="SCREENING">Screening & Diagnosis</Option>
               <Option value="STAGING">Staging & Workup</Option>
@@ -277,35 +329,51 @@ export default function PatientsPage() {
               <Option value="PALLIATIVE">Palliative Care</Option>
             </Select>
           </Col>
-          <Col xs={24} sm={24} md={10} style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
-            <Tag color="blue" style={{ fontSize: 13, padding: '4px 10px' }}>
-              Total Patients: {patients?.meta?.totalItems || patients?.data?.length || 0}
-            </Tag>
+          <Col xs={12} md={6}>
+            <Select 
+              placeholder="Filter by Follow-Up Stage" 
+              style={{ width: '100%' }}
+              allowClear
+              value={followUpFilter}
+              onChange={(val) => setFollowUpFilter(val)}
+            >
+              <Option value="UNDER_TREATMENT">Under Treatment</Option>
+              <Option value="SURVEILLANCE">Surveillance</Option>
+              <Option value="UNDER_FOLLOW_UP">Under Follow-Up</Option>
+              <Option value="AT_RISK_LTFU">At Risk LTFU</Option>
+              <Option value="RE_ENGAGED">Re-Engaged</Option>
+              <Option value="REQUIRING_INVESTIGATION">Requiring Investigation</Option>
+              <Option value="REQUIRING_REVIEW">Requiring Review</Option>
+              <Option value="LOST_TO_FOLLOW_UP">Lost to Follow-Up</Option>
+            </Select>
+          </Col>
+          <Col xs={24} md={4} style={{ textAlign: 'right' }}>
+            <Text type="secondary">{patientList.length} patient(s) found</Text>
           </Col>
         </Row>
       </Card>
 
-      {/* Patient Table */}
-      <Card>
+      {/* Patients Table */}
+      <Card bodyStyle={{ padding: 0 }}>
         <Table 
           columns={columns} 
-          dataSource={patients?.data || []} 
+          dataSource={patientList} 
           rowKey="id" 
           loading={isLoading}
-          pagination={{ pageSize: 10 }}
+          pagination={{ pageSize: 10, showSizeChanger: true }}
         />
       </Card>
 
-      {/* CRUD: Register Patient Modal */}
+      {/* Create Patient Modal */}
       <Modal
-        title="Register New Oncology Patient"
+        title="Quick Register Oncology Patient"
         open={createModalOpen}
         onCancel={() => setCreateModalOpen(false)}
         footer={null}
         destroyOnClose
         width={650}
       >
-        <Form form={createForm} layout="vertical" onFinish={handleCreate} initialValues={{ gender: Gender.FEMALE }}>
+        <Form form={createForm} layout="vertical" onFinish={handleCreate} initialValues={{ gender: Gender.FEMALE, followUpStage: 'UNDER_TREATMENT' }}>
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item name="firstName" label="First Name" rules={[{ required: true, message: 'First name is required' }]}>
@@ -348,8 +416,13 @@ export default function PatientsPage() {
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="email" label="Email Address">
-                <Input placeholder="patient@example.com" />
+              <Form.Item name="followUpStage" label="Initial Follow-Up Stage" rules={[{ required: true }]}>
+                <Select>
+                  <Option value="UNDER_TREATMENT">Under Treatment</Option>
+                  <Option value="SURVEILLANCE">Surveillance</Option>
+                  <Option value="UNDER_FOLLOW_UP">Under Follow-Up</Option>
+                  <Option value="AT_RISK_LTFU">At Risk LTFU</Option>
+                </Select>
               </Form.Item>
             </Col>
           </Row>
@@ -367,9 +440,9 @@ export default function PatientsPage() {
         </Form>
       </Modal>
 
-      {/* CRUD: Edit Patient Modal */}
+      {/* Edit Patient Modal */}
       <Modal
-        title="Edit Patient Details"
+        title="Edit Patient Details & Follow-up Stage"
         open={editModalOpen}
         onCancel={() => { setEditModalOpen(false); setEditingPatient(null); }}
         footer={null}
@@ -404,12 +477,16 @@ export default function PatientsPage() {
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="status" label="Patient Status" rules={[{ required: true }]}>
+              <Form.Item name="followUpStage" label="Follow-Up Continuity Stage" rules={[{ required: true }]}>
                 <Select>
-                  <Option value={PatientStatus.ACTIVE}>Active</Option>
-                  <Option value={PatientStatus.INACTIVE}>Inactive</Option>
-                  <Option value={PatientStatus.DISCHARGED}>Discharged</Option>
-                  <Option value={PatientStatus.DECEASED}>Deceased</Option>
+                  <Option value="UNDER_TREATMENT">Under Treatment</Option>
+                  <Option value="SURVEILLANCE">Surveillance</Option>
+                  <Option value="UNDER_FOLLOW_UP">Under Follow-Up</Option>
+                  <Option value="AT_RISK_LTFU">At Risk LTFU</Option>
+                  <Option value="RE_ENGAGED">Re-Engaged</Option>
+                  <Option value="REQUIRING_INVESTIGATION">Requiring Investigation</Option>
+                  <Option value="REQUIRING_REVIEW">Requiring Review</Option>
+                  <Option value="LOST_TO_FOLLOW_UP">Lost to Follow-Up</Option>
                 </Select>
               </Form.Item>
             </Col>
@@ -427,6 +504,15 @@ export default function PatientsPage() {
               </Form.Item>
             </Col>
           </Row>
+
+          <Form.Item name="status" label="Patient Status" rules={[{ required: true }]}>
+            <Select>
+              <Option value={PatientStatus.ACTIVE}>Active</Option>
+              <Option value={PatientStatus.INACTIVE}>Inactive</Option>
+              <Option value={PatientStatus.DISCHARGED}>Discharged</Option>
+              <Option value={PatientStatus.DECEASED}>Deceased</Option>
+            </Select>
+          </Form.Item>
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
             <Button onClick={() => { setEditModalOpen(false); setEditingPatient(null); }}>Cancel</Button>

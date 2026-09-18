@@ -30,9 +30,9 @@ export const documentService = {
     formData.append('metadata', JSON.stringify(metadata));
     return apiClient.post('/api/v1/documents/upload', formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
-    }).then(res => res.data);
+    }).then(res => res.data?.data || res.data);
   },
-  getDocumentDownloadUrl: (id: string) => apiClient.get(`/api/v1/documents/${id}/download`).then(res => res.data),
-  verifyDocument: (id: string, status: VerificationStatus, notes?: string) => apiClient.patch(`/api/v1/documents/${id}/verify`, { status, notes }).then(res => res.data),
-  deleteDocument: (id: string) => apiClient.delete(`/api/v1/documents/${id}`).then(res => res.data)
+  getDocumentDownloadUrl: (id: string) => apiClient.get(`/api/v1/documents/${id}/download`).then(res => res.data?.data || res.data),
+  verifyDocument: (id: string, status: VerificationStatus, notes?: string) => apiClient.patch(`/api/v1/documents/${id}/verify`, { status, notes }).then(res => res.data?.data || res.data),
+  deleteDocument: (id: string) => apiClient.delete(`/api/v1/documents/${id}`).then(res => res.data?.data || res.data)
 };

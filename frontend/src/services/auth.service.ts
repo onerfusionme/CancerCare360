@@ -18,11 +18,11 @@ export const authService = {
 
   refreshToken: async (token: string): Promise<AuthTokens> => {
     const response = await apiClient.post('/api/v1/auth/refresh', { refreshToken: token });
-    return response.data;
+    return response.data?.data || response.data;
   },
 
   getProfile: async (): Promise<User> => {
     const response = await apiClient.get('/api/v1/auth/profile');
-    return response.data;
+    return response.data?.data || response.data;
   }
 };

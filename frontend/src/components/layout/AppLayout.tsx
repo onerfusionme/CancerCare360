@@ -1,8 +1,9 @@
+'use client';
+
 import React from 'react';
 import { Layout, Menu, Button, Avatar, Dropdown, Space, Badge } from 'antd';
 import {
   DashboardOutlined,
-  TeamOutlined,
   UserOutlined,
   FileSearchOutlined,
   AlertOutlined,
@@ -39,26 +40,25 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   const menuItems: any[] = [
     { key: '/dashboard', icon: <DashboardOutlined />, label: 'Dashboard' },
-    { key: '/registry', icon: <TeamOutlined />, label: 'Patient Registry' },
-    { key: '/patients', icon: <UserOutlined />, label: 'Patients' },
-    { key: '/consultations', icon: <FileSearchOutlined />, label: 'Consultation Readiness' },
-    { key: '/gaps', icon: <AlertOutlined />, label: 'Care Gaps & Follow-up' },
-    { key: '/appointments', icon: <CalendarOutlined />, label: 'Appointments & Clinic Flow' },
+    { key: '/patients', icon: <UserOutlined />, label: 'Patients Directory' },
+    { key: '/gaps', icon: <AlertOutlined />, label: 'Care Gaps & Follow-Up' },
+    { key: '/appointments', icon: <CalendarOutlined />, label: 'Appointments & Flow' },
+    { key: '/consultations', icon: <FileSearchOutlined />, label: 'Consultation Briefing' },
     { key: '/investigations', icon: <ExperimentOutlined />, label: 'Investigations' },
-    { key: '/journey', icon: <MedicineBoxOutlined />, label: 'Treatment Journey' },
+    { key: '/journey', icon: <MedicineBoxOutlined />, label: 'Treatment Journeys' },
     { key: '/documents', icon: <FolderOpenOutlined />, label: 'Clinical Documents' },
-    { key: '/campaigns', icon: <NotificationOutlined />, label: 'Patient Campaigns' },
-    { key: '/education', icon: <ReadOutlined />, label: 'Education & Engagement' },
+    { key: '/campaigns', icon: <NotificationOutlined />, label: 'Outreach & Campaigns' },
+    { key: '/education', icon: <ReadOutlined />, label: 'Patient Education' },
     { 
       key: 'analytics-group', 
       icon: <BarChartOutlined />, 
       label: 'Analytics',
       children: [
-        { key: '/analytics', label: 'Operational Analytics' },
-        { key: '/analytics/practice', icon: <RiseOutlined />, label: 'Practice Growth' }
+        { key: '/analytics', label: 'Operational & Continuity' },
+        { key: '/analytics/practice', label: 'Practice Growth' }
       ]
     },
-    { key: '/reports', icon: <FileTextOutlined />, label: 'Reports' },
+    { key: '/reports', icon: <FileTextOutlined />, label: 'Registry & Reports' },
   ];
 
   if (hasRole('ADMIN' as any)) {
@@ -68,8 +68,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       label: 'Administration',
       children: [
         { key: '/admin', label: 'System Overview' },
+        { key: '/gaps/rules', label: 'Care Gap Protocol Rules' },
         { key: '/admin/ai', label: 'AI Governance & Safety' },
-        { key: '/gaps/rules', label: 'Care Gap Rules' }
+        { key: '/admin/docs', label: 'API Documentation' },
       ]
     });
   }
@@ -145,10 +146,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               Active Facility
             </div>
             <div style={{ fontSize: 12, color: '#f1f5f9', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              City General Hospital
+              City Cancer Center
             </div>
             <div style={{ fontSize: 11, color: '#818cf8' }}>
-              Medical Oncology Wing
+              Comprehensive Oncology Institute
             </div>
           </div>
         )}

@@ -14,8 +14,16 @@ interface AuthState {
   refreshToken: () => Promise<void>;
   hasRole: (role: UserRole) => boolean;
   hasPermission: (permission: string) => boolean;
-  initializeDemoUser: (role?: UserRole) => void;
+  initializeDemoUser: (role?: UserRole) => Promise<void>;
 }
+
+const ROLE_CREDENTIALS: Record<string, LoginCredentials> = {
+  [UserRole.ONCOLOGIST]: { email: 'priya.mehta@cancercare.com', password: 'Doctor@123' },
+  [UserRole.CARE_COORDINATOR]: { email: 'coordinator@cancercare.com', password: 'Coord@123' },
+  [UserRole.ADMIN]: { email: 'admin@cancercare.com', password: 'Admin@123' },
+  [UserRole.SURGICAL_ONCOLOGIST]: { email: 'rajesh.kumar@cancercare.com', password: 'Doctor@123' },
+  [UserRole.RADIATION_ONCOLOGIST]: { email: 'ananya.desai@cancercare.com', password: 'Doctor@123' },
+};
 
 export const useAuthStore = create<AuthState>()(
   persist(
@@ -25,26 +33,9 @@ export const useAuthStore = create<AuthState>()(
       isAuthenticated: false,
       isLoading: false,
 
-      initializeDemoUser: (role = UserRole.ONCOLOGIST) => {
-        const isDoc = role === UserRole.ONCOLOGIST;
-        const isAdmin = role === UserRole.ADMIN;
-        set({
-          user: {
-            id: isDoc ? 'u-staff-doc' : isAdmin ? 'u-staff-admin' : 'u-staff-nurse',
-            email: isDoc ? 'oncologist@cancercare.com' : isAdmin ? 'admin@cancercare.com' : 'nurse@cancercare.com',
-            firstName: isDoc ? 'Clinical' : isAdmin ? 'System' : 'Care',
-            lastName: isDoc ? 'Oncologist' : isAdmin ? 'Administrator' : 'Coordinator',
-            roles: [role],
-            tenantId: 'city-cancer-center',
-            isActive: true,
-          },
-          tokens: {
-            accessToken: 'demo-access-token',
-            refreshToken: 'demo-refresh-token',
-          },
-          isAuthenticated: true,
-          isLoading: false,
-        });
+      initializeDemoUser: async (role = UserRole.ONCOLOGIST) => {
+        const creds = ROLE_CREDENTIALS[role] || ROLE_CREDENTIALS[UserRole.ONCOLOGIST];
+        await get().login(creds);
       },
 
       login: async (credentials) => {
@@ -96,7 +87,13 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'auth-storage',
-      version: 1, // Bumping version clears out the old persisted mock data
+      version: 2,
+      migrate: (persistedState: any, version: number) => {
+        if (version < 2 || persistedState?.tokens?.accessToken === 'demo-access-token') {
+          return { user: null, tokens: null, isAuthenticated: false, isLoading: false };
+        }
+        return persistedState;
+      },
       partialize: (state) => ({ tokens: state.tokens, user: state.user, isAuthenticated: state.isAuthenticated }),
     }
   )

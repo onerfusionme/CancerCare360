@@ -19,20 +19,26 @@ export class InvestigationController {
   constructor(private readonly investigationService: InvestigationService) {}
 
   @Post()
-  @Roles('ONCOLOGIST', 'NURSE')
-  @ApiOperation({ summary: 'Create a new investigation' })
+  @Roles('ADMIN', 'SYSTEM_ADMIN', 'ONCOLOGIST', 'NURSE', 'DOCTOR')
+  @ApiOperation({ summary: 'Create a new investigation order' })
   create(
     @CurrentTenant() tenantId: string,
     @CurrentUser('id') userId: string,
-    @Body() dto: CreateInvestigationDto
+    @Body() dto: CreateInvestigationDto,
   ) {
     return this.investigationService.create(tenantId, userId, dto);
   }
 
   @Get()
-  @ApiOperation({ summary: 'List investigations with filters' })
+  @ApiOperation({ summary: 'List investigations with SLA tracking and filters' })
   findAll(@CurrentTenant() tenantId: string, @Query() filterDto: InvestigationFilterDto) {
     return this.investigationService.findAll(tenantId, filterDto);
+  }
+
+  @Get('summary')
+  @ApiOperation({ summary: 'Get diagnostic TAT metrics, SLA breach counts and compliance rates' })
+  getSummary(@CurrentTenant() tenantId: string) {
+    return this.investigationService.getSummary(tenantId);
   }
 
   @Get('pending')
@@ -42,7 +48,7 @@ export class InvestigationController {
   }
 
   @Get('stats/turnaround')
-  @ApiOperation({ summary: 'Get turnaround time statistics' })
+  @ApiOperation({ summary: 'Get turnaround time statistics by modality' })
   getTurnaroundStats(@CurrentTenant() tenantId: string) {
     return this.investigationService.getTurnaroundStats(tenantId);
   }
@@ -54,12 +60,12 @@ export class InvestigationController {
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Update investigation status/details' })
+  @ApiOperation({ summary: 'Update investigation status, sample collection, report, or review' })
   updateStatus(
     @CurrentTenant() tenantId: string,
     @CurrentUser('id') userId: string,
     @Param('id') id: string,
-    @Body() dto: UpdateInvestigationDto
+    @Body() dto: UpdateInvestigationDto,
   ) {
     return this.investigationService.updateStatus(tenantId, id, userId, dto);
   }

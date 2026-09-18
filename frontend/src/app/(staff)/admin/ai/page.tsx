@@ -88,7 +88,7 @@ export default function AiGovernancePage() {
               </Space>
             </div>
             <Table 
-              dataSource={logs || []} 
+              dataSource={Array.isArray(logs) ? logs : (logs as any)?.items || (logs as any)?.data || []} 
               columns={logColumns} 
               rowKey="id" 
               loading={logsLoading} 

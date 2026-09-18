@@ -25,18 +25,31 @@ apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (
+      error.response?.status === 401 && 
+      !originalRequest?._retry && 
+      !originalRequest?.url?.includes('/auth/login') && 
+      !originalRequest?.url?.includes('/auth/refresh')
+    ) {
       originalRequest._retry = true;
+      const tokens = useAuthStore.getState().tokens;
+      if (!tokens?.refreshToken || tokens.refreshToken === 'demo-refresh-token') {
+        useAuthStore.getState().logout();
+        if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
+          window.location.href = '/login';
+        }
+        return Promise.reject(error);
+      }
       try {
         await useAuthStore.getState().refreshToken();
-        const tokens = useAuthStore.getState().tokens;
-        if (tokens?.accessToken) {
-          originalRequest.headers.Authorization = `Bearer ${tokens.accessToken}`;
+        const newTokens = useAuthStore.getState().tokens;
+        if (newTokens?.accessToken) {
+          originalRequest.headers.Authorization = `Bearer ${newTokens.accessToken}`;
           return apiClient(originalRequest);
         }
       } catch (refreshError) {
         useAuthStore.getState().logout();
-        if (typeof window !== 'undefined') {
+        if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
           window.location.href = '/login';
         }
         return Promise.reject(refreshError);

@@ -34,7 +34,7 @@ import {
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import StatusBadge from '@/components/ui/StatusBadge';
-import { usePatients } from '@/hooks/use-patients';
+import { usePatients, usePatient } from '@/hooks/use-patients';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -63,13 +63,46 @@ export default function JourneyPage() {
   const [selectedMilestone, setSelectedMilestone] = useState<MilestoneItem | null>(null);
 
   const { data: patientData } = usePatients();
-  const patientList = Array.isArray(patientData?.data) ? patientData.data : (Array.isArray(patientData) ? patientData : []);
+  const patientList = React.useMemo(() => {
+    return Array.isArray(patientData?.data) ? patientData.data : (Array.isArray(patientData) ? patientData : []);
+  }, [patientData]);
+
+  // Auto-select first patient if none selected
+  React.useEffect(() => {
+    if (!patientId && patientList.length > 0) {
+      setPatientId(patientList[0].id);
+    }
+  }, [patientList, patientId]);
+
+  const { data: patient } = usePatient(patientId || '');
 
   const [form] = Form.useForm();
   const [editForm] = Form.useForm();
 
   const [milestones, setMilestones] = useState<MilestoneItem[]>([]);
   const [events, setEvents] = useState<JourneyEventItem[]>([]);
+
+  // Sync live milestones from patient care journeys
+  React.useEffect(() => {
+    if (patient?.careJourneys && Array.isArray(patient.careJourneys)) {
+      const allM: MilestoneItem[] = [];
+      patient.careJourneys.forEach((j: any) => {
+        if (j.milestones && Array.isArray(j.milestones)) {
+          allM.push(...j.milestones.map((m: any) => ({
+            id: m.id,
+            type: m.title || m.type || 'Milestone',
+            expectedDate: m.targetDate || m.expectedDate || m.createdAt,
+            actualDate: m.completedDate || m.actualDate,
+            status: m.status || 'PENDING',
+            notes: m.notes || m.description || ''
+          })));
+        }
+      });
+      setMilestones(allM);
+    } else {
+      setMilestones([]);
+    }
+  }, [patient]);
 
   // CRUD: Create Milestone
   const handleCreateMilestone = (values: any) => {

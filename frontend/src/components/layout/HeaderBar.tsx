@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Layout, Button, Avatar, Dropdown, Space, Badge, Tooltip, Drawer, List, Tag, Empty } from 'antd';
+import { Layout, Button, Avatar, Dropdown, Space, Badge, Tooltip, Drawer, List, Tag, Empty, message } from 'antd';
 import {
   MenuUnfoldOutlined,
   MenuFoldOutlined,
@@ -47,11 +47,20 @@ export default function HeaderBar() {
     }
   };
 
+  const handleRoleSwitch = async (role: UserRole) => {
+    try {
+      await initializeDemoUser(role);
+      message.success('Authenticated as ' + (role === UserRole.ONCOLOGIST ? 'Dr. Priya Mehta (Oncologist)' : role === UserRole.CARE_COORDINATOR ? 'Care Coordinator' : 'System Admin'));
+    } catch (err) {
+      message.error('Failed to switch role session');
+    }
+  };
+
   const userMenu = {
     items: [
       {
         key: 'profile',
-        label: `${user?.firstName || 'Dr. Jane'} ${user?.lastName || 'Smith'}`,
+        label: `${user?.firstName || 'Clinical'} ${user?.lastName || 'User'}`,
         icon: <UserOutlined />,
         disabled: true,
       },
@@ -68,19 +77,19 @@ export default function HeaderBar() {
         key: 'switch-doc',
         label: 'Switch to Consultant Oncologist',
         icon: <SwapOutlined />,
-        onClick: () => initializeDemoUser(UserRole.ONCOLOGIST),
+        onClick: () => handleRoleSwitch(UserRole.ONCOLOGIST),
       },
       {
         key: 'switch-coord',
         label: 'Switch to Care Coordinator',
         icon: <SwapOutlined />,
-        onClick: () => initializeDemoUser(UserRole.CARE_COORDINATOR),
+        onClick: () => handleRoleSwitch(UserRole.CARE_COORDINATOR),
       },
       {
         key: 'switch-admin',
         label: 'Switch to System Administrator',
         icon: <SwapOutlined />,
-        onClick: () => initializeDemoUser(UserRole.ADMIN),
+        onClick: () => handleRoleSwitch(UserRole.ADMIN),
       },
       {
         type: 'divider' as const,

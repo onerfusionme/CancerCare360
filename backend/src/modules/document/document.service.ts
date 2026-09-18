@@ -121,6 +121,10 @@ export class DocumentService {
 
     const serializedData = data.map((doc) => ({
       ...doc,
+      patient: doc.patient ? {
+        ...doc.patient,
+        name: `${doc.patient.firstName || ''} ${doc.patient.lastName || ''}`.trim() || 'Patient',
+      } : null,
       fileSize: Number(doc.fileSize),
     }));
 

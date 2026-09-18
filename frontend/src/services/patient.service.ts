@@ -23,36 +23,38 @@ export const patientService = {
 
   getPatient: async (id: string): Promise<Patient> => {
     const response = await apiClient.get(`/api/v1/patients/${id}`);
-    return response.data;
+    return response.data?.data || response.data;
   },
 
   createPatient: async (data: CreatePatientDto): Promise<Patient> => {
     const response = await apiClient.post('/api/v1/patients', data);
-    return response.data;
+    return response.data?.data || response.data;
   },
 
   updatePatient: async (id: string, data: UpdatePatientDto): Promise<Patient> => {
     const response = await apiClient.put(`/api/v1/patients/${id}`, data);
-    return response.data;
+    return response.data?.data || response.data;
   },
 
   deletePatient: async (id: string): Promise<boolean> => {
     const response = await apiClient.delete(`/api/v1/patients/${id}`);
-    return response.data;
+    return response.data?.data !== undefined ? response.data.data : response.data;
   },
 
   searchPatients: async (query: string): Promise<Patient[]> => {
     const response = await apiClient.get('/api/v1/patients/search', { params: { q: query } });
-    return response.data;
+    const data = response.data?.data || response.data;
+    return Array.isArray(data) ? data : [];
   },
 
   getPatientJourney: async (id: string): Promise<CareJourney> => {
     const response = await apiClient.get(`/api/v1/patients/${id}/journey`);
-    return response.data;
+    return response.data?.data || response.data;
   },
 
   getDuplicates: async (data: Partial<CreatePatientDto>): Promise<Patient[]> => {
     const response = await apiClient.get('/api/v1/patients/duplicates', { params: data });
-    return response.data;
+    const resData = response.data?.data || response.data;
+    return Array.isArray(resData) ? resData : [];
   }
 };

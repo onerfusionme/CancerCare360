@@ -39,6 +39,7 @@ import { ReportsModule } from './modules/reports/reports.module';
 import { IntegrationModule } from './modules/integration/integration.module';
 import { ReferralModule } from './modules/referral/referral.module';
 import { FeedbackModule } from './modules/feedback/feedback.module';
+import { NavigationModule } from './modules/navigation/navigation.module';
 
 @Module({
   imports: [
@@ -89,6 +90,7 @@ import { FeedbackModule } from './modules/feedback/feedback.module';
     IntegrationModule,
     ReferralModule,
     FeedbackModule,
+    NavigationModule,
   ],
 })
 export class AppModule {}

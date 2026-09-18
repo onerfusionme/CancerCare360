@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../common/prisma/prisma.service';
-import { AppointmentStatus, InvestigationStatus, MilestoneStatus, TaskStatus, JourneyStatus } from '@prisma/client';
+import { AppointmentStatus, InvestigationStatus, MilestoneStatus, TaskStatus, JourneyStatus, PatientFollowUpStage, BarrierStatus } from '@prisma/client';
 
 @Injectable()
 export class AnalyticsService {
@@ -229,36 +229,44 @@ export class AnalyticsService {
     const date45DaysAgo = new Date();
     date45DaysAgo.setDate(date45DaysAgo.getDate() - 45);
 
-    const lostToFollowUpCount = await this.prisma.careJourney.count({
-      where: {
-        tenantId,
-        status: JourneyStatus.ACTIVE,
-        patient: {
-          appointments: {
-            none: {
-              scheduledAt: { gte: date45DaysAgo },
-            },
-          },
-          outreachLogs: {
-            none: {
-              contactDate: { gte: date45DaysAgo },
-            },
+    const [
+      lostToFollowUpCount,
+      totalMilestones,
+      overdueMilestones,
+      totalPatients,
+      reEngagedPatients,
+      totalBarriers,
+      resolvedBarriers,
+      hospitalSideBarriers,
+      patientSideBarriers,
+    ] = await Promise.all([
+      this.prisma.careJourney.count({
+        where: {
+          tenantId,
+          status: JourneyStatus.ACTIVE,
+          patient: {
+            appointments: { none: { scheduledAt: { gte: date45DaysAgo } } },
+            outreachLogs: { none: { contactDate: { gte: date45DaysAgo } } },
           },
         },
-      },
-    });
-
-    const totalMilestones = await this.prisma.careMilestone.count({
-      where: { tenantId, status: { in: [MilestoneStatus.COMPLETED, MilestoneStatus.PENDING] } },
-    });
-    
-    const overdueMilestones = await this.prisma.careMilestone.count({
-      where: { tenantId, status: MilestoneStatus.PENDING, expectedDate: { lt: new Date() } },
-    });
+      }),
+      this.prisma.careMilestone.count({
+        where: { tenantId, status: { in: [MilestoneStatus.COMPLETED, MilestoneStatus.PENDING] } },
+      }),
+      this.prisma.careMilestone.count({
+        where: { tenantId, status: MilestoneStatus.PENDING, expectedDate: { lt: new Date() } },
+      }),
+      this.prisma.patient.count({ where: { tenantId } }),
+      this.prisma.patient.count({ where: { tenantId, followUpStage: PatientFollowUpStage.RE_ENGAGED } }),
+      this.prisma.patientBarrier.count({ where: { tenantId } }),
+      this.prisma.patientBarrier.count({ where: { tenantId, status: BarrierStatus.RESOLVED } }),
+      this.prisma.patientBarrier.count({ where: { tenantId, isHospitalSide: true } }),
+      this.prisma.patientBarrier.count({ where: { tenantId, isHospitalSide: false } }),
+    ]);
 
     const careContinuityIndex = totalMilestones > 0 
       ? Math.round(((totalMilestones - overdueMilestones) / totalMilestones) * 100) 
-      : 0;
+      : 100;
 
     const stages = ['SCREENING', 'DIAGNOSIS', 'TREATMENT_PLANNING', 'ACTIVE_TREATMENT', 'SURVIVORSHIP'];
     const stageBreakdown: Record<string, number> = {};
@@ -268,11 +276,31 @@ export class AnalyticsService {
       });
     }
 
+    // Follow-up stage breakdown
+    const followUpStages = Object.values(PatientFollowUpStage);
+    const followUpStageBreakdown: Record<string, number> = {};
+    for (const stg of followUpStages) {
+      followUpStageBreakdown[stg] = await this.prisma.patient.count({
+        where: { tenantId, followUpStage: stg },
+      });
+    }
+
+    const barrierResolutionRate = totalBarriers > 0 ? Math.round((resolvedBarriers / totalBarriers) * 100) : 100;
+    const reEngagementRate = totalPatients > 0 ? Math.round((reEngagedPatients / totalPatients) * 100) : 0;
+
     return {
       activeJourneysCount,
       lostToFollowUpCount,
       careContinuityIndex,
       stageBreakdown,
+      followUpStageBreakdown,
+      reEngagedPatients,
+      reEngagementRate,
+      barrierResolutionRate,
+      totalBarriers,
+      resolvedBarriers,
+      hospitalSideBarriers,
+      patientSideBarriers,
     };
   }
 

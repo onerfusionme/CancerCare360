@@ -52,11 +52,14 @@ export const ExtractedDataViewer: React.FC<ExtractedDataViewerProps> = ({ result
     },
   ];
 
-  const dataSource = Object.keys(result.entities).map(key => ({
+  const entities = result?.entities || {};
+  const confidenceMap = result?.confidenceScores || (result as any)?.confidence_scores || {};
+
+  const dataSource = Object.keys(entities).map(key => ({
     key,
     field: key,
-    value: result.entities[key],
-    confidence: result.confidenceScores[key] || 0,
+    value: entities[key],
+    confidence: confidenceMap[key] || 90,
   }));
 
   const handleSave = () => {

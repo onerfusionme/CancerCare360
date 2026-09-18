@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Query, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
-import { FollowUpService } from './follow-up.service';
+import { FollowUpService, TaskHandoffDto, RecoverAppointmentDto } from './follow-up.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { TaskFilterDto } from './dto/task-filter.dto';
@@ -32,6 +32,12 @@ export class FollowUpController {
     @Query() filterDto: TaskFilterDto,
   ) {
     return this.followUpService.findAll(tenantId, filterDto);
+  }
+
+  @Get('command-center')
+  @ApiOperation({ summary: 'Command center aggregated metrics and actionable queue' })
+  getCommandCenter(@CurrentTenant() tenantId: string) {
+    return this.followUpService.getCommandCenter(tenantId);
   }
 
   @Get('my')
@@ -95,5 +101,27 @@ export class FollowUpController {
     @Param('id') id: string,
   ) {
     return this.followUpService.escalate(tenantId, id);
+  }
+
+  @Post(':id/handoff')
+  @ApiOperation({ summary: 'Perform inter-role task handoff' })
+  handoff(
+    @CurrentTenant() tenantId: string,
+    @Param('id') id: string,
+    @CurrentUser() user: any,
+    @Body() dto: TaskHandoffDto,
+  ) {
+    return this.followUpService.handoff(tenantId, id, user.id, dto);
+  }
+
+  @Post(':id/recover-appointment')
+  @ApiOperation({ summary: 'Recover appointment and re-engage patient' })
+  recoverAppointment(
+    @CurrentTenant() tenantId: string,
+    @Param('id') id: string,
+    @CurrentUser() user: any,
+    @Body() dto: RecoverAppointmentDto,
+  ) {
+    return this.followUpService.recoverAppointment(tenantId, id, user.id, dto);
   }
 }
