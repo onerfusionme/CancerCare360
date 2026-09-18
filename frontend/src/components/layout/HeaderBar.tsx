@@ -13,9 +13,10 @@ import {
   CheckOutlined,
   HeartOutlined,
   AlertOutlined,
-  ClockCircleOutlined
+  ClockCircleOutlined,
+  DashboardOutlined
 } from '@ant-design/icons';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useAppStore } from '@/stores/app.store';
 import { useAuth } from '@/hooks/use-auth';
 import { useAppointments } from '@/hooks/use-appointments';
@@ -26,10 +27,30 @@ const { Header } = Layout;
 
 export default function HeaderBar() {
   const router = useRouter();
+  const pathname = usePathname();
   const { sidebarCollapsed, toggleSidebar, language, setLanguage, themeMode, toggleThemeMode } = useAppStore();
   const { user, logout, initializeDemoUser } = useAuth();
   const [notifDrawerOpen, setNotifDrawerOpen] = useState(false);
   const { data: appointments } = useAppointments();
+
+  const getBreadcrumbLabel = (path: string) => {
+    if (path === '/dashboard') return 'Clinical Dashboard';
+    if (path.startsWith('/patients')) return 'Patients Directory';
+    if (path.startsWith('/appointments')) return 'Appointments & Clinic Flow';
+    if (path.startsWith('/community')) return 'CareCircles (Family Connect)';
+    if (path.startsWith('/relief')) return 'CareRelief (Aid & Grants)';
+    if (path.startsWith('/gaps')) return 'Care Gaps & Follow-Up';
+    if (path.startsWith('/consultations')) return 'Consultation Briefing';
+    if (path.startsWith('/investigations')) return 'Investigations';
+    if (path.startsWith('/journey')) return 'Treatment Journeys';
+    if (path.startsWith('/documents')) return 'Clinical Documents';
+    if (path.startsWith('/campaigns')) return 'Outreach & Campaigns';
+    if (path.startsWith('/education')) return 'Patient Education';
+    if (path.startsWith('/analytics')) return 'Analytics';
+    if (path.startsWith('/reports')) return 'Registry & Reports';
+    if (path.startsWith('/admin')) return 'Administration';
+    return 'Workspace';
+  };
 
   const apptList = Array.isArray(appointments) ? appointments : ((appointments as any)?.data || []);
   const todayCount = apptList.length;
@@ -129,6 +150,39 @@ export default function HeaderBar() {
           <GlobalSearch />
         </div>
 
+        {/* Dynamic Breadcrumb Pill */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+          fontSize: 12.5,
+          color: isDark ? '#cbd5e1' : '#334155',
+          fontWeight: 600,
+          padding: '7px 16px',
+          background: isDark ? 'rgba(30, 41, 59, 0.65)' : 'rgba(241, 245, 249, 0.75)',
+          borderRadius: 20,
+          border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(255, 255, 255, 0.7)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.03)',
+        }}>
+          <span 
+            onClick={() => router.push('/dashboard')}
+            style={{ cursor: 'pointer', color: '#6366f1', display: 'flex', alignItems: 'center', gap: 6, fontWeight: 700 }}
+            title="Navigate to Dashboard"
+          >
+            <DashboardOutlined /> <span>Dashboard</span>
+          </span>
+          {pathname !== '/dashboard' && (
+            <>
+              <span style={{ color: isDark ? '#64748b' : '#94a3b8' }}>/</span>
+              <span style={{ color: isDark ? '#f8fafc' : '#0f172a', fontWeight: 700 }}>
+                {getBreadcrumbLabel(pathname)}
+              </span>
+            </>
+          )}
+        </div>
+
         {/* Live Clinic Stats Pill */}
         <div style={{
           display: 'flex',
@@ -195,6 +249,30 @@ export default function HeaderBar() {
       </div>
 
       <Space size="middle">
+        {/* Direct Dashboard Nav Button */}
+        <Tooltip title="Return to Clinical Dashboard">
+          <Button 
+            type="default"
+            icon={<DashboardOutlined style={{ color: '#6366f1' }} />}
+            onClick={() => router.push('/dashboard')}
+            style={{ 
+              borderRadius: 10, 
+              borderColor: isDark ? 'rgba(99, 102, 241, 0.3)' : 'rgba(99, 102, 241, 0.25)',
+              background: isDark ? 'rgba(99, 102, 241, 0.12)' : 'rgba(238, 242, 255, 0.9)',
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
+              color: isDark ? '#a5b4fc' : '#4338ca',
+              fontWeight: 600,
+              fontSize: 12,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6
+            }}
+          >
+            Dashboard
+          </Button>
+        </Tooltip>
+
         {/* Dark / Light Theme Toggle */}
         <Tooltip title={isDark ? "Switch to Clinical Daylight Mode" : "Switch to Executive Dark Mode"}>
           <Button 

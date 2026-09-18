@@ -469,9 +469,9 @@ export default function FollowUpCommandCenterPage() {
       {/* 8 KPI Cards Strip */}
       <Row gutter={[12, 12]}>
         <Col xs={12} sm={6} md={3}>
-          <Card size="small" style={{ borderColor: '#ef4444', background: '#fef2f2' }}>
+          <Card size="small" className="glass-card" style={{ borderColor: 'rgba(239, 68, 68, 0.4)', background: 'rgba(239, 68, 68, 0.08)' }}>
             <Statistic 
-              title={<span style={{ fontSize: 11, color: '#991b1b', fontWeight: 600 }}>ATTENTION REQ.</span>}
+              title={<span style={{ fontSize: 11, color: '#f87171', fontWeight: 700, letterSpacing: '0.04em' }}>ATTENTION REQ.</span>}
               value={metrics.totalRequiringAttention}
               valueStyle={{ color: '#ef4444', fontWeight: 800 }}
             />
@@ -479,78 +479,78 @@ export default function FollowUpCommandCenterPage() {
         </Col>
 
         <Col xs={12} sm={6} md={3}>
-          <Card size="small" style={{ borderColor: '#f97316', background: '#fff7ed' }}>
+          <Card size="small" className="glass-card" style={{ borderColor: 'rgba(249, 115, 22, 0.4)', background: 'rgba(249, 115, 22, 0.08)' }}>
             <Statistic 
-              title={<span style={{ fontSize: 11, color: '#9a3412', fontWeight: 600 }}>CRITICAL / URGENT</span>}
+              title={<span style={{ fontSize: 11, color: '#fb923c', fontWeight: 700, letterSpacing: '0.04em' }}>CRITICAL / URGENT</span>}
               value={metrics.criticalCount}
-              valueStyle={{ color: '#ea580c', fontWeight: 800 }}
+              valueStyle={{ color: '#f97316', fontWeight: 800 }}
             />
           </Card>
         </Col>
 
         <Col xs={12} sm={6} md={3}>
-          <Card size="small" style={{ borderColor: '#eab308', background: '#fefce8' }}>
+          <Card size="small" className="glass-card" style={{ borderColor: 'rgba(234, 179, 8, 0.4)', background: 'rgba(234, 179, 8, 0.08)' }}>
             <Statistic 
-              title={<span style={{ fontSize: 11, color: '#854d0e', fontWeight: 600 }}>OVERDUE DAYS</span>}
+              title={<span style={{ fontSize: 11, color: '#facc15', fontWeight: 700, letterSpacing: '0.04em' }}>OVERDUE DAYS</span>}
               value={metrics.overdueCount}
-              valueStyle={{ color: '#ca8a04', fontWeight: 800 }}
+              valueStyle={{ color: '#eab308', fontWeight: 800 }}
             />
           </Card>
         </Col>
 
         <Col xs={12} sm={6} md={3}>
-          <Card size="small" style={{ borderColor: '#3b82f6', background: '#eff6ff' }}>
+          <Card size="small" className="glass-card" style={{ borderColor: 'rgba(59, 130, 246, 0.4)', background: 'rgba(59, 130, 246, 0.08)' }}>
             <Statistic 
-              title={<span style={{ fontSize: 11, color: '#1e40af', fontWeight: 600 }}>DUE TODAY</span>}
+              title={<span style={{ fontSize: 11, color: '#60a5fa', fontWeight: 700, letterSpacing: '0.04em' }}>DUE TODAY</span>}
               value={metrics.dueTodayCount}
-              valueStyle={{ color: '#2563eb', fontWeight: 800 }}
+              valueStyle={{ color: '#3b82f6', fontWeight: 800 }}
             />
           </Card>
         </Col>
 
         <Col xs={12} sm={6} md={3}>
-          <Card size="small">
+          <Card size="small" className="glass-card">
             <Statistic 
-              title={<span style={{ fontSize: 11, color: '#475569', fontWeight: 600 }}>MISSED APPT</span>}
+              title={<span style={{ fontSize: 11, color: 'var(--color-text-secondary, #475569)', fontWeight: 700, letterSpacing: '0.04em' }}>MISSED APPT</span>}
               value={metrics.missedApptsCount}
-              valueStyle={{ color: '#334155', fontWeight: 700 }}
+              valueStyle={{ color: 'var(--color-text-primary, #0f172a)', fontWeight: 800 }}
             />
           </Card>
         </Col>
 
         <Col xs={12} sm={6} md={3}>
-          <Card size="small">
+          <Card size="small" className="glass-card">
             <Statistic 
-              title={<span style={{ fontSize: 11, color: '#475569', fontWeight: 600 }}>NO FUTURE APPT</span>}
+              title={<span style={{ fontSize: 11, color: 'var(--color-text-secondary, #475569)', fontWeight: 700, letterSpacing: '0.04em' }}>NO FUTURE APPT</span>}
               value={metrics.noFutureApptCount}
-              valueStyle={{ color: '#475569', fontWeight: 700 }}
+              valueStyle={{ color: 'var(--color-text-primary, #0f172a)', fontWeight: 800 }}
             />
           </Card>
         </Col>
 
         <Col xs={12} sm={6} md={3}>
-          <Card size="small">
+          <Card size="small" className="glass-card" style={{ borderColor: 'rgba(168, 85, 247, 0.4)', background: 'rgba(168, 85, 247, 0.08)' }}>
             <Statistic 
-              title={<span style={{ fontSize: 11, color: '#6b21a8', fontWeight: 600 }}>ESCALATED / HANDOFF</span>}
+              title={<span style={{ fontSize: 11, color: '#c084fc', fontWeight: 700, letterSpacing: '0.04em' }}>ESCALATED / HANDOFF</span>}
               value={metrics.escalatedCount}
-              valueStyle={{ color: '#7e22ce', fontWeight: 700 }}
+              valueStyle={{ color: '#a855f7', fontWeight: 800 }}
             />
           </Card>
         </Col>
 
         <Col xs={12} sm={6} md={3}>
-          <Card size="small" style={{ borderColor: '#22c55e', background: '#f0fdf4' }}>
+          <Card size="small" className="glass-card" style={{ borderColor: 'rgba(34, 197, 94, 0.4)', background: 'rgba(34, 197, 94, 0.08)' }}>
             <Statistic 
-              title={<span style={{ fontSize: 11, color: '#166534', fontWeight: 600 }}>RECOVERED & ACTIVE</span>}
+              title={<span style={{ fontSize: 11, color: '#4ade80', fontWeight: 700, letterSpacing: '0.04em' }}>RECOVERED & ACTIVE</span>}
               value={metrics.recoveredCount}
-              valueStyle={{ color: '#16a34a', fontWeight: 800 }}
+              valueStyle={{ color: '#22c55e', fontWeight: 800 }}
             />
           </Card>
         </Col>
       </Row>
 
       {/* Main Tabs */}
-      <Card>
+      <Card className="glass-card" styles={{ body: { padding: '20px' } }}>
         <Tabs
           activeKey={activeTab}
           onChange={setActiveTab}

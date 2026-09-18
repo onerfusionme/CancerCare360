@@ -288,27 +288,27 @@ export default function PatientDetailPage({ params }: { params: { id: string } }
       </div>
 
       {/* Patient Demographic & Continuity Banner */}
-      <Card style={{ marginBottom: 20, background: '#f8fafc', borderColor: '#e2e8f0' }} bodyStyle={{ padding: 16 }}>
-        <Row gutter={[16, 16]} align="middle">
+      <Card className="glass-card" style={{ marginBottom: 20 }} styles={{ body: { padding: '20px 24px' } }}>
+        <Row gutter={[20, 16]} align="middle">
           <Col xs={24} md={6}>
-            <div style={{ fontSize: 18, fontWeight: 700, color: '#0f172a' }}>
+            <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--color-text-primary, #0f172a)' }}>
               {patient?.firstName} {patient?.lastName}
             </div>
-            <div style={{ fontSize: 12, color: '#64748b' }}>
+            <div style={{ fontSize: 12.5, color: 'var(--color-text-secondary, #334155)', marginTop: 4 }}>
               MRN: <Text code strong>{patient?.mrn || '—'}</Text> &bull; {patient?.gender || '—'} &bull; {patient?.dateOfBirth ? `${dayjs().diff(dayjs(patient.dateOfBirth), 'year')} yrs` : '—'}
             </div>
           </Col>
 
           <Col xs={12} md={5}>
-            <div style={{ fontSize: 11, color: '#64748b', textTransform: 'uppercase', fontWeight: 600 }}>Follow-Up Continuity Stage</div>
-            <div style={{ marginTop: 4 }}>
+            <div style={{ fontSize: 11, color: 'var(--color-text-secondary, #475569)', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.04em' }}>Follow-Up Continuity Stage</div>
+            <div style={{ marginTop: 6 }}>
               {getFollowUpStageTag(patient?.followUpStage)}
             </div>
           </Col>
 
           <Col xs={12} md={4}>
-            <div style={{ fontSize: 11, color: '#64748b', textTransform: 'uppercase', fontWeight: 600 }}>Care Coordinator</div>
-            <div style={{ marginTop: 4, fontWeight: 600, fontSize: 13 }}>
+            <div style={{ fontSize: 11, color: 'var(--color-text-secondary, #475569)', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.04em' }}>Care Coordinator</div>
+            <div style={{ marginTop: 6, fontWeight: 600, fontSize: 13, color: 'var(--color-text-primary, #0f172a)' }}>
               {patient?.careCoordinator 
                 ? `${patient.careCoordinator.firstName} ${patient.careCoordinator.lastName}` 
                 : <span style={{ color: '#94a3b8' }}>Unassigned</span>}
@@ -316,15 +316,15 @@ export default function PatientDetailPage({ params }: { params: { id: string } }
           </Col>
 
           <Col xs={12} md={4}>
-            <div style={{ fontSize: 11, color: '#64748b', textTransform: 'uppercase', fontWeight: 600 }}>Primary Oncologist</div>
-            <div style={{ marginTop: 4, fontWeight: 600, fontSize: 13 }}>
+            <div style={{ fontSize: 11, color: 'var(--color-text-secondary, #475569)', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.04em' }}>Primary Oncologist</div>
+            <div style={{ marginTop: 6, fontWeight: 600, fontSize: 13, color: 'var(--color-text-primary, #0f172a)' }}>
               {patient?.primaryDoctorName || 'Treating Oncologist'}
             </div>
           </Col>
 
           <Col xs={12} md={5}>
-            <div style={{ fontSize: 11, color: '#64748b', textTransform: 'uppercase', fontWeight: 600 }}>Contact Number</div>
-            <div style={{ marginTop: 4, fontSize: 13 }}>
+            <div style={{ fontSize: 11, color: 'var(--color-text-secondary, #475569)', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.04em' }}>Contact Number</div>
+            <div style={{ marginTop: 6, fontSize: 13, fontWeight: 600, color: 'var(--color-text-primary, #0f172a)' }}>
               {patient?.phoneNumber || '+91 98765 43210'}
             </div>
           </Col>
@@ -354,6 +354,7 @@ export default function PatientDetailPage({ params }: { params: { id: string } }
           ),
           children: (
             <Card 
+              className="glass-card"
               title="Continuity Barriers & Social Work Interventions"
               extra={
                 <Button 
@@ -385,7 +386,7 @@ export default function PatientDetailPage({ params }: { params: { id: string } }
             </span>
           ),
           children: (
-            <Card title="Chemotherapy, Surgery & Surveillance Milestones">
+            <Card className="glass-card" title="Chemotherapy, Surgery & Surveillance Milestones">
               <Table 
                 dataSource={milestonesList} 
                 columns={milestoneColumns} 
@@ -399,7 +400,7 @@ export default function PatientDetailPage({ params }: { params: { id: string } }
           key: 'journey',
           label: 'Longitudinal Journey',
           children: (
-            <Card title="Longitudinal Patient Journey & Milestones">
+            <Card className="glass-card" title="Longitudinal Patient Journey & Milestones">
               <JourneyTimeline events={Array.isArray(timeline) ? timeline : ((timeline as any)?.events || [])} loading={isTimelineLoading} />
             </Card>
           )

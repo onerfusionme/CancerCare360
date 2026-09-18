@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Layout, Menu, Space, Button, Dropdown, Avatar } from 'antd';
+import { Layout, Menu, Space, Button, Dropdown, Avatar, Tooltip } from 'antd';
 import { useRouter, usePathname } from 'next/navigation';
 import { 
   HomeOutlined, 
@@ -15,7 +15,10 @@ import {
   UserOutlined,
   MedicineBoxOutlined,
   TeamOutlined,
-  BankOutlined
+  BankOutlined,
+  DashboardOutlined,
+  BulbFilled,
+  MoonOutlined
 } from '@ant-design/icons';
 import { useAppStore } from '@/stores/app.store';
 import { useAuth } from '@/hooks/use-auth';
@@ -25,8 +28,9 @@ const { Header, Content, Footer } = Layout;
 export function PortalLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { language, setLanguage } = useAppStore();
+  const { language, setLanguage, themeMode, toggleThemeMode } = useAppStore();
   const { user } = useAuth();
+  const isDark = themeMode === 'dark';
 
   const items = [
     { key: '/portal', icon: <HomeOutlined />, label: 'My Care Home' },
@@ -38,6 +42,15 @@ export function PortalLayout({ children }: { children: React.ReactNode }) {
     { key: '/portal/education', icon: <BookOutlined />, label: 'Patient Guides' },
     { key: '/portal/settings', icon: <SettingOutlined />, label: 'Settings & Privacy' },
   ];
+
+  const getActivePortalKey = () => {
+    if (!pathname) return '/portal';
+    if (pathname === '/portal') return '/portal';
+    const match = items.find(it => it.key !== '/portal' && pathname.startsWith(it.key));
+    return match ? match.key : pathname;
+  };
+
+  const activeKey = getActivePortalKey();
 
   const langMenu = {
     items: [
@@ -51,15 +64,15 @@ export function PortalLayout({ children }: { children: React.ReactNode }) {
   return (
     <Layout className="ambient-canvas" style={{ minHeight: '100vh', background: 'transparent' }}>
       <Header style={{ 
-        background: 'rgba(255, 255, 255, 0.82)', 
+        background: isDark ? 'rgba(15, 23, 42, 0.88)' : 'rgba(255, 255, 255, 0.82)', 
         backdropFilter: 'blur(20px) saturate(180%)',
         WebkitBackdropFilter: 'blur(20px) saturate(180%)',
         padding: '0 28px', 
         display: 'flex', 
         alignItems: 'center', 
         justifyContent: 'space-between',
-        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.04)', 
-        borderBottom: '1px solid rgba(255, 255, 255, 0.6)',
+        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.06)', 
+        borderBottom: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(255, 255, 255, 0.6)',
         position: 'sticky',
         top: 0,
         zIndex: 10,
@@ -90,10 +103,10 @@ export function PortalLayout({ children }: { children: React.ReactNode }) {
               <HeartOutlined />
             </div>
             <div>
-              <div style={{ fontSize: 16, fontWeight: 700, color: '#0f172a', lineHeight: 1.2 }}>
+              <div style={{ fontSize: 16, fontWeight: 700, color: isDark ? '#f8fafc' : '#0f172a', lineHeight: 1.2 }}>
                 CancerCare<span style={{ color: '#0d9488' }}>Companion</span>
               </div>
-              <div style={{ fontSize: 10, color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              <div style={{ fontSize: 10, color: isDark ? '#94a3b8' : '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                 City Cancer Center Patient Portal
               </div>
             </div>
@@ -101,7 +114,7 @@ export function PortalLayout({ children }: { children: React.ReactNode }) {
 
           <Menu 
             mode="horizontal" 
-            selectedKeys={[pathname]} 
+            selectedKeys={[activeKey]} 
             items={items} 
             onClick={({ key }) => router.push(key)}
             style={{ 
@@ -114,31 +127,59 @@ export function PortalLayout({ children }: { children: React.ReactNode }) {
         </div>
 
         <Space size="middle">
-          <Button 
-            size="middle" 
-            icon={<MedicineBoxOutlined />}
-            onClick={() => router.push('/dashboard')}
-            style={{ 
-              borderRadius: 10, 
-              fontSize: 12, 
-              fontWeight: 600,
-              background: 'rgba(255, 255, 255, 0.7)',
-              backdropFilter: 'blur(8px)',
-              borderColor: 'rgba(226, 232, 240, 0.8)',
-            }}
-          >
-            Clinician Desk
-          </Button>
+          {/* Direct Return to Dashboard */}
+          <Tooltip title="Return to Clinical Oncology Dashboard">
+            <Button 
+              type="default"
+              icon={<DashboardOutlined style={{ color: '#6366f1' }} />}
+              onClick={() => router.push('/dashboard')}
+              style={{ 
+                borderRadius: 10, 
+                fontSize: 12, 
+                fontWeight: 600,
+                background: isDark ? 'rgba(99, 102, 241, 0.15)' : 'rgba(238, 242, 255, 0.9)',
+                borderColor: isDark ? 'rgba(99, 102, 241, 0.3)' : 'rgba(99, 102, 241, 0.25)',
+                color: isDark ? '#a5b4fc' : '#4338ca',
+                backdropFilter: 'blur(8px)',
+                WebkitBackdropFilter: 'blur(8px)',
+              }}
+            >
+              Dashboard
+            </Button>
+          </Tooltip>
+
+          {/* Dark / Light Mode Toggle */}
+          <Tooltip title={isDark ? "Switch to Daylight Mode" : "Switch to Dark Mode"}>
+            <Button 
+              type="default"
+              icon={isDark ? <BulbFilled style={{ color: '#fbbf24' }} /> : <MoonOutlined style={{ color: '#6366f1' }} />}
+              onClick={toggleThemeMode}
+              style={{ 
+                borderRadius: 10, 
+                fontSize: 12,
+                fontWeight: 600,
+                background: isDark ? 'rgba(30, 41, 59, 0.7)' : 'rgba(255, 255, 255, 0.75)',
+                borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(226, 232, 240, 0.8)',
+                color: isDark ? '#f8fafc' : '#0f172a',
+                backdropFilter: 'blur(8px)',
+                WebkitBackdropFilter: 'blur(8px)',
+              }}
+            >
+              {isDark ? 'Dark' : 'Light'}
+            </Button>
+          </Tooltip>
 
           <Dropdown menu={langMenu} placement="bottomRight">
             <Button 
               icon={<GlobalOutlined style={{ color: '#0d9488' }} />} 
               style={{ 
                 borderRadius: 10, 
-                borderColor: 'rgba(226, 232, 240, 0.8)',
-                background: 'rgba(255, 255, 255, 0.7)',
+                borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(226, 232, 240, 0.8)',
+                background: isDark ? 'rgba(30, 41, 59, 0.7)' : 'rgba(255, 255, 255, 0.75)',
                 backdropFilter: 'blur(8px)',
+                WebkitBackdropFilter: 'blur(8px)',
                 fontWeight: 600,
+                color: isDark ? '#f8fafc' : '#0f172a',
               }}
             >
               {language === 'hi' ? 'हिंदी' : language === 'mr' ? 'मराठी' : 'English'}
@@ -150,19 +191,20 @@ export function PortalLayout({ children }: { children: React.ReactNode }) {
             alignItems: 'center', 
             gap: 10, 
             padding: '4px 12px',
-            background: 'rgba(255, 255, 255, 0.65)',
+            background: isDark ? 'rgba(30, 41, 59, 0.7)' : 'rgba(255, 255, 255, 0.65)',
             backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
             borderRadius: 10,
-            border: '1px solid rgba(226, 232, 240, 0.7)',
+            border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(226, 232, 240, 0.7)',
           }}>
             <Avatar style={{ backgroundColor: '#0d9488', fontWeight: 600 }}>
               {user?.firstName ? user.firstName[0].toUpperCase() : 'P'}
             </Avatar>
             <div style={{ lineHeight: 1.2 }}>
-              <div style={{ fontSize: 13, fontWeight: 600, color: '#0f172a' }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: isDark ? '#f8fafc' : '#0f172a' }}>
                 {user?.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : 'Patient Portal'}
               </div>
-              <div style={{ fontSize: 11, color: '#64748b' }}>Digital Health ID (ABHA)</div>
+              <div style={{ fontSize: 11, color: isDark ? '#94a3b8' : '#64748b' }}>Digital Health ID (ABHA)</div>
             </div>
           </div>
         </Space>

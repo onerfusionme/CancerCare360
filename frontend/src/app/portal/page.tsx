@@ -80,33 +80,34 @@ export default function PortalDashboard() {
 
       {/* Treatment Roadmap Card */}
       <Card 
+        className="glass-card"
         title={
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <HistoryOutlined style={{ color: '#0d9488' }} />
-              <span style={{ fontSize: 16, fontWeight: 700, color: '#0f172a' }}>
+              <span style={{ fontSize: 16, fontWeight: 700, color: 'var(--color-text-primary, #0f172a)' }}>
                 Your Healing Journey & Roadmap
               </span>
             </div>
           </div>
         }
-        style={{ borderRadius: 12, border: '1px solid #e2e8f0' }}
-        bodyStyle={{ padding: 24 }}
+        style={{ borderRadius: 16 }}
+        styles={{ body: { padding: 24 } }}
       >
-        <div style={{ textAlign: 'center', padding: '24px 0', color: '#64748b' }}>
+        <div style={{ textAlign: 'center', padding: '24px 0', color: 'var(--color-text-secondary, #64748b)' }}>
           No active chemotherapy or radiation treatment protocol assigned yet. Your oncologist will initialize your roadmap upon consultation.
         </div>
       </Card>
 
       {/* CareCircles Peer & Family Network Banner */}
       <Card
+        className="glass-card"
         style={{
-          borderRadius: 14,
-          border: '1px solid #ccfbf1',
-          background: 'linear-gradient(135deg, #f0fdfa 0%, #ffffff 100%)',
-          boxShadow: '0 2px 8px rgba(13, 148, 136, 0.08)',
+          borderRadius: 16,
+          border: '1px solid rgba(45, 212, 191, 0.35)',
+          boxShadow: '0 4px 16px rgba(13, 148, 136, 0.08)',
         }}
-        bodyStyle={{ padding: 22 }}
+        styles={{ body: { padding: 22 } }}
       >
         <Row gutter={[16, 16]} align="middle">
           <Col xs={24} md={17}>
@@ -118,10 +119,10 @@ export default function PortalDashboard() {
                 Karad & Satara District Families
               </span>
             </div>
-            <Title level={4} style={{ margin: '0 0 6px 0', color: '#0f172a' }}>
+            <Title level={4} style={{ margin: '0 0 6px 0', color: 'var(--color-text-primary, #0f172a)' }}>
               Connect with Families Fighting Similar Cancer in Your City
             </Title>
-            <Paragraph style={{ margin: 0, fontSize: 13, color: '#475569', lineHeight: 1.5 }}>
+            <Paragraph style={{ margin: 0, fontSize: 13, color: 'var(--color-text-secondary, #475569)', lineHeight: 1.5 }}>
               Exchange dysphagia & soft diet recipes, manage radiation/chemo side effects, and chat privately 1-on-1 with families nearby who understand the journey.
             </Paragraph>
           </Col>
@@ -131,7 +132,7 @@ export default function PortalDashboard() {
               size="large"
               icon={<TeamOutlined />}
               onClick={() => router.push('/portal/community')}
-              style={{ background: '#0d9488', borderColor: '#0d9488', fontWeight: 700, borderRadius: 8 }}
+              style={{ background: '#0d9488', borderColor: '#0d9488', fontWeight: 700, borderRadius: 10 }}
             >
               Enter CareCircles
             </Button>
@@ -144,16 +145,17 @@ export default function PortalDashboard() {
         <Col xs={24} sm={12} md={6}>
           <Card 
             hoverable
+            className="glass-card"
             onClick={() => router.push('/portal/appointments')}
-            style={{ borderRadius: 12, border: '1px solid #e2e8f0', textAlign: 'center' }}
-            bodyStyle={{ padding: 24 }}
+            style={{ borderRadius: 16, textAlign: 'center' }}
+            styles={{ body: { padding: 24 } }}
           >
             <div style={{
               width: 48,
               height: 48,
               borderRadius: 12,
-              background: '#e0e7ff',
-              color: '#4f46e5',
+              background: 'rgba(99, 102, 241, 0.15)',
+              color: '#6366f1',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -162,24 +164,25 @@ export default function PortalDashboard() {
             }}>
               <CalendarOutlined />
             </div>
-            <div style={{ fontWeight: 700, fontSize: 14, color: '#0f172a' }}>My Appointments</div>
-            <div style={{ fontSize: 12, color: '#64748b', marginTop: 4 }}>View upcoming clinic & daycare visits</div>
+            <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--color-text-primary, #0f172a)' }}>My Appointments</div>
+            <div style={{ fontSize: 12, color: 'var(--color-text-secondary, #64748b)', marginTop: 4 }}>View upcoming clinic & daycare visits</div>
           </Card>
         </Col>
 
         <Col xs={24} sm={12} md={6}>
           <Card 
             hoverable
+            className="glass-card"
             onClick={() => router.push('/portal/records')}
-            style={{ borderRadius: 12, border: '1px solid #e2e8f0', textAlign: 'center' }}
-            bodyStyle={{ padding: 24 }}
+            style={{ borderRadius: 16, textAlign: 'center' }}
+            styles={{ body: { padding: 24 } }}
           >
             <div style={{
               width: 48,
               height: 48,
               borderRadius: 12,
-              background: '#ecfdf5',
-              color: '#059669',
+              background: 'rgba(16, 185, 129, 0.15)',
+              color: '#10b981',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -188,24 +191,25 @@ export default function PortalDashboard() {
             }}>
               <FileTextOutlined />
             </div>
-            <div style={{ fontWeight: 700, fontSize: 14, color: '#0f172a' }}>Lab & Imaging Reports</div>
-            <div style={{ fontSize: 12, color: '#64748b', marginTop: 4 }}>Blood work, mammograms & ABHA sync</div>
+            <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--color-text-primary, #0f172a)' }}>Lab & Imaging Reports</div>
+            <div style={{ fontSize: 12, color: 'var(--color-text-secondary, #64748b)', marginTop: 4 }}>Blood work, mammograms & ABHA sync</div>
           </Card>
         </Col>
 
         <Col xs={24} sm={12} md={6}>
           <Card 
             hoverable
+            className="glass-card"
             onClick={() => router.push('/portal/education')}
-            style={{ borderRadius: 12, border: '1px solid #e2e8f0', textAlign: 'center' }}
-            bodyStyle={{ padding: 24 }}
+            style={{ borderRadius: 16, textAlign: 'center' }}
+            styles={{ body: { padding: 24 } }}
           >
             <div style={{
               width: 48,
               height: 48,
               borderRadius: 12,
-              background: '#fef3c7',
-              color: '#d97706',
+              background: 'rgba(245, 158, 11, 0.15)',
+              color: '#f59e0b',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -214,24 +218,25 @@ export default function PortalDashboard() {
             }}>
               <BookOutlined />
             </div>
-            <div style={{ fontWeight: 700, fontSize: 14, color: '#0f172a' }}>Chemotherapy Guides</div>
-            <div style={{ fontSize: 12, color: '#64748b', marginTop: 4 }}>Managing fatigue, diet & neuropathy</div>
+            <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--color-text-primary, #0f172a)' }}>Chemotherapy Guides</div>
+            <div style={{ fontSize: 12, color: 'var(--color-text-secondary, #64748b)', marginTop: 4 }}>Managing fatigue, diet & neuropathy</div>
           </Card>
         </Col>
 
         <Col xs={24} sm={12} md={6}>
           <Card 
             hoverable
+            className="glass-card"
             onClick={() => router.push('/portal/journey')}
-            style={{ borderRadius: 12, border: '1px solid #e2e8f0', textAlign: 'center' }}
-            bodyStyle={{ padding: 24 }}
+            style={{ borderRadius: 16, textAlign: 'center' }}
+            styles={{ body: { padding: 24 } }}
           >
             <div style={{
               width: 48,
               height: 48,
               borderRadius: 12,
-              background: '#f3e8ff',
-              color: '#7c3aed',
+              background: 'rgba(168, 85, 247, 0.15)',
+              color: '#a855f7',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -240,8 +245,8 @@ export default function PortalDashboard() {
             }}>
               <MedicineBoxOutlined />
             </div>
-            <div style={{ fontWeight: 700, fontSize: 14, color: '#0f172a' }}>Treatment Timeline</div>
-            <div style={{ fontSize: 12, color: '#64748b', marginTop: 4 }}>Detailed clinical milestones</div>
+            <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--color-text-primary, #0f172a)' }}>Treatment Timeline</div>
+            <div style={{ fontSize: 12, color: 'var(--color-text-secondary, #64748b)', marginTop: 4 }}>Detailed clinical milestones</div>
           </Card>
         </Col>
       </Row>

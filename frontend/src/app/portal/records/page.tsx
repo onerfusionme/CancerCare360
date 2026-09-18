@@ -13,7 +13,7 @@ export default function PortalRecords() {
     <div>
       <Title level={3} style={{ marginBottom: 24 }}>Medical Records</Title>
 
-      <Card>
+      <Card className="glass-card" styles={{ body: { padding: 24 } }}>
         {records.length > 0 ? (
           <List
             itemLayout="horizontal"

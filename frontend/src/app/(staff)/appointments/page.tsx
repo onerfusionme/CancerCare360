@@ -384,7 +384,7 @@ export default function AppointmentsPage() {
             key: '2',
             label: `All Bookings (${appointments?.length || 0})`,
             children: (
-              <Card>
+              <Card className="glass-card" styles={{ body: { padding: 0 } }}>
                 <Table 
                   columns={apptColumns} 
                   dataSource={appointments || []} 
@@ -399,7 +399,7 @@ export default function AppointmentsPage() {
             key: '3',
             label: `Waitlist Queue (${waitlist?.length || 0})`,
             children: (
-              <Card>
+              <Card className="glass-card" styles={{ body: { padding: 0 } }}>
                 <Table 
                   columns={waitlistColumns} 
                   dataSource={waitlist || []} 
@@ -414,7 +414,7 @@ export default function AppointmentsPage() {
             key: '4',
             label: `No-Show Risk (${noShowData?.length || 0})`,
             children: (
-              <Card>
+              <Card className="glass-card" styles={{ body: { padding: 0 } }}>
                 <Table 
                   columns={noShowColumns} 
                   dataSource={noShowData || []} 

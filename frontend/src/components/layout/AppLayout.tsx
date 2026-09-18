@@ -79,8 +79,29 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     });
   }
 
-  // Find active key based on pathname
-  const activeKey = pathname;
+  // Find active key based on pathname, supporting nested subroutes
+  const getSelectedKey = () => {
+    if (!pathname) return '/dashboard';
+    const allKeys: string[] = [];
+    menuItems.forEach((item: any) => {
+      if (item.children) {
+        item.children.forEach((child: any) => allKeys.push(child.key));
+      } else {
+        allKeys.push(item.key);
+      }
+    });
+
+    if (allKeys.includes(pathname)) return pathname;
+
+    // Prefix matching for subpages (e.g. /patients/[id] -> /patients)
+    const matched = allKeys
+      .filter(k => k.startsWith('/') && pathname.startsWith(k))
+      .sort((a, b) => b.length - a.length)[0];
+
+    return matched || pathname;
+  };
+
+  const activeKey = getSelectedKey();
 
   return (
     <Layout className="ambient-canvas" style={{ minHeight: '100vh', background: 'transparent' }}>
@@ -177,6 +198,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           theme="dark"
           mode="inline"
           selectedKeys={[activeKey]}
+          defaultOpenKeys={['analytics-group', 'admin-group']}
           items={menuItems}
           onClick={({ key }) => {
             if (key.startsWith('/')) {

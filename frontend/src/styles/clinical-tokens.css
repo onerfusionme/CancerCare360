@@ -19,8 +19,8 @@
   --onc-border-subtle: #e2e8f0;
   --onc-border-elevated: #cbd5e1;
   --onc-text-primary: #0f172a;
-  --onc-text-secondary: #64748b;
-  --onc-text-muted: #94a3b8;
+  --onc-text-secondary: #334155;
+  --onc-text-muted: #475569;
 
   /* Clinical Semantic Tones */
   --onc-primary: #4f46e5;
@@ -102,8 +102,8 @@
   --onc-border-subtle: #1e293b;
   --onc-border-elevated: #334155;
   --onc-text-primary: #f8fafc;
-  --onc-text-secondary: #94a3b8;
-  --onc-text-muted: #64748b;
+  --onc-text-secondary: #cbd5e1;
+  --onc-text-muted: #94a3b8;
 
   --onc-primary: #6366f1;
   --onc-primary-light: rgba(99, 102, 241, 0.15);
@@ -224,9 +224,51 @@
   border: 1px solid rgba(255, 255, 255, 0.18) !important;
   border-radius: 20px !important;
   box-shadow: 0 16px 40px -8px rgba(15, 23, 42, 0.25), inset 0 1px 0 0 rgba(255, 255, 255, 0.25) !important;
-  color: #ffffff;
+  color: #ffffff !important;
   position: relative;
   overflow: hidden;
+}
+
+/* Force high-contrast text inside any .glass-hero */
+.glass-hero h1,
+.glass-hero h2,
+.glass-hero h3,
+.glass-hero h4,
+.glass-hero .ant-typography:not(.ant-typography-secondary) {
+  color: #ffffff !important;
+}
+
+.glass-hero p,
+.glass-hero .ant-typography-secondary,
+.glass-hero .glass-hero-desc {
+  color: rgba(241, 245, 249, 0.92) !important;
+}
+
+/* Universal Ant Design Card Glassmorphism across all pages */
+.ant-card {
+  background: var(--glass-card-bg) !important;
+  backdrop-filter: var(--glass-blur) !important;
+  -webkit-backdrop-filter: var(--glass-blur) !important;
+  border: var(--glass-card-border) !important;
+  border-radius: 16px !important;
+  box-shadow: var(--glass-card-shadow) !important;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.ant-card:hover {
+  background: var(--glass-card-bg-hover) !important;
+  border-color: var(--glass-card-border-hover) !important;
+  box-shadow: var(--glass-card-shadow-hover) !important;
+}
+
+.ant-card .ant-card-head {
+  background: transparent !important;
+  border-bottom: var(--glass-card-border-subtle) !important;
+}
+
+.ant-card .ant-card-head-title {
+  color: var(--onc-text-primary) !important;
+  font-weight: 700 !important;
 }
 
 .glass-panel {
@@ -566,5 +608,109 @@ body {
   color: #ffffff !important;
   box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3) !important;
   font-weight: 600 !important;
+}
+
+/* Table headers & cells high contrast */
+.ant-table-wrapper .ant-table-thead > tr > th {
+  color: #1e293b !important;
+  font-weight: 700 !important;
+}
+
+[data-theme='dark'] .ant-table-wrapper .ant-table-thead > tr > th {
+  color: #f1f5f9 !important;
+}
+
+.ant-table-wrapper .ant-table-tbody > tr > td {
+  color: #0f172a !important;
+}
+
+[data-theme='dark'] .ant-table-wrapper .ant-table-tbody > tr > td {
+  color: #f8fafc !important;
+}
+
+/* High-contrast typography standards */
+.ant-typography:not(.ant-typography-secondary) {
+  color: #0f172a;
+}
+
+[data-theme='dark'] .ant-typography:not(.ant-typography-secondary) {
+  color: #f8fafc;
+}
+
+.ant-typography.ant-typography-secondary,
+.text-secondary {
+  color: #334155 !important;
+}
+
+[data-theme='dark'] .ant-typography.ant-typography-secondary,
+[data-theme='dark'] .text-secondary {
+  color: #cbd5e1 !important;
+}
+
+/* Frosted Drawers */
+.ant-drawer .ant-drawer-content {
+  background: var(--glass-card-bg-elevated) !important;
+  backdrop-filter: blur(24px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(190%) !important;
+}
+
+.ant-drawer .ant-drawer-header {
+  background: transparent !important;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.7) !important;
+}
+
+[data-theme='dark'] .ant-drawer .ant-drawer-header {
+  border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Frosted Tabs */
+.ant-tabs-nav {
+  margin-bottom: 20px !important;
+}
+
+.ant-tabs-tab {
+  font-weight: 600 !important;
+  color: #334155 !important;
+}
+
+[data-theme='dark'] .ant-tabs-tab {
+  color: #94a3b8 !important;
+}
+
+.ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: #4f46e5 !important;
+  font-weight: 700 !important;
+}
+
+[data-theme='dark'] .ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: #818cf8 !important;
+}
+
+/* Frosted Collapse / Accordions */
+.ant-collapse {
+  background: transparent !important;
+  border: var(--glass-card-border) !important;
+  border-radius: 14px !important;
+}
+
+.ant-collapse-item {
+  border-bottom: var(--glass-card-border-subtle) !important;
+}
+
+.ant-collapse-header {
+  background: rgba(255, 255, 255, 0.4) !important;
+  backdrop-filter: blur(8px) !important;
+  font-weight: 600 !important;
+  color: #0f172a !important;
+}
+
+[data-theme='dark'] .ant-collapse-header {
+  background: rgba(15, 23, 42, 0.4) !important;
+  color: #f1f5f9 !important;
+}
+
+.ant-collapse-content {
+  background: transparent !important;
+  border-top: none !important;
 }
 

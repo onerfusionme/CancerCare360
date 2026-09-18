@@ -426,8 +426,9 @@ export default function CareCirclesView() {
 
       {/* Main Tabs Workspace */}
       <Card
-        style={{ borderRadius: 14, border: '1px solid #e2e8f0', boxShadow: '0 2px 8px rgba(0,0,0,0.03)' }}
-        bodyStyle={{ padding: '16px 24px' }}
+        className="glass-card"
+        style={{ borderRadius: 16 }}
+        styles={{ body: { padding: '20px 24px' } }}
       >
         <Tabs
           activeKey={activeTab}
@@ -444,11 +445,10 @@ export default function CareCirclesView() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
                   {/* Search & Geo-Filter Controls */}
                   <div
+                    className="glass-card"
                     style={{
-                      background: '#f8fafc',
-                      padding: '16px 20px',
-                      borderRadius: 12,
-                      border: '1px solid #e2e8f0',
+                      padding: '18px 20px',
+                      borderRadius: 14,
                     }}
                   >
                     <Row gutter={[16, 16]} align="middle">
@@ -556,15 +556,14 @@ export default function CareCirclesView() {
                         <Col xs={24} md={12} key={peer.id}>
                           <Card
                             hoverable
+                            className="glass-card"
                             style={{
-                              borderRadius: 12,
-                              border: '1px solid #e2e8f0',
-                              background: '#ffffff',
+                              borderRadius: 14,
                               height: '100%',
                               display: 'flex',
                               flexDirection: 'column',
                             }}
-                            bodyStyle={{ padding: 20, flex: 1, display: 'flex', flexDirection: 'column' }}
+                            styles={{ body: { padding: 20, flex: 1, display: 'flex', flexDirection: 'column' } }}
                           >
                             {/* Card Header: Avatar, Name, Proximity */}
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
@@ -580,7 +579,7 @@ export default function CareCirclesView() {
                                   {peer.displayName.slice(0, 2).toUpperCase()}
                                 </Avatar>
                                 <div>
-                                  <div style={{ fontWeight: 700, fontSize: 15, color: '#0f172a' }}>
+                                  <div style={{ fontWeight: 700, fontSize: 15, color: 'var(--color-text-primary, #0f172a)' }}>
                                     {peer.displayName}
                                   </div>
                                   <div style={{ fontSize: 12, color: '#64748b' }}>

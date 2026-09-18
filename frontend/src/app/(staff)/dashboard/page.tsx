@@ -81,15 +81,26 @@ export default function DashboardPage() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <Title level={3} style={{ margin: 0, color: textPrimary, fontWeight: 700 }}>
+            <Title 
+              level={3} 
+              onClick={() => router.push('/dashboard')}
+              style={{ margin: 0, color: textPrimary, fontWeight: 700, cursor: 'pointer' }}
+              title="Click to reload / view Clinical Dashboard"
+            >
               Clinical Dashboard
             </Title>
-            <Tag color="indigo" style={{ 
-              background: isDark ? 'rgba(99, 102, 241, 0.2)' : '#e0e7ff', 
-              color: isDark ? '#a5b4fc' : '#4338ca', 
-              border: isDark ? '1px solid rgba(99, 102, 241, 0.4)' : '1px solid #c7d2fe', 
-              fontWeight: 600 
-            }}>
+            <Tag 
+              color="indigo" 
+              onClick={() => router.push('/dashboard')}
+              title="Click to navigate to Clinical Dashboard"
+              style={{ 
+                background: isDark ? 'rgba(99, 102, 241, 0.2)' : '#e0e7ff', 
+                color: isDark ? '#a5b4fc' : '#4338ca', 
+                border: isDark ? '1px solid rgba(99, 102, 241, 0.4)' : '1px solid #c7d2fe', 
+                fontWeight: 600,
+                cursor: 'pointer'
+              }}
+            >
               DASHBOARD OVERVIEW
             </Tag>
           </div>
@@ -148,21 +159,24 @@ export default function DashboardPage() {
                 gap: 8, 
                 padding: '6px 14px', 
                 borderRadius: 20, 
-                marginBottom: 14 
+                marginBottom: 14,
+                background: 'rgba(255, 255, 255, 0.1)',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                backdropFilter: 'blur(8px)',
               }}
             >
               <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#10b981', boxShadow: '0 0 8px #10b981' }} />
-              <span style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: '0.05em', color: isDark ? '#a7f3d0' : '#047857' }}>
+              <span style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: '0.05em', color: '#6ee7b7' }}>
                 ACTIVE CLINIC • {data?.departmentName || 'CITY CANCER CENTER'}
               </span>
             </div>
-            <h2 style={{ fontSize: 26, fontWeight: 800, margin: '0 0 8px 0', color: textPrimary, letterSpacing: '-0.02em' }}>
+            <h2 style={{ fontSize: 26, fontWeight: 800, margin: '0 0 8px 0', color: '#ffffff', letterSpacing: '-0.02em', textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)' }}>
               Welcome back, {user?.firstName ? `${user.firstName} ${user.lastName}` : roleLabel}
             </h2>
-            <p style={{ margin: 0, fontSize: 14, color: textSecondary, lineHeight: 1.6, maxWidth: 660 }}>
+            <p style={{ margin: 0, fontSize: 14, color: 'rgba(241, 245, 249, 0.92)', lineHeight: 1.6, maxWidth: 660 }}>
               {isAdmin 
                 ? 'Institutional overview of oncology departments, patient census, turnaround SLAs, and system audit logs.'
-                : isCoordinator
+                : isCoordinator 
                   ? `Care continuity task queue: monitoring active patient follow-up appointments and overdue milestones.`
                   : `You have ${data?.patientsToday || 0} patients on your clinic roster today. ${(data?.criticalGaps || 0) > 0 ? `${data?.criticalGaps} patients have critical care gaps.` : ''} Average wait time is currently ${data?.avgWaitTime || 0} minutes.`}
             </p>
@@ -190,14 +204,14 @@ export default function DashboardPage() {
             <div style={{ display: 'flex', gap: 10, width: '100%' }}>
               <Button 
                 size="middle" 
-                icon={<CalendarOutlined />}
+                icon={<CalendarOutlined style={{ color: '#818cf8' }} />}
                 onClick={() => router.push('/appointments')}
                 style={{ 
                   flex: 1, 
-                  background: isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(255, 255, 255, 0.75)', 
+                  background: 'rgba(255, 255, 255, 0.12)', 
                   backdropFilter: 'blur(8px)',
-                  borderColor: isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(226, 232, 240, 0.8)', 
-                  color: textPrimary,
+                  borderColor: 'rgba(255, 255, 255, 0.22)', 
+                  color: '#ffffff',
                   fontWeight: 600,
                   fontSize: 13,
                   borderRadius: 10,
@@ -208,14 +222,14 @@ export default function DashboardPage() {
               </Button>
               <Button 
                 size="middle" 
-                icon={<AlertOutlined />}
+                icon={<AlertOutlined style={{ color: '#f87171' }} />}
                 onClick={() => router.push('/gaps')}
                 style={{ 
                   flex: 1, 
-                  background: isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(255, 255, 255, 0.75)', 
+                  background: 'rgba(255, 255, 255, 0.12)', 
                   backdropFilter: 'blur(8px)',
-                  borderColor: isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(226, 232, 240, 0.8)', 
-                  color: textPrimary,
+                  borderColor: 'rgba(255, 255, 255, 0.22)', 
+                  color: '#ffffff',
                   fontWeight: 600,
                   fontSize: 13,
                   borderRadius: 10,

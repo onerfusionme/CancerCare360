@@ -302,7 +302,7 @@ export default function PatientsPage() {
       </div>
 
       {/* Filters Bar */}
-      <Card bodyStyle={{ padding: 16 }}>
+      <Card className="glass-card" styles={{ body: { padding: '16px 20px' } }}>
         <Row gutter={[16, 16]} align="middle">
           <Col xs={24} md={8}>
             <Input 
@@ -348,13 +348,13 @@ export default function PatientsPage() {
             </Select>
           </Col>
           <Col xs={24} md={4} style={{ textAlign: 'right' }}>
-            <Text type="secondary">{patientList.length} patient(s) found</Text>
+            <Text style={{ fontWeight: 600 }}>{patientList.length} patient(s) found</Text>
           </Col>
         </Row>
       </Card>
 
       {/* Patients Table */}
-      <Card bodyStyle={{ padding: 0 }}>
+      <Card className="glass-card" styles={{ body: { padding: 0 } }}>
         <Table 
           columns={columns} 
           dataSource={patientList} 

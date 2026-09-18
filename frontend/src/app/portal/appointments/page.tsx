@@ -18,7 +18,7 @@ export default function PortalAppointments() {
         <Button type="primary" onClick={() => setIsModalVisible(true)}>Book / Request Appointment</Button>
       </div>
 
-      <Card title="Upcoming Appointments" style={{ marginBottom: 24 }}>
+      <Card className="glass-card" title="Upcoming Appointments" style={{ marginBottom: 24 }} styles={{ body: { padding: 24 } }}>
         {appointments.length > 0 ? (
           <List
             itemLayout="horizontal"

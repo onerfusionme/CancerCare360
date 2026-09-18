@@ -44,42 +44,43 @@ export default function ClinicFlowBoard({ appointments, doctorId, onStatusChange
     return (
       <Card 
         size="small" 
+        className="glass-card"
         style={{ 
           marginBottom: 12, 
-          borderRadius: 10,
-          border: isUrgentWait ? '1px solid #fca5a5' : '1px solid #e2e8f0',
-          background: '#ffffff',
-          boxShadow: isUrgentWait ? '0 2px 8px rgba(225, 29, 72, 0.08)' : '0 1px 3px rgba(0,0,0,0.04)',
+          borderRadius: 12,
+          border: isUrgentWait ? '1px solid rgba(244, 63, 94, 0.5)' : undefined,
+          boxShadow: isUrgentWait ? '0 4px 14px rgba(225, 29, 72, 0.12)' : undefined,
         }} 
-        bodyStyle={{ padding: 14 }}
+        styles={{ body: { padding: 14 } }}
         key={appointment.id}
       >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <span style={{
-              width: 28,
-              height: 28,
-              borderRadius: 6,
-              background: '#e0e7ff',
-              color: '#4f46e5',
+              width: 30,
+              height: 30,
+              borderRadius: 8,
+              background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+              color: '#ffffff',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontWeight: 700,
-              fontSize: 11
+              fontSize: 11,
+              boxShadow: '0 2px 6px rgba(99, 102, 241, 0.3)'
             }}>
               {initials}
             </span>
             <div>
-              <span style={{ fontWeight: 700, color: '#0f172a', fontSize: 13, display: 'block', lineHeight: 1.2 }}>
+              <span style={{ fontWeight: 700, color: 'var(--color-text-primary, #0f172a)', fontSize: 13, display: 'block', lineHeight: 1.2 }}>
                 {patientName}
               </span>
-              <span style={{ fontSize: 11, color: '#64748b', fontFamily: 'monospace' }}>
+              <span style={{ fontSize: 11, color: 'var(--color-text-secondary, #475569)', fontFamily: 'monospace' }}>
                 {patientMrn}
               </span>
             </div>
           </div>
-          <span style={{ fontSize: 11, color: '#64748b', fontWeight: 600 }}>
+          <span style={{ fontSize: 11, color: 'var(--color-text-secondary, #475569)', fontWeight: 600 }}>
             {appointment.scheduledAt ? new Date(appointment.scheduledAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
           </span>
         </div>
@@ -167,19 +168,22 @@ export default function ClinicFlowBoard({ appointments, doctorId, onStatusChange
       {/* Column 1: Scheduled */}
       <Col xs={24} sm={12} lg={6}>
         <div style={{ 
-          background: '#f8fafc', 
-          border: '1px solid #e2e8f0', 
-          borderRadius: 12, 
-          padding: '14px 12px', 
-          minHeight: 620 
+          background: 'var(--glass-card-bg)', 
+          backdropFilter: 'var(--glass-blur)',
+          WebkitBackdropFilter: 'var(--glass-blur)',
+          border: 'var(--glass-border)', 
+          borderRadius: 16, 
+          padding: '16px 14px', 
+          minHeight: 620,
+          boxShadow: 'var(--glass-shadow)'
         }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, padding: '0 4px' }}>
-            <span style={{ fontWeight: 700, fontSize: 13, color: '#1e293b', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14, padding: '0 4px' }}>
+            <span style={{ fontWeight: 700, fontSize: 13, color: 'var(--color-text-primary, #0f172a)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
               Scheduled / Confirmed
             </span>
             <span style={{ 
-              background: '#e0e7ff', 
-              color: '#4338ca', 
+              background: 'rgba(99, 102, 241, 0.15)', 
+              color: '#6366f1', 
               fontWeight: 700, 
               fontSize: 12, 
               padding: '2px 8px', 
@@ -197,7 +201,7 @@ export default function ClinicFlowBoard({ appointments, doctorId, onStatusChange
                 size="small" 
                 type="primary" 
                 block 
-                style={{ background: '#4f46e5', height: 32, fontWeight: 600 }}
+                style={{ background: '#4f46e5', height: 32, fontWeight: 600, borderRadius: 8 }}
                 onClick={() => onStatusChange(a.id, AppointmentStatus.CHECKED_IN)}
               >
                 Check In Patient
@@ -210,19 +214,22 @@ export default function ClinicFlowBoard({ appointments, doctorId, onStatusChange
       {/* Column 2: Waiting in Clinic */}
       <Col xs={24} sm={12} lg={6}>
         <div style={{ 
-          background: '#fffbeb', 
-          border: '1px solid #fef3c7', 
-          borderRadius: 12, 
-          padding: '14px 12px', 
-          minHeight: 620 
+          background: 'rgba(245, 158, 11, 0.06)', 
+          backdropFilter: 'var(--glass-blur)',
+          WebkitBackdropFilter: 'var(--glass-blur)',
+          border: '1px solid rgba(245, 158, 11, 0.22)', 
+          borderRadius: 16, 
+          padding: '16px 14px', 
+          minHeight: 620,
+          boxShadow: 'var(--glass-shadow)'
         }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, padding: '0 4px' }}>
-            <span style={{ fontWeight: 700, fontSize: 13, color: '#92400e', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14, padding: '0 4px' }}>
+            <span style={{ fontWeight: 700, fontSize: 13, color: '#d97706', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
               Waiting Room / OPD
             </span>
             <span style={{ 
-              background: '#fde68a', 
-              color: '#78350f', 
+              background: 'rgba(245, 158, 11, 0.2)', 
+              color: '#b45309', 
               fontWeight: 700, 
               fontSize: 12, 
               padding: '2px 8px', 
@@ -242,7 +249,7 @@ export default function ClinicFlowBoard({ appointments, doctorId, onStatusChange
                   type="primary" 
                   icon={<PlayCircleOutlined />}
                   block 
-                  style={{ background: '#0284c7', height: 32, fontWeight: 600 }}
+                  style={{ background: '#0284c7', height: 32, fontWeight: 600, borderRadius: 8 }}
                   onClick={() => onStatusChange(a.id, AppointmentStatus.IN_PROGRESS)}
                 >
                   Call In / Start Consult
@@ -256,19 +263,22 @@ export default function ClinicFlowBoard({ appointments, doctorId, onStatusChange
       {/* Column 3: In Consultation */}
       <Col xs={24} sm={12} lg={6}>
         <div style={{ 
-          background: '#f5f3ff', 
-          border: '1px solid #ede9fe', 
-          borderRadius: 12, 
-          padding: '14px 12px', 
-          minHeight: 620 
+          background: 'rgba(13, 148, 136, 0.06)', 
+          backdropFilter: 'var(--glass-blur)',
+          WebkitBackdropFilter: 'var(--glass-blur)',
+          border: '1px solid rgba(13, 148, 136, 0.22)', 
+          borderRadius: 16, 
+          padding: '16px 14px', 
+          minHeight: 620,
+          boxShadow: 'var(--glass-shadow)'
         }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, padding: '0 4px' }}>
-            <span style={{ fontWeight: 700, fontSize: 13, color: '#5b21b6', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14, padding: '0 4px' }}>
+            <span style={{ fontWeight: 700, fontSize: 13, color: '#0d9488', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
               In Consultation Suite
             </span>
             <span style={{ 
-              background: '#ddd6fe', 
-              color: '#4c1d95', 
+              background: 'rgba(13, 148, 136, 0.2)', 
+              color: '#0f766e', 
               fontWeight: 700, 
               fontSize: 12, 
               padding: '2px 8px', 
@@ -287,7 +297,7 @@ export default function ClinicFlowBoard({ appointments, doctorId, onStatusChange
                 type="primary" 
                 icon={<CheckCircleOutlined />}
                 block 
-                style={{ background: '#059669', height: 32, fontWeight: 600 }}
+                style={{ background: '#059669', height: 32, fontWeight: 600, borderRadius: 8 }}
                 onClick={() => onStatusChange(a.id, AppointmentStatus.COMPLETED)}
               >
                 Complete & Sign Off
@@ -300,19 +310,22 @@ export default function ClinicFlowBoard({ appointments, doctorId, onStatusChange
       {/* Column 4: Completed */}
       <Col xs={24} sm={12} lg={6}>
         <div style={{ 
-          background: '#f8fafc', 
-          border: '1px solid #e2e8f0', 
-          borderRadius: 12, 
-          padding: '14px 12px', 
-          minHeight: 620 
+          background: 'var(--glass-card-bg)', 
+          backdropFilter: 'var(--glass-blur)',
+          WebkitBackdropFilter: 'var(--glass-blur)',
+          border: 'var(--glass-border)', 
+          borderRadius: 16, 
+          padding: '16px 14px', 
+          minHeight: 620,
+          boxShadow: 'var(--glass-shadow)'
         }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, padding: '0 4px' }}>
-            <span style={{ fontWeight: 700, fontSize: 13, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14, padding: '0 4px' }}>
+            <span style={{ fontWeight: 700, fontSize: 13, color: 'var(--color-text-secondary, #334155)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
               Completed Today
             </span>
             <span style={{ 
-              background: '#e2e8f0', 
-              color: '#334155', 
+              background: 'rgba(148, 163, 184, 0.2)', 
+              color: 'var(--color-text-secondary, #334155)', 
               fontWeight: 700, 
               fontSize: 12, 
               padding: '2px 8px', 
