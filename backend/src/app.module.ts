@@ -41,6 +41,7 @@ import { ReferralModule } from './modules/referral/referral.module';
 import { FeedbackModule } from './modules/feedback/feedback.module';
 import { NavigationModule } from './modules/navigation/navigation.module';
 import { CareCirclesModule } from './modules/care-circles/care-circles.module';
+import { FinancialAidModule } from './modules/financial-aid/financial-aid.module';
 
 @Module({
   imports: [
@@ -93,6 +94,7 @@ import { CareCirclesModule } from './modules/care-circles/care-circles.module';
     FeedbackModule,
     NavigationModule,
     CareCirclesModule,
+    FinancialAidModule,
   ],
 })
 export class AppModule {}

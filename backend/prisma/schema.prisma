@@ -60,6 +60,11 @@ model Tenant {
   peerConnections     PeerConnection[]
   peerMessages        PeerMessage[]
   caregiverPosts      CaregiverPost[]
+  financialAidSchemes FinancialAidScheme[]
+  treatmentCostEstimates TreatmentCostEstimate[]
+  aidApplications     AidApplication[]
+  philanthropistDonors PhilanthropistDonor[]
+  donorPledges        DonorPledge[]
 
   @@index([status])
 }
@@ -315,6 +320,9 @@ model Patient {
   referrals           Referral[]
   feedbacks           PatientFeedback[]
   barriers            PatientBarrier[]
+  treatmentEstimates  TreatmentCostEstimate[]
+  aidApplications     AidApplication[]
+  donorPledges        DonorPledge[]
 
   @@unique([tenantId, mrn])
   @@index([tenantId])
@@ -1573,4 +1581,172 @@ model CaregiverPostComment {
   @@index([postId])
   @@index([authorId])
 }
+
+// ----------------------------------------
+// CareRelief - Treatment Aid, Govt Schemes & Trust Grants
+// ----------------------------------------
+
+enum AidOrgCategory {
+  GOVT_CENTRAL
+  GOVT_STATE_MAHARASHTRA
+  TEMPLE_TRUST
+  CHARITABLE_FOUNDATION
+  CORPORATE_CSR
+  CROWDFUNDING
+}
+
+enum AidApplicationStatus {
+  DRAFT
+  SUBMITTED
+  UNDER_REVIEW
+  DOCS_REQUIRED
+  SANCTIONED
+  DISBURSED
+  REJECTED
+}
+
+model FinancialAidScheme {
+  id                    String              @id @default(uuid()) @db.Uuid
+  tenantId              String              @db.Uuid
+  name                  String
+  nameRegional          String?
+  category              AidOrgCategory      @default(GOVT_STATE_MAHARASHTRA)
+  organizationName      String
+  maxGrantAmount        Float?
+  benefitDescription    String
+  incomeLimitAnnual     Float?
+  eligibleRationCards   String?
+  eligibleHospitals     String?
+  officialPortalUrl     String?
+  helplineNumber        String?
+  physicalAddress       String?
+  stepByStepProcedure   String
+  requiredDocuments     String[]
+  processingDays        Int?                @default(14)
+  isActive              Boolean             @default(true)
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+
+  tenant                Tenant              @relation(fields: [tenantId], references: [id])
+  applications          AidApplication[]
+
+  @@index([tenantId])
+  @@index([category])
+  @@index([isActive])
+}
+
+model TreatmentCostEstimate {
+  id                    String           @id @default(uuid()) @db.Uuid
+  tenantId              String           @db.Uuid
+  patientId             String?          @db.Uuid
+  estimateNumber        String           @unique
+  patientName           String
+  cancerType            String
+  cancerStage           String?
+  hospitalName          String
+  treatingDoctorName    String
+  treatingDoctorRegNo   String?
+  surgeryCost           Float            @default(0)
+  chemoCost             Float            @default(0)
+  radiationCost         Float            @default(0)
+  targetedMedCost       Float            @default(0)
+  icuBedCost            Float            @default(0)
+  investigationCost     Float            @default(0)
+  totalEstimatedCost    Float
+  patientContribution   Float            @default(0)
+  netDeficitRequired    Float
+  clinicalJustification String
+  hospitalAccountName   String?
+  hospitalBankName      String?
+  hospitalAccountNumber String?
+  hospitalIfscCode      String?
+  createdAt             DateTime         @default(now())
+  updatedAt             DateTime         @updatedAt
+
+  tenant                Tenant           @relation(fields: [tenantId], references: [id])
+  patient               Patient?         @relation(fields: [patientId], references: [id])
+  applications          AidApplication[]
+
+  @@index([tenantId])
+  @@index([patientId])
+}
+
+model AidApplication {
+  id                   String               @id @default(uuid()) @db.Uuid
+  tenantId             String               @db.Uuid
+  patientId            String?              @db.Uuid
+  schemeId             String               @db.Uuid
+  estimateId           String?              @db.Uuid
+  applicantName        String
+  applicantRelation    String
+  applicantContact     String
+  appliedAmount        Float
+  sanctionedAmount     Float?               @default(0)
+  status               AidApplicationStatus @default(SUBMITTED)
+  applicationRefNumber String?
+  sanctionLetterNumber String?
+  sanctionDate         DateTime?
+  disbursementDate     DateTime?
+  remarks              String?
+  documentsAttached    String[]
+  createdAt            DateTime             @default(now())
+  updatedAt            DateTime             @updatedAt
+
+  tenant               Tenant               @relation(fields: [tenantId], references: [id])
+  patient              Patient?             @relation(fields: [patientId], references: [id])
+  scheme               FinancialAidScheme   @relation(fields: [schemeId], references: [id])
+  estimate             TreatmentCostEstimate? @relation(fields: [estimateId], references: [id])
+
+  @@index([tenantId])
+  @@index([patientId])
+  @@index([schemeId])
+  @@index([status])
+}
+
+model PhilanthropistDonor {
+  id                   String               @id @default(uuid()) @db.Uuid
+  tenantId             String               @db.Uuid
+  donorName            String
+  organizationOrTrust  String?
+  donorType            String               @default("INDIVIDUAL_DONOR")
+  focusAreas           String
+  city                 String
+  state                String               @default("Maharashtra")
+  maxSponsorshipBudget Float?
+  contactEmail         String?
+  contactPhone         String?
+  verifiedStatus       Boolean              @default(true)
+  isAcceptingCases     Boolean              @default(true)
+  bio                  String?
+  createdAt            DateTime             @default(now())
+  updatedAt            DateTime             @updatedAt
+
+  tenant               Tenant               @relation(fields: [tenantId], references: [id])
+  pledges              DonorPledge[]
+
+  @@index([tenantId])
+}
+
+model DonorPledge {
+  id                   String               @id @default(uuid()) @db.Uuid
+  tenantId             String               @db.Uuid
+  donorId              String               @db.Uuid
+  patientId            String?              @db.Uuid
+  estimateId           String?              @db.Uuid
+  pledgedAmount        Float
+  paymentStatus        String               @default("PLEDGED")
+  transactionRef       String?
+  note                 String?
+  createdAt            DateTime             @default(now())
+  updatedAt            DateTime             @updatedAt
+
+  tenant               Tenant               @relation(fields: [tenantId], references: [id])
+  donor                PhilanthropistDonor  @relation(fields: [donorId], references: [id])
+  patient              Patient?             @relation(fields: [patientId], references: [id])
+
+  @@index([tenantId])
+  @@index([donorId])
+  @@index([patientId])
+}
+
 
