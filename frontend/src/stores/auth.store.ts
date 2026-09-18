@@ -39,7 +39,7 @@ export const useAuthStore = create<AuthState>()(
       },
 
       login: async (credentials) => {
-        set({ isLoading: true });
+        set({ isLoading: true, user: null, tokens: null, isAuthenticated: false });
         try {
           const { user, tokens } = await authService.login(credentials);
           set({ user, tokens, isAuthenticated: true, isLoading: false });

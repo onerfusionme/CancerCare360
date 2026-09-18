@@ -5,9 +5,11 @@ export const authService = {
   login: async (credentials: LoginCredentials): Promise<{ user: User; tokens: AuthTokens }> => {
     const response = await apiClient.post('/api/v1/auth/login', credentials);
     const tokens = response.data.data;
-    // Set token temporarily for the profile call
-    apiClient.defaults.headers.common['Authorization'] = `Bearer ${tokens.accessToken}`;
-    const profileResponse = await apiClient.get('/api/v1/auth/profile');
+    const profileResponse = await apiClient.get('/api/v1/auth/profile', {
+      headers: {
+        Authorization: `Bearer ${tokens.accessToken}`,
+      },
+    });
     const user = profileResponse.data.data;
     return { user, tokens };
   },
