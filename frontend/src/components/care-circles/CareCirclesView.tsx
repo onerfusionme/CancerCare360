@@ -420,8 +420,8 @@ export default function CareCirclesView() {
         description="CareCircles connects patients and families for practical diet suggestions, lifestyle precautions, and moral support based on real-world family journeys. Peer advice does not constitute medical diagnosis or prescription. Always consult your oncology care team before introducing supplements or altering clinical feeding plans."
         type="info"
         showIcon
-        icon={<SafetyCertificateOutlined style={{ color: '#0d9488' }} />}
-        style={{ borderRadius: 10, border: '1px solid #ccfbf1', background: '#f0fdfa' }}
+        icon={<SafetyCertificateOutlined className="text-teal-600 dark:text-teal-400" />}
+        style={{ borderRadius: 12 }}
       />
 
       {/* Main Tabs Workspace */}

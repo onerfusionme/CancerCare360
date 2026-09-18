@@ -1216,12 +1216,7 @@ Cancelled Cheque or Bank Passbook copy of the Hospital`,
                     description="Verified business houses, corporate CSR initiatives, and high-net-worth philanthropists committed to direct patient sponsorship. Donors sponsor specific chemotherapy cycles, surgical resection implants, or radiation therapy fractions directly into hospital accounts."
                     type="info"
                     showIcon
-                    style={{
-                      borderRadius: 12,
-                      background: 'rgba(240, 253, 250, 0.65)',
-                      border: '1px solid rgba(94, 234, 212, 0.6)',
-                      backdropFilter: 'blur(10px)',
-                    }}
+                    style={{ borderRadius: 12 }}
                   />
 
                   <Row gutter={[20, 20]}>
