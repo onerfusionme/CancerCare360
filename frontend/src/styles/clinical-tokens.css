@@ -63,11 +63,28 @@
   --alert-normal-text: #15803d;
   --alert-normal-border: #bbf7d0;
 
+  /* Glassmorphism System Tokens (Light Mode) */
+  --glass-canvas-bg: #f8fafc;
+  --glass-card-bg: rgba(255, 255, 255, 0.72);
+  --glass-card-bg-elevated: rgba(255, 255, 255, 0.88);
+  --glass-card-bg-hover: rgba(255, 255, 255, 0.88);
+  --glass-card-border: 1px solid rgba(255, 255, 255, 0.6);
+  --glass-card-border-subtle: 1px solid rgba(226, 232, 240, 0.8);
+  --glass-card-border-hover: 1px solid rgba(99, 102, 241, 0.4);
+  --glass-card-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.06), inset 0 1px 0 0 rgba(255, 255, 255, 0.8);
+  --glass-card-shadow-hover: 0 16px 40px -8px rgba(99, 102, 241, 0.15), inset 0 1px 0 0 rgba(255, 255, 255, 0.9);
+  --glass-blur: blur(16px) saturate(180%);
+  --glass-sider-bg: rgba(15, 23, 42, 0.82);
+  --glass-header-bg: rgba(255, 255, 255, 0.78);
+  --glass-hero-bg: linear-gradient(135deg, rgba(15, 23, 42, 0.92) 0%, rgba(30, 41, 59, 0.88) 50%, rgba(13, 148, 136, 0.85) 100%);
+  --glass-pill-bg: rgba(255, 255, 255, 0.65);
+  --glass-pill-border: 1px solid rgba(255, 255, 255, 0.5);
+
   /* Elevation Shadows */
   --onc-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --onc-shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.07), 0 1px 2px -1px rgb(0 0 0 / 0.07);
-  --onc-shadow-hover: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.05);
-  --onc-shadow-floating: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --onc-shadow-card: 0 4px 16px 0 rgba(31, 38, 135, 0.06);
+  --onc-shadow-hover: 0 12px 28px -4px rgba(99, 102, 241, 0.15);
+  --onc-shadow-floating: 0 20px 35px -5px rgba(0, 0, 0, 0.12);
 }
 
 [data-theme='dark'] {
@@ -126,10 +143,133 @@
   --alert-normal-text: #34d399;
   --alert-normal-border: rgba(16, 185, 129, 0.35);
 
+  /* Glassmorphism System Tokens (Dark Mode) */
+  --glass-canvas-bg: #060911;
+  --glass-card-bg: rgba(15, 23, 42, 0.68);
+  --glass-card-bg-elevated: rgba(30, 41, 59, 0.78);
+  --glass-card-bg-hover: rgba(30, 41, 59, 0.85);
+  --glass-card-border: 1px solid rgba(255, 255, 255, 0.08);
+  --glass-card-border-subtle: 1px solid rgba(255, 255, 255, 0.05);
+  --glass-card-border-hover: 1px solid rgba(99, 102, 241, 0.45);
+  --glass-card-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5), inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+  --glass-card-shadow-hover: 0 16px 40px -8px rgba(99, 102, 241, 0.3), inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
+  --glass-blur: blur(20px) saturate(190%);
+  --glass-sider-bg: rgba(9, 13, 22, 0.85);
+  --glass-header-bg: rgba(11, 17, 32, 0.8);
+  --glass-hero-bg: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.9) 50%, rgba(13, 148, 136, 0.9) 100%);
+  --glass-pill-bg: rgba(30, 41, 59, 0.65);
+  --glass-pill-border: 1px solid rgba(255, 255, 255, 0.1);
+
   --onc-shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.4);
-  --onc-shadow-card: 0 4px 12px 0 rgba(0, 0, 0, 0.45);
-  --onc-shadow-hover: 0 12px 24px -4px rgba(0, 0, 0, 0.6);
-  --onc-shadow-floating: 0 20px 30px -5px rgba(0, 0, 0, 0.7);
+  --onc-shadow-card: 0 4px 16px 0 rgba(0, 0, 0, 0.5);
+  --onc-shadow-hover: 0 14px 30px -4px rgba(0, 0, 0, 0.65);
+  --onc-shadow-floating: 0 24px 40px -5px rgba(0, 0, 0, 0.75);
+}
+
+/* ==========================================================================
+   Ambient Aurora Canvas Background (Luminous Foundation for Glassmorphism)
+   ========================================================================== */
+.ambient-canvas {
+  background-color: #f8fafc;
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.08) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(13, 148, 136, 0.08) 0px, transparent 50%),
+    radial-gradient(at 50% 50%, rgba(245, 158, 11, 0.05) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(147, 51, 234, 0.06) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, rgba(14, 165, 233, 0.07) 0px, transparent 50%);
+  background-attachment: fixed;
+  background-size: cover;
+  min-height: 100vh;
+}
+
+[data-theme='dark'] .ambient-canvas {
+  background-color: #060911;
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(13, 148, 136, 0.14) 0px, transparent 50%),
+    radial-gradient(at 50% 50%, rgba(139, 92, 246, 0.1) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(14, 165, 233, 0.12) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, rgba(244, 63, 94, 0.08) 0px, transparent 50%);
+  background-attachment: fixed;
+  background-size: cover;
+}
+
+/* ==========================================================================
+   Glassmorphism Component Utility Classes
+   ========================================================================== */
+
+.glass-card {
+  background: var(--glass-card-bg) !important;
+  backdrop-filter: var(--glass-blur) !important;
+  -webkit-backdrop-filter: var(--glass-blur) !important;
+  border: var(--glass-card-border) !important;
+  border-radius: 16px !important;
+  box-shadow: var(--glass-card-shadow) !important;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-card:hover {
+  background: var(--glass-card-bg-hover) !important;
+  border-color: var(--glass-card-border-hover) !important;
+  box-shadow: var(--glass-card-shadow-hover) !important;
+  transform: translateY(-2px);
+}
+
+.glass-hero {
+  background: var(--glass-hero-bg) !important;
+  backdrop-filter: blur(24px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(200%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  border-radius: 20px !important;
+  box-shadow: 0 16px 40px -8px rgba(15, 23, 42, 0.25), inset 0 1px 0 0 rgba(255, 255, 255, 0.25) !important;
+  color: #ffffff;
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-panel {
+  background: var(--glass-card-bg) !important;
+  backdrop-filter: var(--glass-blur) !important;
+  -webkit-backdrop-filter: var(--glass-blur) !important;
+  border: var(--glass-card-border) !important;
+  border-radius: 14px !important;
+  box-shadow: var(--glass-card-shadow) !important;
+}
+
+.glass-pill {
+  background: var(--glass-pill-bg) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: var(--glass-pill-border) !important;
+  border-radius: 9999px !important;
+  padding: 6px 14px !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+}
+
+.glass-stat-widget {
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 14px;
+  padding: 14px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.glass-stat-widget:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.35);
+  transform: translateY(-1px);
 }
 
 /* Base resets & typography */
@@ -144,18 +284,22 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
-/* Elevated Clinical Card Component */
+/* Elevated Clinical Card Component (Glassified) */
 .clinical-card {
-  background: #ffffff !important;
-  border: 1px solid var(--onc-border-subtle) !important;
-  border-radius: 12px !important;
-  box-shadow: var(--onc-shadow-card) !important;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  background: var(--glass-card-bg) !important;
+  backdrop-filter: var(--glass-blur) !important;
+  -webkit-backdrop-filter: var(--glass-blur) !important;
+  border: var(--glass-card-border) !important;
+  border-radius: 16px !important;
+  box-shadow: var(--glass-card-shadow) !important;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .clinical-card:hover {
-  box-shadow: var(--onc-shadow-hover) !important;
-  border-color: var(--onc-border-elevated) !important;
+  background: var(--glass-card-bg-hover) !important;
+  box-shadow: var(--glass-card-shadow-hover) !important;
+  border-color: var(--glass-card-border-hover) !important;
+  transform: translateY(-2px);
 }
 
 /* Executive Sidebar Customization */
@@ -290,3 +434,137 @@ body {
   padding: 2px 8px;
   border-radius: 6px;
 }
+
+/* ==========================================================================
+   Ant Design Global Glassmorphic Overrides
+   ========================================================================== */
+
+/* Frosted Glass Modals */
+.ant-modal .ant-modal-content {
+  background: var(--glass-card-bg-elevated) !important;
+  backdrop-filter: blur(24px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(190%) !important;
+  border: var(--glass-card-border) !important;
+  border-radius: 20px !important;
+  box-shadow: 0 24px 60px -12px rgba(15, 23, 42, 0.35), inset 0 1px 0 0 rgba(255, 255, 255, 0.3) !important;
+}
+
+.ant-modal .ant-modal-header {
+  background: transparent !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
+  padding-bottom: 14px !important;
+}
+
+/* Frosted Dropdowns & Popovers */
+.ant-dropdown .ant-dropdown-menu,
+.ant-popover .ant-popover-inner,
+.ant-select-dropdown {
+  background: var(--glass-card-bg-elevated) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border: var(--glass-card-border) !important;
+  border-radius: 14px !important;
+  box-shadow: 0 12px 36px 0 rgba(0, 0, 0, 0.2) !important;
+  padding: 6px !important;
+}
+
+/* Translucent Inputs & Selects */
+.ant-input,
+.ant-input-affix-wrapper,
+.ant-select:not(.ant-select-customize-input) .ant-select-selector {
+  background: rgba(255, 255, 255, 0.6) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  border: 1px solid rgba(203, 213, 225, 0.7) !important;
+  border-radius: 10px !important;
+  transition: all 0.2s ease !important;
+}
+
+[data-theme='dark'] .ant-input,
+[data-theme='dark'] .ant-input-affix-wrapper,
+[data-theme='dark'] .ant-select:not(.ant-select-customize-input) .ant-select-selector {
+  background: rgba(15, 23, 42, 0.5) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  color: #f8fafc !important;
+}
+
+.ant-input:focus,
+.ant-input-focused,
+.ant-input-affix-wrapper:focus,
+.ant-input-affix-wrapper-focused,
+.ant-select-focused:not(.ant-select-disabled).ant-select:not(.ant-select-customize-input) .ant-select-selector {
+  background: rgba(255, 255, 255, 0.85) !important;
+  border-color: #6366f1 !important;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15) !important;
+}
+
+[data-theme='dark'] .ant-input:focus,
+[data-theme='dark'] .ant-input-focused,
+[data-theme='dark'] .ant-input-affix-wrapper:focus,
+[data-theme='dark'] .ant-input-affix-wrapper-focused {
+  background: rgba(15, 23, 42, 0.75) !important;
+  border-color: #818cf8 !important;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3) !important;
+}
+
+/* Frosted Tables */
+.ant-table-wrapper .ant-table {
+  background: transparent !important;
+}
+
+.ant-table-wrapper .ant-table-thead > tr > th {
+  background: rgba(248, 250, 252, 0.6) !important;
+  backdrop-filter: blur(8px) !important;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8) !important;
+  font-weight: 600 !important;
+  font-size: 12px !important;
+  letter-spacing: 0.03em !important;
+  text-transform: uppercase !important;
+  color: #64748b !important;
+}
+
+[data-theme='dark'] .ant-table-wrapper .ant-table-thead > tr > th {
+  background: rgba(15, 23, 42, 0.6) !important;
+  border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+  color: #94a3b8 !important;
+}
+
+.ant-table-wrapper .ant-table-tbody > tr > td {
+  border-bottom: 1px solid rgba(241, 245, 249, 0.8) !important;
+}
+
+[data-theme='dark'] .ant-table-wrapper .ant-table-tbody > tr > td {
+  border-bottom-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+.ant-table-wrapper .ant-table-tbody > tr:hover > td {
+  background: rgba(99, 102, 241, 0.04) !important;
+}
+
+[data-theme='dark'] .ant-table-wrapper .ant-table-tbody > tr:hover > td {
+  background: rgba(99, 102, 241, 0.08) !important;
+}
+
+/* Frosted Radio Buttons / Segmented Controls */
+.ant-radio-button-wrapper {
+  background: rgba(255, 255, 255, 0.5) !important;
+  backdrop-filter: blur(8px) !important;
+  border-color: rgba(226, 232, 240, 0.8) !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+}
+
+[data-theme='dark'] .ant-radio-button-wrapper {
+  background: rgba(15, 23, 42, 0.5) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #94a3b8 !important;
+}
+
+.ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled) {
+  background: #6366f1 !important;
+  border-color: #6366f1 !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3) !important;
+  font-weight: 600 !important;
+}
+

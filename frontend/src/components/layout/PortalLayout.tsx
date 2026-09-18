@@ -49,19 +49,21 @@ export function PortalLayout({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <Layout style={{ minHeight: '100vh', background: '#f8fafc' }}>
+    <Layout className="ambient-canvas" style={{ minHeight: '100vh', background: 'transparent' }}>
       <Header style={{ 
-        background: '#ffffff', 
+        background: 'rgba(255, 255, 255, 0.82)', 
+        backdropFilter: 'blur(20px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(20px) saturate(180%)',
         padding: '0 28px', 
         display: 'flex', 
         alignItems: 'center', 
         justifyContent: 'space-between',
-        boxShadow: '0 1px 3px rgba(0,0,0,0.05)', 
-        borderBottom: '1px solid #e2e8f0',
+        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.04)', 
+        borderBottom: '1px solid rgba(255, 255, 255, 0.6)',
         position: 'sticky',
         top: 0,
         zIndex: 10,
-        height: 64,
+        height: 68,
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 28 }}>
           <div 
@@ -69,21 +71,21 @@ export function PortalLayout({ children }: { children: React.ReactNode }) {
             style={{ 
               display: 'flex', 
               alignItems: 'center', 
-              gap: 10, 
+              gap: 12, 
               cursor: 'pointer' 
             }}
           >
             <div style={{
-              width: 34,
-              height: 34,
-              borderRadius: 8,
+              width: 38,
+              height: 38,
+              borderRadius: 10,
               background: 'linear-gradient(135deg, #0d9488 0%, #059669 100%)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               color: '#ffffff',
-              fontSize: 18,
-              boxShadow: '0 2px 6px rgba(13, 148, 136, 0.3)'
+              fontSize: 20,
+              boxShadow: '0 4px 14px rgba(13, 148, 136, 0.35)'
             }}>
               <HeartOutlined />
             </div>
@@ -91,7 +93,7 @@ export function PortalLayout({ children }: { children: React.ReactNode }) {
               <div style={{ fontSize: 16, fontWeight: 700, color: '#0f172a', lineHeight: 1.2 }}>
                 CancerCare<span style={{ color: '#0d9488' }}>Companion</span>
               </div>
-              <div style={{ fontSize: 10, color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>
+              <div style={{ fontSize: 10, color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                 City Cancer Center Patient Portal
               </div>
             </div>
@@ -106,28 +108,53 @@ export function PortalLayout({ children }: { children: React.ReactNode }) {
               borderBottom: 'none', 
               minWidth: 460, 
               background: 'transparent',
-              fontWeight: 500,
+              fontWeight: 600,
             }}
           />
         </div>
 
         <Space size="middle">
           <Button 
-            size="small" 
+            size="middle" 
             icon={<MedicineBoxOutlined />}
             onClick={() => router.push('/dashboard')}
-            style={{ borderRadius: 6, fontSize: 12, fontWeight: 600 }}
+            style={{ 
+              borderRadius: 10, 
+              fontSize: 12, 
+              fontWeight: 600,
+              background: 'rgba(255, 255, 255, 0.7)',
+              backdropFilter: 'blur(8px)',
+              borderColor: 'rgba(226, 232, 240, 0.8)',
+            }}
           >
             Clinician Desk
           </Button>
 
           <Dropdown menu={langMenu} placement="bottomRight">
-            <Button icon={<GlobalOutlined style={{ color: '#0d9488' }} />} style={{ borderRadius: 6, borderColor: '#cbd5e1' }}>
+            <Button 
+              icon={<GlobalOutlined style={{ color: '#0d9488' }} />} 
+              style={{ 
+                borderRadius: 10, 
+                borderColor: 'rgba(226, 232, 240, 0.8)',
+                background: 'rgba(255, 255, 255, 0.7)',
+                backdropFilter: 'blur(8px)',
+                fontWeight: 600,
+              }}
+            >
               {language === 'hi' ? 'हिंदी' : language === 'mr' ? 'मराठी' : 'English'}
             </Button>
           </Dropdown>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '4px 8px' }}>
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: 10, 
+            padding: '4px 12px',
+            background: 'rgba(255, 255, 255, 0.65)',
+            backdropFilter: 'blur(8px)',
+            borderRadius: 10,
+            border: '1px solid rgba(226, 232, 240, 0.7)',
+          }}>
             <Avatar style={{ backgroundColor: '#0d9488', fontWeight: 600 }}>
               {user?.firstName ? user.firstName[0].toUpperCase() : 'P'}
             </Avatar>
@@ -141,11 +168,18 @@ export function PortalLayout({ children }: { children: React.ReactNode }) {
         </Space>
       </Header>
 
-      <Content style={{ padding: '28px 24px', maxWidth: '1240px', margin: '0 auto', width: '100%' }}>
+      <Content style={{ padding: '32px 28px', maxWidth: '1280px', margin: '0 auto', width: '100%' }}>
         {children}
       </Content>
 
-      <Footer style={{ textAlign: 'center', color: '#64748b', background: '#f1f5f9', borderTop: '1px solid #e2e8f0', padding: '20px 24px' }}>
+      <Footer style={{ 
+        textAlign: 'center', 
+        color: '#64748b', 
+        background: 'rgba(241, 245, 249, 0.75)', 
+        backdropFilter: 'blur(16px)',
+        borderTop: '1px solid rgba(255, 255, 255, 0.6)', 
+        padding: '24px 28px' 
+      }}>
         <div style={{ fontWeight: 600, color: '#334155', marginBottom: 4 }}>
           City General Hospital • Comprehensive Cancer Center
         </div>

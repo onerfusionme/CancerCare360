@@ -488,31 +488,26 @@ Cancelled Cheque or Bank Passbook copy of the Hospital`,
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-      {/* Hero Banner with Executive Oncology Styling */}
-      <div
-        style={{
-          background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0d9488 100%)',
-          borderRadius: 16,
-          padding: '24px 32px',
-          color: '#ffffff',
-          boxShadow: '0 4px 20px rgba(15, 23, 42, 0.15)',
-        }}
-      >
-        <Row gutter={[24, 16]} align="middle" justify="space-between">
-          <Col xs={24} md={16}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+      {/* Luminous Frosted Glass Hero Command Banner */}
+      <div className="glass-hero" style={{ padding: '28px 36px' }}>
+        <Row gutter={[24, 20]} align="middle" justify="space-between">
+          <Col xs={24} md={15}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 8 }}>
               <div
                 style={{
-                  background: 'rgba(255, 255, 255, 0.15)',
-                  borderRadius: 10,
-                  width: 42,
-                  height: 42,
+                  background: 'rgba(255, 255, 255, 0.18)',
+                  backdropFilter: 'blur(10px)',
+                  WebkitBackdropFilter: 'blur(10px)',
+                  borderRadius: 12,
+                  width: 46,
+                  height: 46,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: 22,
-                  color: '#f59e0b',
+                  fontSize: 24,
+                  color: '#fbbf24',
+                  boxShadow: '0 4px 16px rgba(245, 158, 11, 0.3)',
                 }}
               >
                 <BankOutlined />
@@ -521,56 +516,48 @@ Cancelled Cheque or Bank Passbook copy of the Hospital`,
                 <Title level={3} style={{ color: '#ffffff', margin: 0, fontWeight: 800, letterSpacing: '-0.02em' }}>
                   CareRelief
                 </Title>
-                <Text style={{ color: '#a7f3d0', fontSize: 13, fontWeight: 600 }}>
+                <Text style={{ color: '#99f6e4', fontSize: 13, fontWeight: 600 }}>
                   Financial Aid, Government Relief Schemes & Temple Trust Grants Navigator
                 </Text>
               </div>
             </div>
-            <Paragraph style={{ color: '#cbd5e1', fontSize: 13, margin: '8px 0 0', maxWidth: 700, lineHeight: 1.5 }}>
+            <Paragraph style={{ color: '#e2e8f0', fontSize: 13.5, margin: '8px 0 0', maxWidth: 740, lineHeight: 1.6 }}>
               Comprehensive funding directory connecting cancer patients with <b>CMRF Maharashtra, PMNRF, Lalbaugcha Raja Mandal, Siddhivinayak Trust, MJPJAY</b>, and philanthropic sponsors. Generate official treatment cost dossiers and track grants in one place.
             </Paragraph>
           </Col>
 
-          <Col xs={24} md={8} style={{ textAlign: 'right' }}>
-            <div
-              style={{
-                display: 'inline-flex',
-                gap: 16,
-                background: 'rgba(255, 255, 255, 0.08)',
-                padding: '12px 18px',
-                borderRadius: 12,
-                border: '1px solid rgba(255, 255, 255, 0.12)',
-              }}
-            >
-              <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 20, fontWeight: 800, color: '#f59e0b' }}>
+          <Col xs={24} md={9} style={{ textAlign: 'right' }}>
+            <div style={{ display: 'inline-flex', gap: 12, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+              <div className="glass-stat-widget" style={{ minWidth: 100 }}>
+                <div style={{ fontSize: 22, fontWeight: 800, color: '#fbbf24' }}>
                   {metrics?.totalSchemes || 12}
                 </div>
-                <div style={{ fontSize: 11, color: '#94a3b8', textTransform: 'uppercase' }}>Verified Schemes</div>
+                <div style={{ fontSize: 11, color: '#cbd5e1', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Verified Schemes</div>
               </div>
-              <Divider type="vertical" style={{ height: 38, borderColor: 'rgba(255, 255, 255, 0.15)' }} />
-              <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 20, fontWeight: 800, color: '#10b981' }}>
+
+              <div className="glass-stat-widget" style={{ minWidth: 120 }}>
+                <div style={{ fontSize: 22, fontWeight: 800, color: '#34d399' }}>
                   {formatCurrency(metrics?.totalSanctionedAmount || 0)}
                 </div>
-                <div style={{ fontSize: 11, color: '#94a3b8', textTransform: 'uppercase' }}>Sanctioned Funds</div>
+                <div style={{ fontSize: 11, color: '#cbd5e1', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Sanctioned Funds</div>
               </div>
-              <Divider type="vertical" style={{ height: 38, borderColor: 'rgba(255, 255, 255, 0.15)' }} />
-              <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 20, fontWeight: 800, color: '#38bdf8' }}>
+
+              <div className="glass-stat-widget" style={{ minWidth: 95 }}>
+                <div style={{ fontSize: 22, fontWeight: 800, color: '#38bdf8' }}>
                   {metrics?.totalDonors || 4}
                 </div>
-                <div style={{ fontSize: 11, color: '#94a3b8', textTransform: 'uppercase' }}>Angel Donors</div>
+                <div style={{ fontSize: 11, color: '#cbd5e1', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Angel Donors</div>
               </div>
             </div>
           </Col>
         </Row>
       </div>
 
-      {/* Main Tabs Workspace */}
+      {/* Main Tabs Workspace (Glassified) */}
       <Card
-        style={{ borderRadius: 14, border: '1px solid #e2e8f0', boxShadow: '0 2px 8px rgba(0,0,0,0.03)' }}
-        bodyStyle={{ padding: '16px 24px' }}
+        className="glass-card"
+        style={{ borderRadius: 18 }}
+        styles={{ body: { padding: '20px 24px' } }}
       >
         <Tabs
           activeKey={activeTab}
@@ -585,13 +572,12 @@ Cancelled Cheque or Bank Passbook copy of the Hospital`,
               ),
               children: (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-                  {/* Category Filter & Search Bar */}
+                  {/* Category Filter & Search Bar (Glass Panel) */}
                   <div
+                    className="glass-panel"
                     style={{
-                      background: '#f8fafc',
                       padding: '16px 20px',
-                      borderRadius: 12,
-                      border: '1px solid #e2e8f0',
+                      borderRadius: 14,
                       display: 'flex',
                       justifyContent: 'space-between',
                       alignItems: 'center',
@@ -617,21 +603,32 @@ Cancelled Cheque or Bank Passbook copy of the Hospital`,
 
                     <Space wrap>
                       <Input
-                        prefix={<SearchOutlined style={{ color: '#94a3b8' }} />}
+                        prefix={<SearchOutlined style={{ color: '#0d9488' }} />}
                         placeholder="Search scheme name, temple trust, city..."
                         value={searchQuery}
                         onChange={(e) => {
                           setSearchQuery(e.target.value);
                           loadSchemes(selectedCategory, e.target.value);
                         }}
-                        style={{ width: 260, borderRadius: 8 }}
+                        style={{
+                          width: 280,
+                          borderRadius: 20,
+                          background: 'rgba(255, 255, 255, 0.65)',
+                          backdropFilter: 'blur(8px)',
+                        }}
                         allowClear
                       />
                       <Button
                         type="primary"
                         icon={<PlusOutlined />}
                         onClick={handleOpenOnboardScheme}
-                        style={{ background: '#0d9488', borderColor: '#0d9488', fontWeight: 600, borderRadius: 8 }}
+                        style={{
+                          background: 'linear-gradient(135deg, #0d9488 0%, #0f766e 100%)',
+                          borderColor: 'transparent',
+                          fontWeight: 600,
+                          borderRadius: 20,
+                          boxShadow: '0 4px 12px rgba(13, 148, 136, 0.28)',
+                        }}
                       >
                         + Onboard Temple / CSR / Trust
                       </Button>
@@ -650,33 +647,33 @@ Cancelled Cheque or Bank Passbook copy of the Hospital`,
                       {schemes.map((scheme) => (
                         <Col xs={24} md={12} key={scheme.id}>
                           <Card
+                            className="glass-card"
                             hoverable
                             style={{
-                              borderRadius: 12,
-                              border: '1px solid #e2e8f0',
+                              borderRadius: 16,
                               height: '100%',
                               display: 'flex',
                               flexDirection: 'column',
                             }}
-                            bodyStyle={{ padding: 20, flex: 1, display: 'flex', flexDirection: 'column' }}
+                            styles={{ body: { padding: 22, flex: 1, display: 'flex', flexDirection: 'column' } }}
                           >
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
                               <div style={{ flex: 1, paddingRight: 8 }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', marginBottom: 4 }}>
-                                  <Tag color={getCategoryColor(scheme.category)} style={{ fontWeight: 700, fontSize: 11, margin: 0 }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', marginBottom: 6 }}>
+                                  <Tag color={getCategoryColor(scheme.category)} style={{ fontWeight: 700, fontSize: 11, margin: 0, borderRadius: 6 }}>
                                     {scheme.category.replace(/_/g, ' ')}
                                   </Tag>
                                   {scheme.organizationName && (
-                                    <Tag color="cyan" style={{ fontSize: 11, margin: 0 }}>
+                                    <Tag color="cyan" style={{ fontSize: 11, margin: 0, borderRadius: 6 }}>
                                       {scheme.organizationName}
                                     </Tag>
                                   )}
                                 </div>
-                                <Title level={5} style={{ margin: '4px 0 2px 0', color: '#0f172a', fontWeight: 700 }}>
+                                <Title level={5} style={{ margin: '4px 0 2px 0', color: '#0f172a', fontWeight: 700, fontSize: 16 }}>
                                   {scheme.name}
                                 </Title>
                                 {scheme.nameRegional && (
-                                  <div style={{ fontSize: 12, color: '#0d9488', fontWeight: 600 }}>
+                                  <div style={{ fontSize: 12.5, color: '#0d9488', fontWeight: 600, marginTop: 2 }}>
                                     {scheme.nameRegional}
                                   </div>
                                 )}
@@ -688,12 +685,14 @@ Cancelled Cheque or Bank Passbook copy of the Hospital`,
                                   style={{
                                     fontSize: 13,
                                     fontWeight: 800,
-                                    padding: '4px 10px',
-                                    borderRadius: 8,
-                                    border: '1px solid #86efac',
-                                    background: '#f0fdf4',
-                                    color: '#166534',
+                                    padding: '4px 12px',
+                                    borderRadius: 12,
+                                    border: '1px solid rgba(74, 222, 128, 0.4)',
+                                    background: 'rgba(240, 253, 244, 0.85)',
+                                    backdropFilter: 'blur(6px)',
+                                    color: '#15803d',
                                     margin: 0,
+                                    boxShadow: '0 2px 6px rgba(22, 101, 52, 0.08)',
                                   }}
                                 >
                                   {scheme.maxGrantAmount ? `Up to ${formatCurrency(scheme.maxGrantAmount)}` : '100% Cashless'}
@@ -728,24 +727,26 @@ Cancelled Cheque or Bank Passbook copy of the Hospital`,
 
                             <Paragraph
                               ellipsis={{ rows: 2 }}
-                              style={{ fontSize: 12.5, color: '#475569', lineHeight: 1.5, margin: '8px 0 12px 0' }}
+                              style={{ fontSize: 13, color: '#475569', lineHeight: 1.55, margin: '8px 0 14px 0' }}
                             >
                               {scheme.benefitDescription}
                             </Paragraph>
 
-                            {/* Eligibility Specs */}
+                            {/* Eligibility Specs (Frosted Glass Panel) */}
                             <div
                               style={{
-                                background: '#f8fafc',
-                                border: '1px solid #e2e8f0',
-                                borderRadius: 8,
-                                padding: '10px 12px',
+                                background: 'rgba(255, 255, 255, 0.55)',
+                                border: '1px solid rgba(255, 255, 255, 0.75)',
+                                borderRadius: 10,
+                                padding: '12px 14px',
                                 fontSize: 12,
                                 color: '#334155',
-                                marginBottom: 14,
+                                marginBottom: 16,
                                 display: 'flex',
                                 flexDirection: 'column',
-                                gap: 4,
+                                gap: 6,
+                                backdropFilter: 'blur(8px)',
+                                boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.8)',
                               }}
                             >
                               {scheme.incomeLimitAnnual && (
@@ -771,7 +772,13 @@ Cancelled Cheque or Bank Passbook copy of the Hospital`,
                                 block
                                 icon={<SolutionOutlined />}
                                 onClick={() => setSelectedSchemeModal(scheme)}
-                                style={{ fontWeight: 600 }}
+                                style={{
+                                  borderRadius: 10,
+                                  fontWeight: 600,
+                                  background: 'rgba(255, 255, 255, 0.7)',
+                                  backdropFilter: 'blur(6px)',
+                                  border: '1px solid rgba(226, 232, 240, 0.8)',
+                                }}
                               >
                                 View Procedure & Checklist
                               </Button>
@@ -779,7 +786,13 @@ Cancelled Cheque or Bank Passbook copy of the Hospital`,
                                 type="primary"
                                 icon={<PlusOutlined />}
                                 onClick={() => handleOpenApplyModal(scheme)}
-                                style={{ background: '#0d9488', borderColor: '#0d9488', fontWeight: 600 }}
+                                style={{
+                                  borderRadius: 10,
+                                  fontWeight: 600,
+                                  background: 'linear-gradient(135deg, #0d9488 0%, #0f766e 100%)',
+                                  borderColor: 'transparent',
+                                  boxShadow: '0 4px 12px rgba(13, 148, 136, 0.28)',
+                                }}
                               >
                                 Apply for Aid
                               </Button>
@@ -804,13 +817,15 @@ Cancelled Cheque or Bank Passbook copy of the Hospital`,
                   {/* Left Column: Cost Calculation Form */}
                   <Col xs={24} lg={14}>
                     <Card
+                      className="glass-card"
                       title={
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                           <DollarOutlined style={{ color: '#0d9488' }} />
                           <span>Generate Official Hospital Cost Estimate Certificate (वैद्यकीय खर्चाचे अंदाजपत्रक)</span>
                         </div>
                       }
-                      style={{ borderRadius: 12, border: '1px solid #e2e8f0' }}
+                      style={{ borderRadius: 16 }}
+                      styles={{ body: { padding: 24 } }}
                     >
                       <Form form={estimateForm} layout="vertical" onFinish={handleSaveEstimate}>
                         <Row gutter={16}>
@@ -909,24 +924,26 @@ Cancelled Cheque or Bank Passbook copy of the Hospital`,
                           </Col>
                         </Row>
 
-                        {/* Deficit Banner */}
+                        {/* Deficit Banner (Frosted Glass) */}
                         <div
                           style={{
-                            background: '#f0fdfa',
-                            border: '1px solid #99f6e4',
-                            borderRadius: 10,
-                            padding: '14px 18px',
-                            marginBottom: 16,
+                            background: 'rgba(204, 251, 241, 0.45)',
+                            border: '1px solid rgba(45, 212, 191, 0.4)',
+                            borderRadius: 14,
+                            padding: '16px 20px',
+                            marginBottom: 18,
                             display: 'flex',
                             justifyContent: 'space-between',
                             alignItems: 'center',
+                            backdropFilter: 'blur(10px)',
+                            boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.8)',
                           }}
                         >
                           <div>
-                            <div style={{ fontSize: 12, color: '#0f766e', fontWeight: 600 }}>
+                            <div style={{ fontSize: 12, color: '#0f766e', fontWeight: 700, letterSpacing: '0.04em' }}>
                               CALCULATED FINANCIAL DEFICIT NEEDED FROM TRUST
                             </div>
-                            <div style={{ fontSize: 11, color: '#64748b' }}>
+                            <div style={{ fontSize: 11.5, color: '#64748b', marginTop: 2 }}>
                               Total Estimated Cost ({formatCurrency(calcTotal)}) − Family Contribution ({formatCurrency(calcContribution)})
                             </div>
                           </div>
@@ -967,7 +984,15 @@ Cancelled Cheque or Bank Passbook copy of the Hospital`,
                           htmlType="submit"
                           loading={creatingEstimate}
                           icon={<PrinterOutlined />}
-                          style={{ background: '#0d9488', borderColor: '#0d9488', height: 42, width: '100%', fontWeight: 700 }}
+                          style={{
+                            background: 'linear-gradient(135deg, #0d9488 0%, #0f766e 100%)',
+                            borderColor: 'transparent',
+                            height: 44,
+                            width: '100%',
+                            fontWeight: 700,
+                            borderRadius: 12,
+                            boxShadow: '0 4px 14px rgba(13, 148, 136, 0.3)',
+                          }}
                         >
                           Compile & Generate Official Treatment Cost Dossier
                         </Button>
@@ -978,13 +1003,15 @@ Cancelled Cheque or Bank Passbook copy of the Hospital`,
                   {/* Right Column: Existing Generated Estimates */}
                   <Col xs={24} lg={10}>
                     <Card
+                      className="glass-card"
                       title={
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                           <CheckCircleOutlined style={{ color: '#10b981' }} />
                           <span>Generated Cost Dossiers ({estimates.length})</span>
                         </div>
                       }
-                      style={{ borderRadius: 12, border: '1px solid #e2e8f0', minHeight: 450 }}
+                      style={{ borderRadius: 16, minHeight: 450 }}
+                      styles={{ body: { padding: 20 } }}
                     >
                       {loadingEstimates ? (
                         <div style={{ textAlign: 'center', padding: '40px 0' }}><Spin /></div>
@@ -996,16 +1023,17 @@ Cancelled Cheque or Bank Passbook copy of the Hospital`,
                             <div
                               key={est.id}
                               style={{
-                                border: '1px solid #e2e8f0',
-                                borderRadius: 10,
-                                padding: 14,
-                                background: '#ffffff',
-                                boxShadow: '0 1px 3px rgba(0,0,0,0.02)',
+                                border: '1px solid rgba(255, 255, 255, 0.75)',
+                                borderRadius: 14,
+                                padding: 16,
+                                background: 'rgba(255, 255, 255, 0.55)',
+                                backdropFilter: 'blur(10px)',
+                                boxShadow: '0 4px 12px rgba(15, 23, 42, 0.04)',
                               }}
                             >
                               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                 <div>
-                                  <Tag color="cyan" style={{ fontWeight: 700 }}>{est.estimateNumber}</Tag>
+                                  <Tag color="cyan" style={{ fontWeight: 700, borderRadius: 6 }}>{est.estimateNumber}</Tag>
                                   <div style={{ fontWeight: 700, fontSize: 14, color: '#0f172a', marginTop: 4 }}>
                                     {est.patientName}
                                   </div>
@@ -1032,6 +1060,7 @@ Cancelled Cheque or Bank Passbook copy of the Hospital`,
                                     size="small"
                                     icon={<PrinterOutlined />}
                                     onClick={() => setSelectedEstimateForView(est)}
+                                    style={{ borderRadius: 8 }}
                                   >
                                     View Certificate
                                   </Button>
@@ -1046,7 +1075,7 @@ Cancelled Cheque or Bank Passbook copy of the Hospital`,
                                       });
                                       setApplyModalOpen(true);
                                     }}
-                                    style={{ background: '#0d9488' }}
+                                    style={{ background: '#0d9488', borderRadius: 8 }}
                                   >
                                     Apply
                                   </Button>
@@ -1188,57 +1217,75 @@ Cancelled Cheque or Bank Passbook copy of the Hospital`,
                     description="Verified business houses, corporate CSR initiatives, and high-net-worth philanthropists committed to direct patient sponsorship. Donors sponsor specific chemotherapy cycles, surgical resection implants, or radiation therapy fractions directly into hospital accounts."
                     type="info"
                     showIcon
-                    style={{ borderRadius: 10 }}
+                    style={{
+                      borderRadius: 12,
+                      background: 'rgba(240, 253, 250, 0.65)',
+                      border: '1px solid rgba(94, 234, 212, 0.6)',
+                      backdropFilter: 'blur(10px)',
+                    }}
                   />
 
                   <Row gutter={[20, 20]}>
                     {donors.map((donor) => (
                       <Col xs={24} md={12} key={donor.id}>
                         <Card
+                          className="glass-card"
+                          hoverable
                           style={{
-                            borderRadius: 12,
-                            border: '1px solid #e2e8f0',
+                            borderRadius: 16,
                             height: '100%',
                             display: 'flex',
                             flexDirection: 'column',
                           }}
-                          bodyStyle={{ padding: 20, flex: 1, display: 'flex', flexDirection: 'column' }}
+                          styles={{ body: { padding: 22, flex: 1, display: 'flex', flexDirection: 'column' } }}
                         >
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
                             <div>
-                              <Tag color="cyan" style={{ fontWeight: 700 }}>
+                              <Tag color="cyan" style={{ fontWeight: 700, borderRadius: 6 }}>
                                 {donor.donorType.replace(/_/g, ' ')}
                               </Tag>
-                              <Title level={5} style={{ margin: '4px 0 2px 0', color: '#0f172a' }}>
+                              <Title level={5} style={{ margin: '6px 0 2px 0', color: '#0f172a', fontSize: 16, fontWeight: 700 }}>
                                 {donor.donorName}
                               </Title>
-                              <div style={{ fontSize: 12, color: '#64748b' }}>
+                              <div style={{ fontSize: 12.5, color: '#64748b' }}>
                                 {donor.organizationOrTrust} • {donor.city}, {donor.state}
                               </div>
                             </div>
 
-                            <Tag color="green" style={{ fontWeight: 800, fontSize: 12 }}>
+                            <Tag
+                              color="green"
+                              style={{
+                                fontWeight: 800,
+                                fontSize: 12.5,
+                                padding: '3px 10px',
+                                borderRadius: 10,
+                                background: 'rgba(240, 253, 244, 0.85)',
+                                border: '1px solid rgba(74, 222, 128, 0.4)',
+                              }}
+                            >
                               Budget: {formatCurrency(donor.maxSponsorshipBudget)}
                             </Tag>
                           </div>
 
-                          <Paragraph style={{ fontSize: 13, color: '#334155', lineHeight: 1.5, margin: '8px 0 12px 0' }}>
+                          <Paragraph style={{ fontSize: 13, color: '#334155', lineHeight: 1.55, margin: '8px 0 14px 0' }}>
                             {donor.bio}
                           </Paragraph>
 
                           <div
                             style={{
-                              background: '#f8fafc',
-                              border: '1px solid #e2e8f0',
-                              borderRadius: 8,
-                              padding: '10px 12px',
+                              background: 'rgba(255, 255, 255, 0.55)',
+                              border: '1px solid rgba(255, 255, 255, 0.75)',
+                              borderRadius: 10,
+                              padding: '12px 14px',
                               fontSize: 12,
                               color: '#334155',
                               marginBottom: 16,
+                              backdropFilter: 'blur(8px)',
+                              boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.8)',
                             }}
                           >
                             <div><b>Focus Areas:</b> {donor.focusAreas}</div>
-                            {donor.contactEmail && <div><b>Email:</b> {donor.contactEmail}</div>}
+                            {donor.contactEmail && <div style={{ marginTop: 4 }}><b>Email:</b> {donor.contactEmail}</div>}
                           </div>
 
                           <div style={{ marginTop: 'auto' }}>
@@ -1247,7 +1294,14 @@ Cancelled Cheque or Bank Passbook copy of the Hospital`,
                               block
                               icon={<HeartOutlined />}
                               onClick={() => handleOpenPledgeModal(donor)}
-                              style={{ background: '#0d9488', borderColor: '#0d9488', fontWeight: 600 }}
+                              style={{
+                                background: 'linear-gradient(135deg, #0d9488 0%, #0f766e 100%)',
+                                borderColor: 'transparent',
+                                fontWeight: 600,
+                                borderRadius: 10,
+                                height: 40,
+                                boxShadow: '0 4px 12px rgba(13, 148, 136, 0.28)',
+                              }}
                             >
                               Request Sponsorship / Pledge
                             </Button>
@@ -1714,7 +1768,7 @@ Cancelled Cheque or Bank Passbook copy of the Hospital`,
                   <Option value={AidOrgCategory.CHARITABLE_FOUNDATION}>🎗️ Charitable Foundation / NGO</Option>
                   <Option value={AidOrgCategory.GOVT_STATE_MAHARASHTRA}>🏛️ Maharashtra State Govt</Option>
                   <Option value={AidOrgCategory.GOVT_CENTRAL}>🇮🇳 Central Government</Option>
-                  <Option value={AidOrgCategory.OTHER_NGO}>🤝 Other NGO / Association</Option>
+                  <Option value={AidOrgCategory.CROWDFUNDING}>🤝 Crowdfunding / Community Pool</Option>
                 </Select>
               </Form.Item>
             </Col>

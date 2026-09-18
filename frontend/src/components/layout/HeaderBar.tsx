@@ -104,16 +104,18 @@ export default function HeaderBar() {
   return (
     <Header style={{ 
       padding: '0 28px', 
-      background: isDark ? '#0b1120' : '#ffffff', 
+      background: isDark ? 'rgba(11, 17, 32, 0.82)' : 'rgba(255, 255, 255, 0.82)', 
+      backdropFilter: 'blur(20px) saturate(180%)',
+      WebkitBackdropFilter: 'blur(20px) saturate(180%)',
       display: 'flex', 
       alignItems: 'center', 
       justifyContent: 'space-between',
-      borderBottom: isDark ? '1px solid #1e293b' : '1px solid #e2e8f0',
+      borderBottom: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(255, 255, 255, 0.5)',
       position: 'sticky',
       top: 0,
       zIndex: 9,
       height: 68,
-      boxShadow: isDark ? '0 4px 20px rgba(0, 0, 0, 0.5)' : '0 1px 2px 0 rgb(0 0 0 / 0.03)',
+      boxShadow: isDark ? '0 8px 32px rgba(0, 0, 0, 0.4)' : '0 4px 20px rgba(0, 0, 0, 0.03)',
       transition: 'all 0.25s ease',
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
@@ -132,12 +134,15 @@ export default function HeaderBar() {
           display: 'flex',
           alignItems: 'center',
           gap: 12,
-          padding: '6px 14px',
-          background: isDark ? '#131c2e' : '#f1f5f9',
+          padding: '7px 16px',
+          background: isDark ? 'rgba(30, 41, 59, 0.65)' : 'rgba(241, 245, 249, 0.75)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
           borderRadius: 20,
-          border: isDark ? '1px solid #1e293b' : '1px solid #e2e8f0',
+          border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(255, 255, 255, 0.7)',
           fontSize: 12,
           color: isDark ? '#cbd5e1' : '#334155',
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.03)',
         }}>
           <Tooltip title="View Clinic Roster & Appointments">
             <div 
@@ -197,9 +202,11 @@ export default function HeaderBar() {
             icon={isDark ? <BulbFilled style={{ color: '#fbbf24' }} /> : <MoonOutlined style={{ color: '#6366f1' }} />}
             onClick={toggleThemeMode}
             style={{ 
-              borderRadius: 8, 
-              borderColor: isDark ? '#1e293b' : '#e2e8f0',
-              background: isDark ? '#131c2e' : '#ffffff',
+              borderRadius: 10, 
+              borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(226, 232, 240, 0.8)',
+              background: isDark ? 'rgba(30, 41, 59, 0.7)' : 'rgba(255, 255, 255, 0.75)',
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
               color: isDark ? '#f8fafc' : '#0f172a',
               fontWeight: 600,
               fontSize: 12,
@@ -217,12 +224,14 @@ export default function HeaderBar() {
             type="default" 
             icon={<GlobalOutlined style={{ color: '#6366f1' }} />}
             style={{ 
-              borderRadius: 6, 
-              borderColor: isDark ? '#1e293b' : '#e2e8f0', 
-              background: isDark ? '#131c2e' : '#ffffff',
+              borderRadius: 10, 
+              borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(226, 232, 240, 0.8)', 
+              background: isDark ? 'rgba(30, 41, 59, 0.7)' : 'rgba(255, 255, 255, 0.75)',
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
               color: isDark ? '#cbd5e1' : '#0f172a',
               fontSize: 13, 
-              fontWeight: 500 
+              fontWeight: 600 
             }}
           >
             {language.toUpperCase()}
@@ -234,13 +243,13 @@ export default function HeaderBar() {
             <Button 
               type="text" 
               icon={<BellOutlined style={{ fontSize: 19, color: isDark ? '#94a3b8' : '#475569' }} />} 
-              style={{ width: 40, height: 40, borderRadius: 8 }}
+              style={{ width: 40, height: 40, borderRadius: 10 }}
               onClick={() => setNotifDrawerOpen(true)}
             />
           </Badge>
         </Tooltip>
         
-        <div style={{ width: 1, height: 28, background: isDark ? '#1e293b' : '#e2e8f0', margin: '0 4px' }} />
+        <div style={{ width: 1, height: 28, background: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(226, 232, 240, 0.8)', margin: '0 4px' }} />
 
         <Dropdown menu={userMenu} placement="bottomRight" trigger={['click']}>
           <div style={{ 
@@ -248,11 +257,14 @@ export default function HeaderBar() {
             display: 'flex', 
             alignItems: 'center', 
             gap: 12, 
-            padding: '4px 10px',
-            borderRadius: 8,
-            background: isDark ? '#131c2e' : 'transparent',
-            border: isDark ? '1px solid #1e293b' : 'none',
-            transition: 'background 0.2s',
+            padding: '4px 12px',
+            borderRadius: 10,
+            background: isDark ? 'rgba(30, 41, 59, 0.65)' : 'rgba(255, 255, 255, 0.65)',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+            border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(226, 232, 240, 0.7)',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.03)',
+            transition: 'all 0.2s',
           }}>
             <Avatar 
               style={{ 
