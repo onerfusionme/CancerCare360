@@ -40,6 +40,7 @@ import { IntegrationModule } from './modules/integration/integration.module';
 import { ReferralModule } from './modules/referral/referral.module';
 import { FeedbackModule } from './modules/feedback/feedback.module';
 import { NavigationModule } from './modules/navigation/navigation.module';
+import { CareCirclesModule } from './modules/care-circles/care-circles.module';
 
 @Module({
   imports: [
@@ -91,6 +92,7 @@ import { NavigationModule } from './modules/navigation/navigation.module';
     ReferralModule,
     FeedbackModule,
     NavigationModule,
+    CareCirclesModule,
   ],
 })
 export class AppModule {}

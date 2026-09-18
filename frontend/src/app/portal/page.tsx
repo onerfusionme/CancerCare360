@@ -14,7 +14,8 @@ import {
   ClockCircleOutlined,
   MedicineBoxOutlined,
   RightOutlined,
-  HomeOutlined
+  HomeOutlined,
+  TeamOutlined
 } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
 
@@ -95,6 +96,47 @@ export default function PortalDashboard() {
         <div style={{ textAlign: 'center', padding: '24px 0', color: '#64748b' }}>
           No active chemotherapy or radiation treatment protocol assigned yet. Your oncologist will initialize your roadmap upon consultation.
         </div>
+      </Card>
+
+      {/* CareCircles Peer & Family Network Banner */}
+      <Card
+        style={{
+          borderRadius: 14,
+          border: '1px solid #ccfbf1',
+          background: 'linear-gradient(135deg, #f0fdfa 0%, #ffffff 100%)',
+          boxShadow: '0 2px 8px rgba(13, 148, 136, 0.08)',
+        }}
+        bodyStyle={{ padding: 22 }}
+      >
+        <Row gutter={[16, 16]} align="middle">
+          <Col xs={24} md={17}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+              <Tag color="cyan" style={{ fontWeight: 700, borderRadius: 12 }}>
+                <TeamOutlined /> CARECIRCLES NETWORK
+              </Tag>
+              <span style={{ fontSize: 12, color: '#0d9488', fontWeight: 600 }}>
+                Karad & Satara District Families
+              </span>
+            </div>
+            <Title level={4} style={{ margin: '0 0 6px 0', color: '#0f172a' }}>
+              Connect with Families Fighting Similar Cancer in Your City
+            </Title>
+            <Paragraph style={{ margin: 0, fontSize: 13, color: '#475569', lineHeight: 1.5 }}>
+              Exchange dysphagia & soft diet recipes, manage radiation/chemo side effects, and chat privately 1-on-1 with families nearby who understand the journey.
+            </Paragraph>
+          </Col>
+          <Col xs={24} md={7} style={{ textAlign: 'right' }}>
+            <Button
+              type="primary"
+              size="large"
+              icon={<TeamOutlined />}
+              onClick={() => router.push('/portal/community')}
+              style={{ background: '#0d9488', borderColor: '#0d9488', fontWeight: 700, borderRadius: 8 }}
+            >
+              Enter CareCircles
+            </Button>
+          </Col>
+        </Row>
       </Card>
 
       {/* Quick Access Tiles */}

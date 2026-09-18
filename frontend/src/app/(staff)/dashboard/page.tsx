@@ -45,6 +45,7 @@ import { useRouter } from 'next/navigation';
 import { useRoleDashboard } from '@/hooks/use-analytics';
 import { useAppStore } from '@/stores/app.store';
 import { useAuth } from '@/hooks/use-auth';
+import { UserRole } from '@/types/auth';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -55,9 +56,9 @@ export default function DashboardPage() {
   const isDark = themeMode === 'dark';
 
   // Automatically determine view based on the authenticated user's actual role
-  const userRoles = user?.roles || [];
-  const isAdmin = userRoles.includes('ADMIN');
-  const isCoordinator = userRoles.includes('CARE_COORDINATOR');
+  const userRoles = (user?.roles || []) as any[];
+  const isAdmin = userRoles.includes(UserRole.ADMIN) || userRoles.includes('ADMIN');
+  const isCoordinator = userRoles.includes(UserRole.CARE_COORDINATOR) || userRoles.includes('CARE_COORDINATOR');
   const activeRole = isAdmin ? 'Administrator' : isCoordinator ? 'Care Coordinator' : 'Oncologist';
 
   const { data, isLoading, isError } = useRoleDashboard(activeRole);
@@ -153,7 +154,7 @@ export default function DashboardPage() {
                 ? 'Institutional overview of oncology departments, patient census, turnaround SLAs, and system audit logs.'
                 : isCoordinator
                   ? `Care continuity task queue: monitoring active patient follow-up appointments and overdue milestones.`
-                  : `You have ${data?.patientsToday || 0} patients on your clinic roster today. ${data?.criticalGaps > 0 ? `${data.criticalGaps} patients have critical care gaps.` : ''} Average wait time is currently ${data?.avgWaitTime || 0} minutes.`}
+                  : `You have ${data?.patientsToday || 0} patients on your clinic roster today. ${(data?.criticalGaps || 0) > 0 ? `${data?.criticalGaps} patients have critical care gaps.` : ''} Average wait time is currently ${data?.avgWaitTime || 0} minutes.`}
             </p>
           </Col>
 

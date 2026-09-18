@@ -13,7 +13,8 @@ import {
   GlobalOutlined,
   HeartOutlined,
   UserOutlined,
-  MedicineBoxOutlined
+  MedicineBoxOutlined,
+  TeamOutlined
 } from '@ant-design/icons';
 import { useAppStore } from '@/stores/app.store';
 import { useAuth } from '@/hooks/use-auth';
@@ -28,6 +29,7 @@ export function PortalLayout({ children }: { children: React.ReactNode }) {
 
   const items = [
     { key: '/portal', icon: <HomeOutlined />, label: 'My Care Home' },
+    { key: '/portal/community', icon: <TeamOutlined />, label: 'CareCircles (Family Connect)' },
     { key: '/portal/appointments', icon: <CalendarOutlined />, label: 'Appointments' },
     { key: '/portal/journey', icon: <HistoryOutlined />, label: 'Treatment Roadmap' },
     { key: '/portal/records', icon: <FileTextOutlined />, label: 'My Reports & Labs' },
