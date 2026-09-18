@@ -175,9 +175,28 @@ export interface CreatePledgePayload {
   note?: string;
 }
 
+export interface CreateSchemePayload {
+  name: string;
+  nameRegional?: string;
+  category: AidOrgCategory;
+  organizationName: string;
+  maxGrantAmount?: number;
+  benefitDescription: string;
+  incomeLimitAnnual?: number;
+  eligibleRationCards?: string;
+  eligibleHospitals?: string;
+  officialPortalUrl?: string;
+  helplineNumber?: string;
+  physicalAddress?: string;
+  stepByStepProcedure: string;
+  requiredDocuments: string[];
+  processingDays?: number;
+  isActive?: boolean;
+}
+
 export const financialAidService = {
   async getSummary(): Promise<ReliefSummaryMetrics> {
-    const res = await apiClient.get<ReliefSummaryMetrics>('/relief/summary');
+    const res = await apiClient.get<ReliefSummaryMetrics>('/api/v1/relief/summary');
     return res.data;
   },
 
@@ -185,56 +204,71 @@ export const financialAidService = {
     const params: any = {};
     if (category) params.category = category;
     if (search) params.search = search;
-    const res = await apiClient.get<FinancialAidScheme[]>('/relief/schemes', { params });
+    const res = await apiClient.get<FinancialAidScheme[]>('/api/v1/relief/schemes', { params });
     return res.data;
   },
 
   async getSchemeById(id: string): Promise<FinancialAidScheme> {
-    const res = await apiClient.get<FinancialAidScheme>(`/relief/schemes/${id}`);
+    const res = await apiClient.get<FinancialAidScheme>(`/api/v1/relief/schemes/${id}`);
+    return res.data;
+  },
+
+  async createScheme(payload: CreateSchemePayload): Promise<FinancialAidScheme> {
+    const res = await apiClient.post<FinancialAidScheme>('/api/v1/relief/schemes', payload);
+    return res.data;
+  },
+
+  async updateScheme(id: string, payload: CreateSchemePayload): Promise<FinancialAidScheme> {
+    const res = await apiClient.patch<FinancialAidScheme>(`/api/v1/relief/schemes/${id}`, payload);
+    return res.data;
+  },
+
+  async deleteScheme(id: string): Promise<any> {
+    const res = await apiClient.delete(`/api/v1/relief/schemes/${id}`);
     return res.data;
   },
 
   async createEstimate(payload: CreateEstimatePayload): Promise<TreatmentCostEstimate> {
-    const res = await apiClient.post<TreatmentCostEstimate>('/relief/estimates', payload);
+    const res = await apiClient.post<TreatmentCostEstimate>('/api/v1/relief/estimates', payload);
     return res.data;
   },
 
   async getEstimates(patientId?: string): Promise<TreatmentCostEstimate[]> {
     const params: any = {};
     if (patientId) params.patientId = patientId;
-    const res = await apiClient.get<TreatmentCostEstimate[]>('/relief/estimates', { params });
+    const res = await apiClient.get<TreatmentCostEstimate[]>('/api/v1/relief/estimates', { params });
     return res.data;
   },
 
   async getEstimateById(id: string): Promise<TreatmentCostEstimate> {
-    const res = await apiClient.get<TreatmentCostEstimate>(`/relief/estimates/${id}`);
+    const res = await apiClient.get<TreatmentCostEstimate>(`/api/v1/relief/estimates/${id}`);
     return res.data;
   },
 
   async createApplication(payload: CreateAidApplicationPayload): Promise<AidApplication> {
-    const res = await apiClient.post<AidApplication>('/relief/applications', payload);
+    const res = await apiClient.post<AidApplication>('/api/v1/relief/applications', payload);
     return res.data;
   },
 
   async getApplications(patientId?: string): Promise<AidApplication[]> {
     const params: any = {};
     if (patientId) params.patientId = patientId;
-    const res = await apiClient.get<AidApplication[]>('/relief/applications', { params });
+    const res = await apiClient.get<AidApplication[]>('/api/v1/relief/applications', { params });
     return res.data;
   },
 
   async updateApplicationStatus(id: string, payload: UpdateAidStatusPayload): Promise<AidApplication> {
-    const res = await apiClient.patch<AidApplication>(`/relief/applications/${id}/status`, payload);
+    const res = await apiClient.patch<AidApplication>(`/api/v1/relief/applications/${id}/status`, payload);
     return res.data;
   },
 
   async getDonors(): Promise<PhilanthropistDonor[]> {
-    const res = await apiClient.get<PhilanthropistDonor[]>('/relief/donors');
+    const res = await apiClient.get<PhilanthropistDonor[]>('/api/v1/relief/donors');
     return res.data;
   },
 
   async createDonorPledge(payload: CreatePledgePayload): Promise<any> {
-    const res = await apiClient.post('/relief/donors/pledge', payload);
+    const res = await apiClient.post('/api/v1/relief/donors/pledge', payload);
     return res.data;
   },
 };

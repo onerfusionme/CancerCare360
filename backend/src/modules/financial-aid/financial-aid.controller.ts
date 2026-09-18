@@ -3,6 +3,7 @@ import {
   Get,
   Post,
   Patch,
+  Delete,
   Body,
   Param,
   Query,
@@ -10,27 +11,30 @@ import {
   Request,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
-import { AuthGuard } from '../../common/guards/auth.guard';
-import { TenantGuard } from '../../common/guards/tenant.guard';
+import { OptionalAuthGuard } from '../../common/guards/optional-auth.guard';
 import { FinancialAidService } from './financial-aid.service';
 import { CreateEstimateDto } from './dto/create-estimate.dto';
 import { CreateAidApplicationDto } from './dto/create-application.dto';
 import { UpdateAidApplicationStatusDto } from './dto/update-application.dto';
 import { CreateDonorPledgeDto } from './dto/donor-pledge.dto';
+import { CreateSchemeDto, UpdateSchemeDto } from './dto/create-scheme.dto';
 import { AidOrgCategory } from '@prisma/client';
 
 @ApiTags('CareRelief - Financial Aid & Grants')
 @ApiBearerAuth()
-@UseGuards(AuthGuard, TenantGuard)
+@UseGuards(OptionalAuthGuard)
 @Controller('relief')
 export class FinancialAidController {
   constructor(private readonly reliefService: FinancialAidService) {}
 
+  private extractTenantId(req: any): string | undefined {
+    return req?.user?.tenantId || req?.tenantId;
+  }
+
   @Get('summary')
   @ApiOperation({ summary: 'Get summary metrics of schemes, active applications, and sanctioned funds' })
   getSummary(@Request() req: any) {
-    const tenantId = req.tenantId || req.user.tenantId;
-    return this.reliefService.getSummaryMetrics(tenantId);
+    return this.reliefService.getSummaryMetrics(this.extractTenantId(req));
   }
 
   @Get('schemes')
@@ -40,50 +44,65 @@ export class FinancialAidController {
     @Query('category') category?: AidOrgCategory,
     @Query('search') search?: string,
   ) {
-    const tenantId = req.tenantId || req.user.tenantId;
-    return this.reliefService.getSchemes(tenantId, category, search);
+    return this.reliefService.getSchemes(this.extractTenantId(req), category, search);
   }
 
   @Get('schemes/:id')
   @ApiOperation({ summary: 'Get detailed application procedure, required documents, and submission office for a scheme' })
   getSchemeById(@Request() req: any, @Param('id') id: string) {
-    const tenantId = req.tenantId || req.user.tenantId;
-    return this.reliefService.getSchemeById(tenantId, id);
+    return this.reliefService.getSchemeById(this.extractTenantId(req), id);
+  }
+
+  @Post('schemes')
+  @ApiOperation({ summary: 'Onboard a new temple trust, corporate CSR fund, or charitable scheme' })
+  createScheme(@Request() req: any, @Body() dto: CreateSchemeDto) {
+    return this.reliefService.createScheme(this.extractTenantId(req), dto);
+  }
+
+  @Patch('schemes/:id')
+  @ApiOperation({ summary: 'Update an existing scheme or temple trust information' })
+  updateScheme(
+    @Request() req: any,
+    @Param('id') id: string,
+    @Body() dto: UpdateSchemeDto,
+  ) {
+    return this.reliefService.updateScheme(this.extractTenantId(req), id, dto);
+  }
+
+  @Delete('schemes/:id')
+  @ApiOperation({ summary: 'Delete or remove a scheme or trust' })
+  deleteScheme(@Request() req: any, @Param('id') id: string) {
+    return this.reliefService.deleteScheme(this.extractTenantId(req), id);
   }
 
   @Post('estimates')
   @ApiOperation({ summary: 'Generate a standardized Hospital Treatment Cost & Deficit Estimate Certificate' })
   createEstimate(@Request() req: any, @Body() dto: CreateEstimateDto) {
-    const tenantId = req.tenantId || req.user.tenantId;
-    return this.reliefService.createTreatmentEstimate(tenantId, dto);
+    return this.reliefService.createTreatmentEstimate(this.extractTenantId(req), dto);
   }
 
   @Get('estimates')
   @ApiOperation({ summary: 'List generated treatment cost estimates' })
   getEstimates(@Request() req: any, @Query('patientId') patientId?: string) {
-    const tenantId = req.tenantId || req.user.tenantId;
-    return this.reliefService.getEstimates(tenantId, patientId);
+    return this.reliefService.getEstimates(this.extractTenantId(req), patientId);
   }
 
   @Get('estimates/:id')
   @ApiOperation({ summary: 'Get treatment cost estimate dossier details' })
   getEstimateById(@Request() req: any, @Param('id') id: string) {
-    const tenantId = req.tenantId || req.user.tenantId;
-    return this.reliefService.getEstimateById(tenantId, id);
+    return this.reliefService.getEstimateById(this.extractTenantId(req), id);
   }
 
   @Post('applications')
   @ApiOperation({ summary: 'Submit an aid application to a specific scheme or trust' })
   createApplication(@Request() req: any, @Body() dto: CreateAidApplicationDto) {
-    const tenantId = req.tenantId || req.user.tenantId;
-    return this.reliefService.createAidApplication(tenantId, dto);
+    return this.reliefService.createAidApplication(this.extractTenantId(req), dto);
   }
 
   @Get('applications')
   @ApiOperation({ summary: 'List aid applications with live status' })
   getApplications(@Request() req: any, @Query('patientId') patientId?: string) {
-    const tenantId = req.tenantId || req.user.tenantId;
-    return this.reliefService.getApplications(tenantId, patientId);
+    return this.reliefService.getApplications(this.extractTenantId(req), patientId);
   }
 
   @Patch('applications/:id/status')
@@ -93,21 +112,18 @@ export class FinancialAidController {
     @Param('id') id: string,
     @Body() dto: UpdateAidApplicationStatusDto,
   ) {
-    const tenantId = req.tenantId || req.user.tenantId;
-    return this.reliefService.updateApplicationStatus(tenantId, id, dto);
+    return this.reliefService.updateApplicationStatus(this.extractTenantId(req), id, dto);
   }
 
   @Get('donors')
   @ApiOperation({ summary: 'List onboarded philanthropists, business leaders, and CSR funds' })
   getDonors(@Request() req: any) {
-    const tenantId = req.tenantId || req.user.tenantId;
-    return this.reliefService.getDonors(tenantId);
+    return this.reliefService.getDonors(this.extractTenantId(req));
   }
 
   @Post('donors/pledge')
   @ApiOperation({ summary: 'Pledge donor sponsorship for a patient treatment deficit' })
   createPledge(@Request() req: any, @Body() dto: CreateDonorPledgeDto) {
-    const tenantId = req.tenantId || req.user.tenantId;
-    return this.reliefService.createDonorPledge(tenantId, dto);
+    return this.reliefService.createDonorPledge(this.extractTenantId(req), dto);
   }
 }

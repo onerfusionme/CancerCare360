@@ -27,6 +27,7 @@ import {
   Descriptions,
   List,
   Checkbox,
+  Popconfirm,
 } from 'antd';
 import {
   BankOutlined,
@@ -47,6 +48,8 @@ import {
   InfoCircleOutlined,
   CheckSquareOutlined,
   UserOutlined,
+  EditOutlined,
+  DeleteOutlined,
 } from '@ant-design/icons';
 import {
   financialAidService,
@@ -78,6 +81,12 @@ export default function CareReliefView() {
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedSchemeModal, setSelectedSchemeModal] = useState<FinancialAidScheme | null>(null);
+
+  // Scheme Onboarding & Editing State (CRUD)
+  const [schemeModalOpen, setSchemeModalOpen] = useState<boolean>(false);
+  const [editingScheme, setEditingScheme] = useState<FinancialAidScheme | null>(null);
+  const [schemeForm] = Form.useForm();
+  const [savingScheme, setSavingScheme] = useState<boolean>(false);
 
   // Cost Estimate Generator State
   const [estimates, setEstimates] = useState<TreatmentCostEstimate[]>([]);
@@ -141,6 +150,105 @@ export default function CareReliefView() {
       message.error('Failed to load financial aid schemes');
     } finally {
       setLoadingSchemes(false);
+    }
+  };
+
+  const handleOpenOnboardScheme = () => {
+    setEditingScheme(null);
+    schemeForm.resetFields();
+    schemeForm.setFieldsValue({
+      category: AidOrgCategory.TEMPLE_TRUST,
+      processingDays: 14,
+      requiredDocumentsText: `Ration Card (Yellow/Orange/White)
+Income Certificate from Tahsildar / SDO (< ₹2,50,000/yr)
+Hospital Doctor Treatment Protocol & Cost Estimate on letterhead
+Patient & Family Aadhaar Card copies
+Cancer Histopathology / Biopsy / PET-CT Report
+Cancelled Cheque or Bank Passbook copy of the Hospital`,
+      stepByStepProcedure: `1. Obtain official Treatment Cost Estimate & Medical Certificate signed by the Treating Oncologist and Hospital Medical Superintendent.
+2. Complete the financial grant requisition form and attach income certificate, ration card, and diagnostic reports.
+3. Submit the completed application dossier at the trust aid desk or upload to official portal.
+4. Social work scrutiny and verification committee reviews the financial deficit.
+5. Sanction letter issued and grant amount disbursed directly to the Hospital's Cancer Care account via RTGS/Cheque.`,
+    });
+    setSchemeModalOpen(true);
+  };
+
+  const handleOpenEditScheme = (scheme: FinancialAidScheme) => {
+    setEditingScheme(scheme);
+    schemeForm.resetFields();
+    schemeForm.setFieldsValue({
+      name: scheme.name,
+      nameRegional: scheme.nameRegional,
+      category: scheme.category,
+      organizationName: scheme.organizationName,
+      maxGrantAmount: scheme.maxGrantAmount,
+      benefitDescription: scheme.benefitDescription,
+      incomeLimitAnnual: scheme.incomeLimitAnnual,
+      eligibleRationCards: scheme.eligibleRationCards,
+      eligibleHospitals: scheme.eligibleHospitals,
+      helplineNumber: scheme.helplineNumber,
+      officialPortalUrl: scheme.officialPortalUrl,
+      physicalAddress: scheme.physicalAddress,
+      stepByStepProcedure: scheme.stepByStepProcedure,
+      requiredDocumentsText: scheme.requiredDocuments?.join('\n') || '',
+      processingDays: scheme.processingDays,
+    });
+    setSchemeModalOpen(true);
+  };
+
+  const handleSaveScheme = async (values: any) => {
+    setSavingScheme(true);
+    try {
+      const docsArray = typeof values.requiredDocumentsText === 'string'
+        ? values.requiredDocumentsText.split('\n').map((s: string) => s.trim()).filter((s: string) => s.length > 0)
+        : [];
+
+      const payload = {
+        name: values.name,
+        nameRegional: values.nameRegional || undefined,
+        category: values.category,
+        organizationName: values.organizationName,
+        maxGrantAmount: values.maxGrantAmount ? Number(values.maxGrantAmount) : undefined,
+        benefitDescription: values.benefitDescription,
+        incomeLimitAnnual: values.incomeLimitAnnual ? Number(values.incomeLimitAnnual) : undefined,
+        eligibleRationCards: values.eligibleRationCards || undefined,
+        eligibleHospitals: values.eligibleHospitals || undefined,
+        helplineNumber: values.helplineNumber || undefined,
+        officialPortalUrl: values.officialPortalUrl || undefined,
+        physicalAddress: values.physicalAddress || undefined,
+        stepByStepProcedure: values.stepByStepProcedure,
+        requiredDocuments: docsArray,
+        processingDays: values.processingDays ? Number(values.processingDays) : undefined,
+      };
+
+      if (editingScheme) {
+        await financialAidService.updateScheme(editingScheme.id, payload);
+        message.success('Aid scheme/trust updated successfully!');
+      } else {
+        await financialAidService.createScheme(payload);
+        message.success('Aid scheme/trust onboarded successfully!');
+      }
+
+      setSchemeModalOpen(false);
+      schemeForm.resetFields();
+      loadSchemes(selectedCategory, searchQuery);
+      loadSummary();
+    } catch (err: any) {
+      message.error(err?.response?.data?.message || 'Failed to save scheme');
+    } finally {
+      setSavingScheme(false);
+    }
+  };
+
+  const handleDeleteScheme = async (schemeId: string) => {
+    try {
+      await financialAidService.deleteScheme(schemeId);
+      message.success('Aid scheme removed successfully');
+      loadSchemes(selectedCategory, searchQuery);
+      loadSummary();
+    } catch (err: any) {
+      message.error(err?.response?.data?.message || 'Failed to delete scheme');
     }
   };
 
@@ -500,23 +608,34 @@ export default function CareReliefView() {
                       buttonStyle="solid"
                     >
                       <Radio.Button value="ALL">All Sources ({schemes.length})</Radio.Button>
-                      <Radio.Button value={AidOrgCategory.GOVT_STATE_MAHARASHTRA}>🏛️ Maharashtra Govt (CMRF / MJPJAY)</Radio.Button>
-                      <Radio.Button value={AidOrgCategory.TEMPLE_TRUST}>🛕 Temple Trusts (Lalbaugcha Raja / Siddhivinayak)</Radio.Button>
-                      <Radio.Button value={AidOrgCategory.GOVT_CENTRAL}>🇮🇳 Central Govt (PMNRF / RAN / Ayushman)</Radio.Button>
-                      <Radio.Button value={AidOrgCategory.CHARITABLE_FOUNDATION}>🎗️ Tata Trusts & Cancer NGOs</Radio.Button>
+                      <Radio.Button value={AidOrgCategory.GOVT_STATE_MAHARASHTRA}>🏛️ Maharashtra Govt</Radio.Button>
+                      <Radio.Button value={AidOrgCategory.TEMPLE_TRUST}>🛕 Temple Trusts</Radio.Button>
+                      <Radio.Button value={AidOrgCategory.GOVT_CENTRAL}>🇮🇳 Central Govt</Radio.Button>
+                      <Radio.Button value={AidOrgCategory.CHARITABLE_FOUNDATION}>🎗️ Foundations & NGOs</Radio.Button>
+                      <Radio.Button value={AidOrgCategory.CORPORATE_CSR}>🏢 Corporate CSR</Radio.Button>
                     </Radio.Group>
 
-                    <Input
-                      prefix={<SearchOutlined style={{ color: '#94a3b8' }} />}
-                      placeholder="Search scheme name, temple trust, city..."
-                      value={searchQuery}
-                      onChange={(e) => {
-                        setSearchQuery(e.target.value);
-                        loadSchemes(selectedCategory, e.target.value);
-                      }}
-                      style={{ width: 300, borderRadius: 8 }}
-                      allowClear
-                    />
+                    <Space wrap>
+                      <Input
+                        prefix={<SearchOutlined style={{ color: '#94a3b8' }} />}
+                        placeholder="Search scheme name, temple trust, city..."
+                        value={searchQuery}
+                        onChange={(e) => {
+                          setSearchQuery(e.target.value);
+                          loadSchemes(selectedCategory, e.target.value);
+                        }}
+                        style={{ width: 260, borderRadius: 8 }}
+                        allowClear
+                      />
+                      <Button
+                        type="primary"
+                        icon={<PlusOutlined />}
+                        onClick={handleOpenOnboardScheme}
+                        style={{ background: '#0d9488', borderColor: '#0d9488', fontWeight: 600, borderRadius: 8 }}
+                      >
+                        + Onboard Temple / CSR / Trust
+                      </Button>
+                    </Space>
                   </div>
 
                   {/* Schemes Cards Grid */}
@@ -542,10 +661,17 @@ export default function CareReliefView() {
                             bodyStyle={{ padding: 20, flex: 1, display: 'flex', flexDirection: 'column' }}
                           >
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
-                              <div>
-                                <Tag color={getCategoryColor(scheme.category)} style={{ fontWeight: 700, fontSize: 11, marginBottom: 4 }}>
-                                  {scheme.category.replace(/_/g, ' ')}
-                                </Tag>
+                              <div style={{ flex: 1, paddingRight: 8 }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', marginBottom: 4 }}>
+                                  <Tag color={getCategoryColor(scheme.category)} style={{ fontWeight: 700, fontSize: 11, margin: 0 }}>
+                                    {scheme.category.replace(/_/g, ' ')}
+                                  </Tag>
+                                  {scheme.organizationName && (
+                                    <Tag color="cyan" style={{ fontSize: 11, margin: 0 }}>
+                                      {scheme.organizationName}
+                                    </Tag>
+                                  )}
+                                </div>
                                 <Title level={5} style={{ margin: '4px 0 2px 0', color: '#0f172a', fontWeight: 700 }}>
                                   {scheme.name}
                                 </Title>
@@ -556,20 +682,48 @@ export default function CareReliefView() {
                                 )}
                               </div>
 
-                              <Tag
-                                color="green"
-                                style={{
-                                  fontSize: 13,
-                                  fontWeight: 800,
-                                  padding: '4px 10px',
-                                  borderRadius: 8,
-                                  border: '1px solid #86efac',
-                                  background: '#f0fdf4',
-                                  color: '#166534',
-                                }}
-                              >
-                                {scheme.maxGrantAmount ? `Up to ${formatCurrency(scheme.maxGrantAmount)}` : '100% Cashless'}
-                              </Tag>
+                              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
+                                <Tag
+                                  color="green"
+                                  style={{
+                                    fontSize: 13,
+                                    fontWeight: 800,
+                                    padding: '4px 10px',
+                                    borderRadius: 8,
+                                    border: '1px solid #86efac',
+                                    background: '#f0fdf4',
+                                    color: '#166534',
+                                    margin: 0,
+                                  }}
+                                >
+                                  {scheme.maxGrantAmount ? `Up to ${formatCurrency(scheme.maxGrantAmount)}` : '100% Cashless'}
+                                </Tag>
+                                <Space size={4}>
+                                  <Tooltip title="Edit Scheme / Trust Information">
+                                    <Button
+                                      type="text"
+                                      size="small"
+                                      icon={<EditOutlined style={{ color: '#0d9488', fontSize: 14 }} />}
+                                      onClick={() => handleOpenEditScheme(scheme)}
+                                    />
+                                  </Tooltip>
+                                  <Popconfirm
+                                    title="Delete Scheme / Trust"
+                                    description="Are you sure you want to remove this aid scheme?"
+                                    onConfirm={() => handleDeleteScheme(scheme.id)}
+                                    okText="Yes, Delete"
+                                    cancelText="Cancel"
+                                    okButtonProps={{ danger: true }}
+                                  >
+                                    <Button
+                                      type="text"
+                                      size="small"
+                                      danger
+                                      icon={<DeleteOutlined style={{ fontSize: 14 }} />}
+                                    />
+                                  </Popconfirm>
+                                </Space>
+                              </div>
                             </div>
 
                             <Paragraph
@@ -1516,6 +1670,195 @@ export default function CareReliefView() {
           >
             Record Sponsorship Allocation
           </Button>
+        </Form>
+      </Modal>
+
+      {/* Onboard / Edit Scheme & Temple Trust Modal */}
+      <Modal
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <BankOutlined style={{ color: '#0d9488' }} />
+            <span>{editingScheme ? 'Edit Financial Aid Scheme / Temple Trust' : 'Onboard New Temple Trust, Foundation or CSR Grant'}</span>
+          </div>
+        }
+        open={schemeModalOpen}
+        onCancel={() => setSchemeModalOpen(false)}
+        footer={null}
+        width={760}
+        style={{ top: 20 }}
+      >
+        <Paragraph style={{ color: '#64748b', fontSize: 13, marginBottom: 20 }}>
+          Register charitable temple trusts (e.g. Lalbaugcha Raja, Siddhivinayak), corporate CSR funds, or institutional cancer grants so cancer patients and oncology social workers can access eligibility rules, required document checklists, and sanction workflows.
+        </Paragraph>
+
+        <Form form={schemeForm} layout="vertical" onFinish={handleSaveScheme}>
+          <Row gutter={16}>
+            <Col xs={24} sm={16}>
+              <Form.Item
+                name="name"
+                label="Scheme / Grant Title"
+                rules={[{ required: true, message: 'Please enter scheme or grant title' }]}
+              >
+                <Input placeholder="e.g. Lalbaugcha Raja Dialysis & Cancer Medical Aid Fund" />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={8}>
+              <Form.Item
+                name="category"
+                label="Category"
+                rules={[{ required: true, message: 'Select category' }]}
+              >
+                <Select>
+                  <Option value={AidOrgCategory.TEMPLE_TRUST}>🛕 Temple Trust</Option>
+                  <Option value={AidOrgCategory.CORPORATE_CSR}>🏢 Corporate CSR</Option>
+                  <Option value={AidOrgCategory.CHARITABLE_FOUNDATION}>🎗️ Charitable Foundation / NGO</Option>
+                  <Option value={AidOrgCategory.GOVT_STATE_MAHARASHTRA}>🏛️ Maharashtra State Govt</Option>
+                  <Option value={AidOrgCategory.GOVT_CENTRAL}>🇮🇳 Central Government</Option>
+                  <Option value={AidOrgCategory.OTHER_NGO}>🤝 Other NGO / Association</Option>
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={16}>
+            <Col xs={24} sm={12}>
+              <Form.Item
+                name="nameRegional"
+                label="Regional Language Name (Marathi / Hindi)"
+              >
+                <Input placeholder="उदा. लालबागचा राजा वैद्यकीय सहाय्यता निधी" />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12}>
+              <Form.Item
+                name="organizationName"
+                label="Trust / Temple / Corporate Organization"
+                rules={[{ required: true, message: 'Please enter organization or temple trust name' }]}
+              >
+                <Input placeholder="e.g. Lalbaugcha Raja Sarvajanik Ganeshotsav Mandal" />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={16}>
+            <Col xs={24} sm={8}>
+              <Form.Item
+                name="maxGrantAmount"
+                label="Max Grant Amount (₹)"
+              >
+                <Input type="number" placeholder="e.g. 100000 (empty = 100% cashless)" />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={8}>
+              <Form.Item
+                name="incomeLimitAnnual"
+                label="Annual Income Limit (₹)"
+              >
+                <Input type="number" placeholder="e.g. 250000" />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={8}>
+              <Form.Item
+                name="processingDays"
+                label="Turnaround Time (Days)"
+              >
+                <Input type="number" placeholder="e.g. 14" />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Form.Item
+            name="benefitDescription"
+            label="Grant Benefits & Treatment Scope"
+            rules={[{ required: true, message: 'Please describe the benefits' }]}
+          >
+            <TextArea
+              rows={2}
+              placeholder="e.g. Direct financial grant disbursed to treating hospital oncology ledger for Chemotherapy, Radiation, or Surgery for economically weaker patients."
+            />
+          </Form.Item>
+
+          <Row gutter={16}>
+            <Col xs={24} sm={12}>
+              <Form.Item
+                name="eligibleRationCards"
+                label="Eligible Ration Cards"
+              >
+                <Input placeholder="e.g. Yellow, Orange (BPL / APL / Antyodaya)" />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12}>
+              <Form.Item
+                name="eligibleHospitals"
+                label="Empanelled / Eligible Hospitals"
+              >
+                <Input placeholder="e.g. All NABH / Govt empanelled cancer centers in Maharashtra" />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={16}>
+            <Col xs={24} sm={8}>
+              <Form.Item
+                name="helplineNumber"
+                label="Helpline / Contact Phone"
+              >
+                <Input placeholder="e.g. +91 22 2471 2345" />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={8}>
+              <Form.Item
+                name="officialPortalUrl"
+                label="Official Website / Application Portal"
+              >
+                <Input placeholder="e.g. https://lalbaugcharaja.com" />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={8}>
+              <Form.Item
+                name="physicalAddress"
+                label="Physical Aid Desk / Office Address"
+              >
+                <Input placeholder="e.g. Lalbaug, Parel, Mumbai 400012" />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Form.Item
+            name="stepByStepProcedure"
+            label="Application Procedure (Step-by-Step Instructions)"
+            rules={[{ required: true, message: 'Please provide application steps' }]}
+          >
+            <TextArea
+              rows={4}
+              placeholder={`1. Obtain treatment cost estimation letter from oncologist.\n2. Submit requisition with income certificate and pathology reports.\n3. Medical scrutiny committee review.\n4. Cheque/RTGS issued to hospital.`}
+            />
+          </Form.Item>
+
+          <Form.Item
+            name="requiredDocumentsText"
+            label="Mandatory Verification Documents (One per line)"
+            rules={[{ required: true, message: 'Please enter required documents' }]}
+          >
+            <TextArea
+              rows={4}
+              placeholder={`Ration Card (Yellow/Orange)\nIncome Certificate from Tahsildar\nHospital Treatment Cost Estimate\nPatient Aadhaar Card\nCancer Biopsy / PET-CT Report`}
+            />
+          </Form.Item>
+
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, marginTop: 16 }}>
+            <Button onClick={() => setSchemeModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={savingScheme}
+              style={{ background: '#0d9488', borderColor: '#0d9488', fontWeight: 700 }}
+            >
+              {editingScheme ? 'Update Scheme Information' : 'Register & Publish Scheme'}
+            </Button>
+          </div>
         </Form>
       </Modal>
     </div>
