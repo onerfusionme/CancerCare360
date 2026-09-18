@@ -263,7 +263,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           margin: 0, 
           padding: '24px 32px', 
           background: 'transparent', 
-          minHeight: 'calc(100vh - 68px)',
+          minHeight: 'calc(100vh - 64px)',
         }}>
           {children}
         </Content>

@@ -124,8 +124,8 @@ export default function HeaderBar() {
 
   return (
     <Header style={{ 
-      padding: '0 28px', 
-      background: isDark ? 'rgba(11, 17, 32, 0.82)' : 'rgba(255, 255, 255, 0.82)', 
+      padding: '0 20px', 
+      background: isDark ? 'rgba(11, 17, 32, 0.85)' : 'rgba(255, 255, 255, 0.85)', 
       backdropFilter: 'blur(20px) saturate(180%)',
       WebkitBackdropFilter: 'blur(20px) saturate(180%)',
       display: 'flex', 
@@ -134,41 +134,55 @@ export default function HeaderBar() {
       borderBottom: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(255, 255, 255, 0.5)',
       position: 'sticky',
       top: 0,
-      zIndex: 9,
-      height: 68,
+      zIndex: 99,
+      height: 64,
       boxShadow: isDark ? '0 8px 32px rgba(0, 0, 0, 0.4)' : '0 4px 20px rgba(0, 0, 0, 0.03)',
       transition: 'all 0.25s ease',
+      overflow: 'hidden',
+      whiteSpace: 'nowrap',
+      flexWrap: 'nowrap',
     }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+      <div style={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        gap: 12, 
+        flexShrink: 1, 
+        minWidth: 0, 
+        overflow: 'hidden',
+        whiteSpace: 'nowrap',
+        flexWrap: 'nowrap'
+      }}>
         <Button
           type="text"
           icon={sidebarCollapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
           onClick={toggleSidebar}
-          style={{ fontSize: '18px', width: 40, height: 40, color: isDark ? '#94a3b8' : '#475569' }}
+          style={{ fontSize: '18px', width: 38, height: 38, flexShrink: 0, color: isDark ? '#94a3b8' : '#475569' }}
         />
-        <div style={{ width: 340 }}>
+
+        <div style={{ width: 220, minWidth: 150, flexShrink: 1 }}>
           <GlobalSearch />
         </div>
 
-        {/* Dynamic Breadcrumb Pill */}
+        {/* Dynamic Interactive Breadcrumb Pill */}
         <div style={{
           display: 'flex',
           alignItems: 'center',
-          gap: 8,
-          fontSize: 12.5,
+          gap: 6,
+          fontSize: 12,
           color: isDark ? '#cbd5e1' : '#334155',
           fontWeight: 600,
-          padding: '7px 16px',
+          padding: '5px 12px',
           background: isDark ? 'rgba(30, 41, 59, 0.65)' : 'rgba(241, 245, 249, 0.75)',
-          borderRadius: 20,
+          borderRadius: 16,
           border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(255, 255, 255, 0.7)',
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
           boxShadow: '0 2px 8px rgba(0, 0, 0, 0.03)',
+          flexShrink: 0,
         }}>
           <span 
             onClick={() => router.push('/dashboard')}
-            style={{ cursor: 'pointer', color: '#6366f1', display: 'flex', alignItems: 'center', gap: 6, fontWeight: 700 }}
+            style={{ cursor: 'pointer', color: '#6366f1', display: 'flex', alignItems: 'center', gap: 5, fontWeight: 700 }}
             title="Navigate to Dashboard"
           >
             <DashboardOutlined /> <span>Dashboard</span>
@@ -176,103 +190,57 @@ export default function HeaderBar() {
           {pathname !== '/dashboard' && (
             <>
               <span style={{ color: isDark ? '#64748b' : '#94a3b8' }}>/</span>
-              <span style={{ color: isDark ? '#f8fafc' : '#0f172a', fontWeight: 700 }}>
+              <span style={{ 
+                color: isDark ? '#f8fafc' : '#0f172a', 
+                fontWeight: 700, 
+                maxWidth: 160, 
+                overflow: 'hidden', 
+                textOverflow: 'ellipsis', 
+                whiteSpace: 'nowrap' 
+              }}>
                 {getBreadcrumbLabel(pathname)}
               </span>
             </>
           )}
         </div>
 
-        {/* Live Clinic Stats Pill */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 12,
-          padding: '7px 16px',
-          background: isDark ? 'rgba(30, 41, 59, 0.65)' : 'rgba(241, 245, 249, 0.75)',
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
-          borderRadius: 20,
-          border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(255, 255, 255, 0.7)',
-          fontSize: 12,
-          color: isDark ? '#cbd5e1' : '#334155',
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.03)',
-        }}>
-          <Tooltip title="View Clinic Roster & Appointments">
-            <div 
-              onClick={() => router.push('/appointments')}
-              style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}
-            >
-              <span style={{ 
-                width: 8, 
-                height: 8, 
-                borderRadius: '50%', 
-                background: '#10b981', 
-                boxShadow: '0 0 8px #10b981',
-                display: 'inline-block' 
-              }} />
-              <span style={{ fontWeight: 600 }}>Active Clinic:</span>
-              <span style={{ textDecoration: 'underline', textUnderlineOffset: 3 }}>{todayCount} Today</span>
-            </div>
-          </Tooltip>
-          <span style={{ color: isDark ? '#334155' : '#cbd5e1' }}>|</span>
-          <Tooltip title="View In-Consultation Queue">
-            <div 
-              onClick={() => router.push('/appointments')}
-              style={{ display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer' }}
-            >
-              <span style={{ color: '#818cf8', fontWeight: 600 }}>{inConsultCount}</span>
-              <span style={{ color: isDark ? '#94a3b8' : '#64748b' }}>In Consult</span>
-            </div>
-          </Tooltip>
-          <span style={{ color: isDark ? '#334155' : '#cbd5e1' }}>|</span>
-          <Tooltip title="View Open Care Gaps & Escalations">
-            <div 
-              onClick={() => router.push('/gaps')}
-              style={{ display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer' }}
-            >
-              <span style={{ 
-                background: isDark ? 'rgba(244, 63, 94, 0.2)' : '#fee2e2', 
-                color: isDark ? '#fb7185' : '#dc2626', 
-                padding: '2px 8px', 
-                borderRadius: 10, 
-                fontWeight: 700, 
-                fontSize: 11,
-                border: isDark ? '1px solid rgba(244, 63, 94, 0.3)' : 'none',
-                transition: 'transform 0.1s'
-              }}>
-                0 Urgent Gaps
-              </span>
-            </div>
-          </Tooltip>
-        </div>
-      </div>
-
-      <Space size="middle">
-        {/* Direct Dashboard Nav Button */}
-        <Tooltip title="Return to Clinical Dashboard">
-          <Button 
-            type="default"
-            icon={<DashboardOutlined style={{ color: '#6366f1' }} />}
-            onClick={() => router.push('/dashboard')}
-            style={{ 
-              borderRadius: 10, 
-              borderColor: isDark ? 'rgba(99, 102, 241, 0.3)' : 'rgba(99, 102, 241, 0.25)',
-              background: isDark ? 'rgba(99, 102, 241, 0.12)' : 'rgba(238, 242, 255, 0.9)',
-              backdropFilter: 'blur(8px)',
-              WebkitBackdropFilter: 'blur(8px)',
-              color: isDark ? '#a5b4fc' : '#4338ca',
-              fontWeight: 600,
-              fontSize: 12,
+        {/* Compact Live Clinic Stats Pill */}
+        <Tooltip title="Click to view today's clinic flow & appointments">
+          <div 
+            onClick={() => router.push('/appointments')}
+            style={{
               display: 'flex',
               alignItems: 'center',
-              gap: 6
+              gap: 8,
+              padding: '5px 12px',
+              background: isDark ? 'rgba(30, 41, 59, 0.65)' : 'rgba(241, 245, 249, 0.75)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              borderRadius: 16,
+              border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(255, 255, 255, 0.7)',
+              fontSize: 11.5,
+              color: isDark ? '#cbd5e1' : '#334155',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.03)',
+              cursor: 'pointer',
+              flexShrink: 0,
             }}
           >
-            Dashboard
-          </Button>
+            <span style={{ 
+              width: 7, 
+              height: 7, 
+              borderRadius: '50%', 
+              background: '#10b981', 
+              boxShadow: '0 0 6px #10b981',
+              display: 'inline-block' 
+            }} />
+            <span style={{ fontWeight: 700 }}>{todayCount} Today</span>
+            <span style={{ color: isDark ? '#475569' : '#cbd5e1' }}>•</span>
+            <span style={{ color: '#818cf8', fontWeight: 600 }}>{inConsultCount} In Consult</span>
+          </div>
         </Tooltip>
+      </div>
 
+      <Space size={8} wrap={false} style={{ flexShrink: 0 }}>
         {/* Dark / Light Theme Toggle */}
         <Tooltip title={isDark ? "Switch to Clinical Daylight Mode" : "Switch to Executive Dark Mode"}>
           <Button 
@@ -290,10 +258,10 @@ export default function HeaderBar() {
               fontSize: 12,
               display: 'flex',
               alignItems: 'center',
-              gap: 6
+              gap: 4
             }}
           >
-            {isDark ? 'Dark Mode' : 'Light Mode'}
+            {isDark ? 'Dark' : 'Light'}
           </Button>
         </Tooltip>
 
@@ -308,7 +276,7 @@ export default function HeaderBar() {
               backdropFilter: 'blur(8px)',
               WebkitBackdropFilter: 'blur(8px)',
               color: isDark ? '#cbd5e1' : '#0f172a',
-              fontSize: 13, 
+              fontSize: 12, 
               fontWeight: 600 
             }}
           >
@@ -320,14 +288,14 @@ export default function HeaderBar() {
           <Badge count={2} size="small" offset={[-2, 4]} color="#f43f5e">
             <Button 
               type="text" 
-              icon={<BellOutlined style={{ fontSize: 19, color: isDark ? '#94a3b8' : '#475569' }} />} 
-              style={{ width: 40, height: 40, borderRadius: 10 }}
+              icon={<BellOutlined style={{ fontSize: 18, color: isDark ? '#94a3b8' : '#475569' }} />} 
+              style={{ width: 36, height: 36, borderRadius: 10 }}
               onClick={() => setNotifDrawerOpen(true)}
             />
           </Badge>
         </Tooltip>
         
-        <div style={{ width: 1, height: 28, background: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(226, 232, 240, 0.8)', margin: '0 4px' }} />
+        <div style={{ width: 1, height: 24, background: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(226, 232, 240, 0.8)', margin: '0 2px' }} />
 
         <Dropdown menu={userMenu} placement="bottomRight" trigger={['click']}>
           <div style={{ 
@@ -353,10 +321,26 @@ export default function HeaderBar() {
               icon={<UserOutlined />} 
             />
             <div style={{ lineHeight: '1.25', display: 'flex', flexDirection: 'column' }}>
-              <span style={{ fontWeight: 600, fontSize: 13, color: isDark ? '#f8fafc' : '#0f172a' }}>
+              <span style={{ 
+                fontWeight: 600, 
+                fontSize: 12.5, 
+                color: isDark ? '#f8fafc' : '#0f172a',
+                maxWidth: 130,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap'
+              }}>
                 {user?.firstName ? `${user?.firstName} ${user?.lastName || ''}` : 'Clinical Staff'}
               </span>
-              <span style={{ fontSize: 11, color: isDark ? '#94a3b8' : '#64748b', fontWeight: 500 }}>
+              <span style={{ 
+                fontSize: 10.5, 
+                color: isDark ? '#94a3b8' : '#64748b', 
+                fontWeight: 500,
+                maxWidth: 130,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap'
+              }}>
                 {user?.roles?.[0] === UserRole.ONCOLOGIST || user?.roles?.[0] === UserRole.MEDICAL_ONCOLOGIST ? 'Consultant Oncologist' : (user?.roles?.[0] || 'Care Coordinator')}
               </span>
             </div>

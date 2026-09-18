@@ -481,6 +481,15 @@ body {
    Ant Design Global Glassmorphic Overrides
    ========================================================================== */
 
+/* Header layout safety: prevent any wrapping or overflow from hanging over page content */
+.ant-layout-header {
+  height: 64px !important;
+  line-height: normal !important;
+  overflow: hidden !important;
+  white-space: nowrap !important;
+  flex-wrap: nowrap !important;
+}
+
 /* Frosted Glass Modals */
 .ant-modal .ant-modal-content {
   background: var(--glass-card-bg-elevated) !important;
