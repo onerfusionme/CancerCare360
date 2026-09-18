@@ -314,7 +314,7 @@ export function SecondOpinionHubView() {
               Pending Triage
             </div>
             <div style={{ fontSize: 28, fontWeight: 800, color: '#f59e0b', marginTop: 4 }}>
-              {metrics?.pendingTriage ?? 1}
+              {metrics?.pendingTriage ?? 0}
             </div>
             <div style={{ fontSize: 11, color: '#d97706', marginTop: 2 }}>Records & pathology intake</div>
           </Card>
@@ -326,7 +326,7 @@ export function SecondOpinionHubView() {
               In Tumor Board Review
             </div>
             <div style={{ fontSize: 28, fontWeight: 800, color: '#6366f1', marginTop: 4 }}>
-              {metrics?.underReview ?? 2}
+              {metrics?.underReview ?? 0}
             </div>
             <div style={{ fontSize: 11, color: '#818cf8', marginTop: 2 }}>MDT panel scheduled</div>
           </Card>
@@ -338,7 +338,7 @@ export function SecondOpinionHubView() {
               Reports Delivered
             </div>
             <div style={{ fontSize: 28, fontWeight: 800, color: '#10b981', marginTop: 4 }}>
-              {metrics?.reportsReady ?? 3}
+              {metrics?.reportsReady ?? 0}
             </div>
             <div style={{ fontSize: 11, color: '#059669', marginTop: 2 }}>Consensus sent to patient</div>
           </Card>
@@ -350,7 +350,7 @@ export function SecondOpinionHubView() {
               Plan Discordance Rate
             </div>
             <div style={{ fontSize: 28, fontWeight: 800, color: '#f43f5e', marginTop: 4 }}>
-              {metrics?.concordanceMetrics.discordanceRate ?? 50}%
+              {metrics?.concordanceMetrics?.discordanceRate ?? 0}%
             </div>
             <div style={{ fontSize: 11, color: '#e11d48', marginTop: 2 }}>Treatment optimized / changed</div>
           </Card>
