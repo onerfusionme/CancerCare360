@@ -101,14 +101,23 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           flexDirection: 'column',
         }}
       >
-        <div style={{ 
-          height: 68, 
-          display: 'flex', 
-          alignItems: 'center', 
-          padding: sidebarCollapsed ? '0 16px' : '0 20px',
-          borderBottom: isDark ? '1px solid #1e293b' : '1px solid #1e293b',
-          gap: 12,
-        }}>
+        <div 
+          onClick={() => router.push('/dashboard')}
+          title="Go to Dashboard"
+          style={{ 
+            height: 68, 
+            display: 'flex', 
+            alignItems: 'center', 
+            padding: sidebarCollapsed ? '0 16px' : '0 20px',
+            borderBottom: isDark ? '1px solid #1e293b' : '1px solid #1e293b',
+            gap: 12,
+            cursor: 'pointer',
+            transition: 'opacity 0.2s ease',
+            userSelect: 'none',
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.85')}
+          onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
+        >
           <div style={{
             width: 36,
             height: 36,
