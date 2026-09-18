@@ -88,7 +88,7 @@ export default function AppointmentsPage() {
     try {
       await createAppointmentMutation.mutateAsync({
         patientId: values.patientId,
-        doctorId: values.doctorId || '3527bd79-ef28-465a-bdb8-a7e4a52273a3',
+        doctorId: values.doctorId || 'e6f2d1f3-3469-47c1-a11f-bc03437dfdc3',
         appointmentType: values.appointmentType,
         scheduledAt: values.scheduledAt ? values.scheduledAt.toISOString() : new Date().toISOString(),
         room: values.room || 'OPD Room 1',
@@ -449,9 +449,9 @@ export default function AppointmentsPage() {
 
           <Form.Item name="doctorId" label="Consulting Oncologist" rules={[{ required: true, message: 'Please select oncologist' }]}>
             <Select placeholder="Select Doctor">
-              <Option value="3527bd79-ef28-465a-bdb8-a7e4a52273a3">Dr. Rajesh Kumar (Medical Oncology)</Option>
-              <Option value="85d9d88d-d588-4a8c-abfb-c8e741cab162">Dr. Priya Mehta (Surgical Oncology)</Option>
-              <Option value="31d3d8ee-1011-4a7f-a185-8e0879df002b">Dr. Ananya Desai (Radiation Oncology)</Option>
+              <Option value="e6f2d1f3-3469-47c1-a11f-bc03437dfdc3">Dr. Rajesh Kumar (Surgical Oncology)</Option>
+              <Option value="a783fe7b-398c-43ff-a10f-69eabfc763cb">Dr. Priya Mehta (Medical Oncology)</Option>
+              <Option value="11712c24-c7ea-40d5-93a9-0594c8754d25">Dr. Ananya Desai (Radiation Oncology)</Option>
             </Select>
           </Form.Item>
 
