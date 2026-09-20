@@ -73,17 +73,30 @@ export const useAuthStore = create<AuthState>()(
 
       hasRole: (role) => {
         const user = get().user;
-        return user?.roles?.includes(role) ?? false;
+        if (!user || !user.roles) return false;
+        return user.roles.some(
+          (r: any) => String(r).toUpperCase() === String(role).toUpperCase()
+        );
       },
 
       hasPermission: (permission) => {
-        // Mock permission logic based on roles
         const user = get().user;
         if (!user) return false;
-        if (user.roles.includes(UserRole.ADMIN)) return true;
-        // Basic check mapping permission prefixes to roles
-        return true; 
-      }
+        if (
+          user.roles?.some((r: any) =>
+            ['ADMIN', 'SYSTEM_ADMIN', 'SUPER_ADMIN'].includes(String(r).toUpperCase())
+          )
+        ) {
+          return true;
+        }
+        if (!user.permissions) return true; // Default fallback to allow navigation if not strictly restricted
+        const [resource] = permission.split(':');
+        return (
+          user.permissions.includes(permission) ||
+          user.permissions.includes(`${resource}:ALL`) ||
+          user.permissions.includes(`${resource}:READ`)
+        );
+      },
     }),
     {
       name: 'auth-storage',

@@ -43,6 +43,8 @@ import { NavigationModule } from './modules/navigation/navigation.module';
 import { CareCirclesModule } from './modules/care-circles/care-circles.module';
 import { FinancialAidModule } from './modules/financial-aid/financial-aid.module';
 import { SecondOpinionModule } from './modules/second-opinion/second-opinion.module';
+import { RoleModule } from './modules/role/role.module';
+import { MailerModule } from './common/mailer/mailer.module';
 
 @Module({
   imports: [
@@ -97,6 +99,8 @@ import { SecondOpinionModule } from './modules/second-opinion/second-opinion.mod
     CareCirclesModule,
     FinancialAidModule,
     SecondOpinionModule,
+    RoleModule,
+    MailerModule,
   ],
 })
 export class AppModule {}

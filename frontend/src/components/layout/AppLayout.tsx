@@ -38,46 +38,58 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const { sidebarCollapsed, toggleSidebar, themeMode } = useAppStore();
-  const { user, hasRole } = useAuth();
+  const { user, hasRole, hasPermission } = useAuth();
   const isDark = themeMode === 'dark';
 
-  const menuItems: any[] = [
-    { key: '/dashboard', icon: <DashboardOutlined />, label: 'Dashboard' },
-    { key: '/patients', icon: <UserOutlined />, label: 'Patients Directory' },
-    { key: '/second-opinion', icon: <AuditOutlined style={{ color: '#818cf8' }} />, label: 'Second Opinion Hub' },
-    { key: '/community', icon: <TeamOutlined style={{ color: '#2dd4bf' }} />, label: 'CareCircles (Family Connect)' },
-    { key: '/relief', icon: <BankOutlined style={{ color: '#f59e0b' }} />, label: 'CareRelief (Aid & Grants)' },
-    { key: '/gaps', icon: <AlertOutlined />, label: 'Care Gaps & Follow-Up' },
-    { key: '/appointments', icon: <CalendarOutlined />, label: 'Appointments & Flow' },
-    { key: '/consultations', icon: <FileSearchOutlined />, label: 'Consultation Briefing' },
-    { key: '/investigations', icon: <ExperimentOutlined />, label: 'Investigations' },
-    { key: '/journey', icon: <MedicineBoxOutlined />, label: 'Treatment Journeys' },
-    { key: '/documents', icon: <FolderOpenOutlined />, label: 'Clinical Documents' },
-    { key: '/campaigns', icon: <NotificationOutlined />, label: 'Outreach & Campaigns' },
-    { key: '/education', icon: <ReadOutlined />, label: 'Patient Education' },
+  const baseMenuItems: any[] = [
+    { key: '/dashboard', icon: <DashboardOutlined />, label: 'Dashboard', perm: 'DASHBOARD:READ' },
+    { key: '/patients', icon: <UserOutlined />, label: 'Patients Directory', perm: 'PATIENT:READ' },
+    { key: '/second-opinion', icon: <AuditOutlined style={{ color: '#818cf8' }} />, label: 'Second Opinion Hub', perm: 'SECOND_OPINION:READ' },
+    { key: '/community', icon: <TeamOutlined style={{ color: '#2dd4bf' }} />, label: 'CareCircles (Family Connect)', perm: 'CARE_CIRCLES:READ' },
+    { key: '/relief', icon: <BankOutlined style={{ color: '#f59e0b' }} />, label: 'CareRelief (Aid & Grants)', perm: 'CARE_RELIEF:READ' },
+    { key: '/gaps', icon: <AlertOutlined />, label: 'Care Gaps & Follow-Up', perm: 'CARE_GAPS:READ' },
+    { key: '/appointments', icon: <CalendarOutlined />, label: 'Appointments & Flow', perm: 'APPOINTMENT:READ' },
+    { key: '/consultations', icon: <FileSearchOutlined />, label: 'Consultation Briefing', perm: 'CONSULTATION:READ' },
+    { key: '/investigations', icon: <ExperimentOutlined />, label: 'Investigations', perm: 'INVESTIGATION:READ' },
+    { key: '/journey', icon: <MedicineBoxOutlined />, label: 'Treatment Journeys', perm: 'JOURNEY:READ' },
+    { key: '/documents', icon: <FolderOpenOutlined />, label: 'Clinical Documents', perm: 'DOCUMENT:READ' },
+    { key: '/campaigns', icon: <NotificationOutlined />, label: 'Outreach & Campaigns', perm: 'CAMPAIGN:READ' },
+    { key: '/education', icon: <ReadOutlined />, label: 'Patient Education', perm: 'EDUCATION:READ' },
     { 
       key: 'analytics-group', 
       icon: <BarChartOutlined />, 
       label: 'Analytics',
+      perm: 'ANALYTICS:READ',
       children: [
         { key: '/analytics', label: 'Operational & Continuity' },
         { key: '/analytics/practice', label: 'Practice Growth' }
       ]
     },
-    { key: '/reports', icon: <FileTextOutlined />, label: 'Registry & Reports' },
+    { key: '/reports', icon: <FileTextOutlined />, label: 'Registry & Reports', perm: 'ANALYTICS:READ' },
   ];
 
-  if (hasRole('ADMIN' as any)) {
+  // Dynamic filter: Show modules permitted by user's assigned role
+  const menuItems = baseMenuItems.filter((item) => {
+    if (!item.perm) return true;
+    return hasPermission(item.perm);
+  });
+
+  if (
+    hasRole('ADMIN' as any) ||
+    hasRole('SYSTEM_ADMIN' as any) ||
+    hasRole('SUPER_ADMIN' as any) ||
+    hasPermission('ADMIN_SETTINGS:READ')
+  ) {
     menuItems.push({
       key: 'admin-group',
       icon: <SettingOutlined />,
-      label: 'Administration',
+      label: 'Super Admin Settings',
       children: [
-        { key: '/admin', label: 'System Overview' },
+        { key: '/admin', label: 'Users & RBAC Governance' },
         { key: '/gaps/rules', label: 'Care Gap Protocol Rules' },
         { key: '/admin/ai', label: 'AI Governance & Safety' },
         { key: '/admin/docs', label: 'API Documentation' },
-      ]
+      ],
     });
   }
 

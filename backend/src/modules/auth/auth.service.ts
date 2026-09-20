@@ -68,7 +68,15 @@ export class AuthService {
         department: true,
         tenant: true,
         userRoles: {
-          include: { role: true },
+          include: {
+            role: {
+              include: {
+                rolePermissions: {
+                  include: { permission: true },
+                },
+              },
+            },
+          },
         },
       },
     });
@@ -77,7 +85,20 @@ export class AuthService {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
 
-    const { keycloakId, ...safeUser } = user;
-    return safeUser;
+    const { keycloakId, password, ...safeUser } = user;
+    const roles = user.userRoles.map((ur) => ur.role.name);
+    const permissions = Array.from(
+      new Set(
+        user.userRoles.flatMap((ur) =>
+          ur.role.rolePermissions.map((rp) => `${rp.permission.resource}:${rp.permission.action}`)
+        )
+      )
+    );
+
+    return {
+      ...safeUser,
+      roles,
+      permissions,
+    };
   }
 }

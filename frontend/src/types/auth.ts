@@ -19,11 +19,12 @@ export interface User {
   email: string;
   firstName: string;
   lastName: string;
-  roles: UserRole[];
+  roles: Array<UserRole | string>;
+  permissions?: string[];
   tenantId: string;
   departmentId?: string;
   phoneNumber?: string;
-  isActive: boolean;
+  isActive?: boolean;
   profileImageUrl?: string;
 }
 
