@@ -45,6 +45,7 @@ import { FinancialAidModule } from './modules/financial-aid/financial-aid.module
 import { SecondOpinionModule } from './modules/second-opinion/second-opinion.module';
 import { RoleModule } from './modules/role/role.module';
 import { MailerModule } from './common/mailer/mailer.module';
+import { PalliativeModule } from './modules/palliative/palliative.module';
 
 @Module({
   imports: [
@@ -101,6 +102,7 @@ import { MailerModule } from './common/mailer/mailer.module';
     SecondOpinionModule,
     RoleModule,
     MailerModule,
+    PalliativeModule,
   ],
 })
 export class AppModule {}

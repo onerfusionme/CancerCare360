@@ -47,6 +47,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     { key: '/second-opinion', icon: <AuditOutlined style={{ color: '#818cf8' }} />, label: 'Second Opinion Hub', perm: 'SECOND_OPINION:READ' },
     { key: '/community', icon: <TeamOutlined style={{ color: '#2dd4bf' }} />, label: 'CareCircles (Family Connect)', perm: 'CARE_CIRCLES:READ' },
     { key: '/relief', icon: <BankOutlined style={{ color: '#f59e0b' }} />, label: 'CareRelief (Aid & Grants)', perm: 'CARE_RELIEF:READ' },
+    { key: '/palliative', icon: <HeartOutlined style={{ color: '#f43f5e' }} />, label: 'Pain & Palliative Care', perm: 'PATIENT:READ' },
     { key: '/gaps', icon: <AlertOutlined />, label: 'Care Gaps & Follow-Up', perm: 'CARE_GAPS:READ' },
     { key: '/appointments', icon: <CalendarOutlined />, label: 'Appointments & Flow', perm: 'APPOINTMENT:READ' },
     { key: '/consultations', icon: <FileSearchOutlined />, label: 'Consultation Briefing', perm: 'CONSULTATION:READ' },
