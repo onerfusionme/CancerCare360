@@ -24,7 +24,14 @@ async function bootstrap() {
   app.useLogger(app.get(Logger));
 
   // Security
-  app.use(helmet());
+  app.use(
+    helmet({
+      contentSecurityPolicy: false,
+      frameguard: false,
+      crossOriginResourcePolicy: false,
+      crossOriginOpenerPolicy: false,
+    }),
+  );
   app.enableCors();
   app.use(compression());
 

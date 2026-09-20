@@ -1,13 +1,14 @@
 'use client';
 
-import React from 'react';
-import { Card, Typography, Space, Button, Alert, Tag } from 'antd';
-import { ApiOutlined, ReloadOutlined, ExportOutlined, CheckCircleOutlined } from '@ant-design/icons';
+import React, { useState } from 'react';
+import { Card, Typography, Space, Button, Alert, Spin } from 'antd';
+import { ReloadOutlined, ExportOutlined, FileTextOutlined, ApiOutlined } from '@ant-design/icons';
 
 const { Title, Text } = Typography;
 
 export default function ApiDocsPage() {
-  const [key, setKey] = React.useState(0);
+  const [key, setKey] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -15,15 +16,25 @@ export default function ApiDocsPage() {
         <div>
           <Title level={3} style={{ margin: 0 }}>API & Platform Documentation</Title>
           <Text type="secondary">
-            Interactive OpenAPI / Swagger reference for Care Gaps, Patient Navigation, and Continuity Endpoints
+            Interactive OpenAPI 3.0 / Swagger reference for CancerCare360 Oncology Command Center Endpoints
           </Text>
         </div>
         <Space>
           <Button 
             icon={<ReloadOutlined />} 
-            onClick={() => setKey(prev => prev + 1)}
+            onClick={() => {
+              setIsLoading(true);
+              setKey(prev => prev + 1);
+            }}
           >
             Reload Specs
+          </Button>
+          <Button 
+            icon={<FileTextOutlined />} 
+            href="/api/docs-json" 
+            target="_blank"
+          >
+            OpenAPI Spec (JSON)
           </Button>
           <Button 
             type="primary" 
@@ -39,16 +50,38 @@ export default function ApiDocsPage() {
 
       <Alert
         message="Unified SaaS API Architecture"
-        description="All backend endpoints (Care Gaps, Barrier Assessment, Inter-role Handoff, Appointment Recovery, and Analytics) are seamlessly proxied through this single web application. You do not need to switch servers."
+        description="All CancerCare360 backend micro-modules (RBAC, Second Opinion Hub, Care Gaps, CareRelief Aid, CareCircles, Appointments, and AI Governance) are unified under the OpenAPI 3.0 specification."
         type="info"
         showIcon
       />
 
-      <Card bodyStyle={{ padding: 0, height: 'calc(100vh - 240px)', overflow: 'hidden' }}>
+      <Card 
+        styles={{ body: { padding: 0, height: 'calc(100vh - 240px)', position: 'relative', overflow: 'hidden' } }}
+        className="glass-card"
+      >
+        {isLoading && (
+          <div 
+            style={{ 
+              position: 'absolute', 
+              inset: 0, 
+              display: 'flex', 
+              flexDirection: 'column',
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              background: 'rgba(255, 255, 255, 0.7)',
+              zIndex: 10,
+              gap: 12,
+            }}
+          >
+            <Spin size="large" />
+            <Text type="secondary">Loading CancerCare360 Swagger Console...</Text>
+          </div>
+        )}
         <iframe
           key={key}
-          src="http://localhost:3001/api/docs"
-          style={{ width: '100%', height: '100%', border: 'none' }}
+          src="/api/docs"
+          onLoad={() => setIsLoading(false)}
+          style={{ width: '100%', height: '100%', border: 'none', background: '#fafafa' }}
           title="CancerCare 360 Swagger Documentation"
         />
       </Card>
