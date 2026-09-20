@@ -20,6 +20,7 @@ import {
   Empty,
   Spin,
   Tooltip,
+  Drawer,
 } from 'antd';
 import {
   SearchOutlined,
@@ -64,6 +65,59 @@ const FACILITY_TYPE_MAP: Record<string, { label: string; color: string }> = {
 
 const POPULAR_CITIES = ['Karad', 'Satara', 'Pune', 'Mumbai', 'Kolhapur'];
 
+export const VERIFIED_PUBLIC_CENTERS = [
+  {
+    city: 'Karad',
+    centerName: 'Krishna Hospital & Medical Research Centre (KIMS)',
+    wing: 'Department of Oncology & Palliative Care',
+    phone: '(02164) 241556',
+    altPhone: '(02164) 241555',
+    callNumber: '02164241556',
+    address: 'Malkapur, Karad, Satara District - 415110',
+    type: 'Tertiary Teaching Hospital',
+  },
+  {
+    city: 'Pune',
+    centerName: 'Cipla Palliative Care & Training Centre',
+    wing: 'Saath-Saath National Palliative Helpline',
+    phone: '1800-202-7777 (Toll-Free)',
+    altPhone: '020-2523-1130',
+    callNumber: '18002027777',
+    address: 'Motiram Nagar, Warje, Pune - 411058',
+    type: 'Dedicated Palliative Hospice',
+  },
+  {
+    city: 'Mumbai',
+    centerName: 'Tata Memorial Hospital (TMH)',
+    wing: 'Department of Palliative Medicine',
+    phone: '022-24177000 (Ext. 4271 / 4289)',
+    altPhone: 'tmhpalliative@gmail.com',
+    callNumber: '02224177000',
+    address: 'Dr. E Borges Road, Parel, Mumbai - 400012',
+    type: 'National Apex Cancer Center',
+  },
+  {
+    city: 'Kolhapur',
+    centerName: 'Kolhapur Cancer Centre (KCC)',
+    wing: 'Supportive & Palliative Oncology Dept',
+    phone: '+91 88880 13333',
+    altPhone: '+91 88880 24444',
+    callNumber: '+918888013333',
+    address: 'Gokul Shirgaon, Kolhapur - 416234',
+    type: 'Comprehensive Cancer Hospital',
+  },
+  {
+    city: 'Satara',
+    centerName: 'Onco-Life Cancer Centre',
+    wing: 'Supportive & Palliative Oncology',
+    phone: '+91 77690 04343',
+    altPhone: '02162-350063 (Emergency: 9860100601)',
+    callNumber: '+917769004343',
+    address: 'Pune-Bangalore Highway, Shendre, Satara - 415519',
+    type: 'Regional Cancer Specialty Hospital',
+  },
+];
+
 export function PalliativeClinicDirectoryView() {
   const [clinics, setClinics] = useState<PalliativeClinic[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -71,7 +125,8 @@ export function PalliativeClinicDirectoryView() {
   const [selectedCity, setSelectedCity] = useState<string>('ALL');
   const [selectedService, setSelectedService] = useState<string>('ALL');
 
-  // Modal State
+  // Drawer & Modal State
+  const [isPublicHelplinesOpen, setIsPublicHelplinesOpen] = useState<boolean>(false);
   const [isOnboardModalOpen, setIsOnboardModalOpen] = useState<boolean>(false);
   const [form] = Form.useForm();
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -195,22 +250,37 @@ export function PalliativeClinicDirectoryView() {
             </div>
           </Col>
 
-          <Col xs={24} md={8} style={{ textAlign: 'right' }}>
-            <Button
-              type="primary"
-              size="large"
-              icon={<PlusOutlined />}
-              onClick={() => setIsOnboardModalOpen(true)}
-              style={{
-                borderRadius: 10,
-                background: 'linear-gradient(135deg, #14b8a6 0%, #0d9488 100%)',
-                border: 'none',
-                fontWeight: 600,
-                boxShadow: '0 6px 16px rgba(20, 184, 166, 0.35)',
-              }}
-            >
-              Onboard Pain Clinic
-            </Button>
+          <Col xs={24} md={10} style={{ textAlign: 'right' }}>
+            <Space wrap>
+              <Button
+                size="large"
+                icon={<PhoneOutlined />}
+                onClick={() => setIsPublicHelplinesOpen(true)}
+                style={{
+                  borderRadius: 10,
+                  fontWeight: 600,
+                  borderColor: 'rgba(20, 184, 166, 0.4)',
+                  color: '#14b8a6',
+                }}
+              >
+                Public Helplines
+              </Button>
+              <Button
+                type="primary"
+                size="large"
+                icon={<PlusOutlined />}
+                onClick={() => setIsOnboardModalOpen(true)}
+                style={{
+                  borderRadius: 10,
+                  background: 'linear-gradient(135deg, #14b8a6 0%, #0d9488 100%)',
+                  border: 'none',
+                  fontWeight: 600,
+                  boxShadow: '0 6px 16px rgba(20, 184, 166, 0.35)',
+                }}
+              >
+                Onboard Pain Clinic
+              </Button>
+            </Space>
           </Col>
         </Row>
 
@@ -771,6 +841,108 @@ export function PalliativeClinicDirectoryView() {
           </div>
         </Modal>
       )}
+
+      {/* Verified Public Centers & Helplines Drawer */}
+      <Drawer
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: 8,
+                background: '#14b8a6',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#fff',
+                fontSize: 16,
+              }}
+            >
+              <PhoneOutlined />
+            </div>
+            <div>
+              <div style={{ fontWeight: 700, fontSize: 16 }}>Verified Public Helplines & Centers</div>
+              <div style={{ fontSize: 12, color: '#888', fontWeight: 400 }}>
+                Real-world public tertiary hospitals & palliative helplines in Maharashtra
+              </div>
+            </div>
+          </div>
+        }
+        open={isPublicHelplinesOpen}
+        onClose={() => setIsPublicHelplinesOpen(false)}
+        width={460}
+      >
+        <Alert
+          message="External Public Reference Directory"
+          description="These are verified public institutions and toll-free palliative switchboards. Distinct from your hospital's onboarded partner network."
+          type="info"
+          showIcon
+          style={{ marginBottom: 16, borderRadius: 8 }}
+        />
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          {VERIFIED_PUBLIC_CENTERS.map((item) => (
+            <Card
+              key={item.centerName}
+              size="small"
+              className="glass-card"
+              style={{
+                borderRadius: 12,
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+              }}
+              styles={{ body: { padding: '14px 16px' } }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
+                <div>
+                  <Tag color="teal" style={{ fontWeight: 600, borderRadius: 6, fontSize: 11, marginBottom: 4 }}>
+                    📍 {item.city}
+                  </Tag>
+                  <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--text-primary, #ffffff)' }}>
+                    {item.centerName}
+                  </div>
+                  <div style={{ fontSize: 12, color: 'var(--text-secondary, #a1a1aa)', marginTop: 2 }}>
+                    {item.wing}
+                  </div>
+                  <div style={{ fontSize: 11, color: '#888', marginTop: 2 }}>
+                    {item.address}
+                  </div>
+                </div>
+              </div>
+
+              <Divider style={{ margin: '10px 0' }} />
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <div style={{ fontSize: 11, color: '#888', textTransform: 'uppercase' }}>Contact Line</div>
+                  <div style={{ fontWeight: 700, fontSize: 14, color: '#14b8a6' }}>
+                    {item.phone}
+                  </div>
+                  {item.altPhone && (
+                    <div style={{ fontSize: 11, color: '#888' }}>
+                      Alt: {item.altPhone}
+                    </div>
+                  )}
+                </div>
+
+                <Button
+                  type="primary"
+                  icon={<PhoneOutlined />}
+                  href={`tel:${item.callNumber}`}
+                  style={{
+                    borderRadius: 8,
+                    background: '#14b8a6',
+                    borderColor: '#14b8a6',
+                    fontWeight: 600,
+                  }}
+                >
+                  Call Now
+                </Button>
+              </div>
+            </Card>
+          ))}
+        </div>
+      </Drawer>
     </div>
   );
 }
