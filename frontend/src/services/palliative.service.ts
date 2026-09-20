@@ -71,6 +71,15 @@ export const palliativeService = {
     return res.data?.data || res.data;
   },
 
+  updateClinic: async (id: string, payload: Partial<OnboardClinicPayload>): Promise<PalliativeClinic> => {
+    const res = await apiClient.put(`/api/v1/palliative/clinics/${id}`, payload);
+    return res.data?.data || res.data;
+  },
+
+  deleteClinic: async (id: string): Promise<void> => {
+    await apiClient.delete(`/api/v1/palliative/clinics/${id}`);
+  },
+
   getAssessments: async (patientId?: string): Promise<EsasAssessmentRecord[]> => {
     const url = patientId ? `/api/v1/palliative/assessments/${patientId}` : '/api/v1/palliative/assessments';
     const res = await apiClient.get(url);

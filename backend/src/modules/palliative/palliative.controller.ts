@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Param, Query, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards, UseInterceptors } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { PalliativeService } from './palliative.service';
 import { CreatePalliativeClinicDto } from './dto/create-clinic.dto';
+import { UpdatePalliativeClinicDto } from './dto/update-clinic.dto';
 import { CreatePalliativeAssessmentDto } from './dto/create-assessment.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { AuditInterceptor } from '../../common/interceptors/audit.interceptor';
@@ -36,6 +37,33 @@ export class PalliativeController {
       success: true,
       data,
       message: `Pain clinic "${dto.name}" in ${dto.city} onboarded successfully`,
+    };
+  }
+
+  @Put('clinics/:id')
+  @ApiOperation({ summary: 'Update an existing pain & palliative clinic center' })
+  async updateClinic(
+    @Param('id') id: string,
+    @Body() dto: UpdatePalliativeClinicDto,
+  ): Promise<ApiResponseDto<any>> {
+    const data = await this.palliativeService.updateClinic(id, dto);
+    return {
+      success: true,
+      data,
+      message: `Pain clinic "${data.name}" updated successfully`,
+    };
+  }
+
+  @Delete('clinics/:id')
+  @ApiOperation({ summary: 'Delete an existing pain & palliative clinic center' })
+  async deleteClinic(
+    @Param('id') id: string,
+  ): Promise<ApiResponseDto<any>> {
+    const data = await this.palliativeService.deleteClinic(id);
+    return {
+      success: true,
+      data,
+      message: data.message,
     };
   }
 

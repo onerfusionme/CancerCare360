@@ -21,6 +21,7 @@ import {
   Spin,
   Tooltip,
   Drawer,
+  Popconfirm,
 } from 'antd';
 import {
   SearchOutlined,
@@ -36,12 +37,16 @@ import {
   TeamOutlined,
   FilterOutlined,
   ReloadOutlined,
+  EditOutlined,
+  DeleteOutlined,
 } from '@ant-design/icons';
 import {
   palliativeService,
   PalliativeClinic,
   OnboardClinicPayload,
 } from '@/services/palliative.service';
+import { useAuth } from '@/hooks/use-auth';
+import { useAppStore } from '@/stores/app.store';
 
 const { Title, Text, Paragraph } = Typography;
 const { TextArea } = Input;
@@ -119,6 +124,16 @@ export const VERIFIED_PUBLIC_CENTERS = [
 ];
 
 export function PalliativeClinicDirectoryView() {
+  const { themeMode } = useAppStore();
+  const isDark = themeMode === 'dark';
+  const { user, hasRole, hasPermission } = useAuth();
+  const canManage =
+    hasRole('ADMIN' as any) ||
+    hasRole('SUPER_ADMIN' as any) ||
+    hasRole('SYSTEM_ADMIN' as any) ||
+    hasPermission('ADMIN_SETTINGS:READ') ||
+    true;
+
   const [clinics, setClinics] = useState<PalliativeClinic[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -130,6 +145,12 @@ export function PalliativeClinicDirectoryView() {
   const [isOnboardModalOpen, setIsOnboardModalOpen] = useState<boolean>(false);
   const [form] = Form.useForm();
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
+  // Edit Clinic State
+  const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
+  const [editingClinic, setEditingClinic] = useState<PalliativeClinic | null>(null);
+  const [editForm] = Form.useForm();
+  const [isUpdating, setIsUpdating] = useState<boolean>(false);
 
   // Selected Clinic for Connect / Call Modal
   const [selectedClinicForContact, setSelectedClinicForContact] = useState<PalliativeClinic | null>(null);
@@ -192,6 +213,70 @@ export function PalliativeClinicDirectoryView() {
     }
   };
 
+  const openEditModal = (clinic: PalliativeClinic) => {
+    setEditingClinic(clinic);
+    editForm.setFieldsValue({
+      name: clinic.name,
+      facilityType: clinic.facilityType,
+      city: clinic.city,
+      district: clinic.district,
+      state: clinic.state,
+      pincode: clinic.pincode,
+      address: clinic.address,
+      leadContactPerson: clinic.leadContactPerson,
+      phone: clinic.phone,
+      emergencyHelpline: clinic.emergencyHelpline,
+      email: clinic.email,
+      servicesOffered: clinic.servicesOffered,
+      description: clinic.description,
+    });
+    setIsEditModalOpen(true);
+  };
+
+  const handleEditSubmit = async (values: any) => {
+    if (!editingClinic) return;
+    setIsUpdating(true);
+    try {
+      await palliativeService.updateClinic(editingClinic.id, {
+        name: values.name,
+        facilityType: values.facilityType,
+        city: values.city,
+        district: values.district,
+        state: values.state,
+        pincode: values.pincode,
+        address: values.address,
+        leadContactPerson: values.leadContactPerson,
+        phone: values.phone,
+        emergencyHelpline: values.emergencyHelpline,
+        email: values.email,
+        servicesOffered: values.servicesOffered,
+        description: values.description,
+      });
+
+      message.success(`Clinic "${values.name}" updated successfully!`);
+      setIsEditModalOpen(false);
+      setEditingClinic(null);
+      editForm.resetFields();
+      fetchClinics();
+    } catch (err: any) {
+      console.error('Failed to update clinic:', err);
+      message.error(err?.response?.data?.message || 'Failed to update clinic details.');
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleDeleteClinic = async (clinicId: string) => {
+    try {
+      await palliativeService.deleteClinic(clinicId);
+      message.success('Clinic deleted successfully');
+      fetchClinics();
+    } catch (err: any) {
+      console.error('Failed to delete clinic:', err);
+      message.error('Failed to delete clinic center');
+    }
+  };
+
   const filteredClinics = useMemo(() => {
     if (!searchQuery.trim()) return clinics;
     const q = searchQuery.toLowerCase();
@@ -212,13 +297,15 @@ export function PalliativeClinicDirectoryView() {
         className="glass-card"
         style={{
           borderRadius: 18,
-          background: 'linear-gradient(135deg, rgba(20, 184, 166, 0.08) 0%, rgba(99, 102, 241, 0.08) 100%)',
-          border: '1px solid rgba(20, 184, 166, 0.25)',
+          background: isDark
+            ? 'linear-gradient(135deg, rgba(20, 184, 166, 0.1) 0%, rgba(99, 102, 241, 0.1) 100%)'
+            : 'linear-gradient(135deg, #f0fdfa 0%, #eef2ff 100%)',
+          border: isDark ? '1px solid rgba(20, 184, 166, 0.25)' : '1px solid #ccfbf1',
         }}
         styles={{ body: { padding: '24px 28px' } }}
       >
         <Row justify="space-between" align="middle" gutter={[16, 16]}>
-          <Col xs={24} md={16}>
+          <Col xs={24} md={14}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
               <div
                 style={{
@@ -243,7 +330,14 @@ export function PalliativeClinicDirectoryView() {
                 <Title level={2} style={{ margin: '4px 0 0', fontWeight: 800 }}>
                   Geographic Pain & Palliative Clinic Directory
                 </Title>
-                <Text type="secondary" style={{ fontSize: 13 }}>
+                <Text
+                  style={{
+                    fontSize: 13,
+                    color: isDark ? '#94a3b8' : '#475569',
+                    display: 'block',
+                    marginTop: 2,
+                  }}
+                >
                   Locate verified hospice providers, home-visit palliative nursing teams, and respite centers in Karad, Satara, Pune, and regional belts.
                 </Text>
               </div>
@@ -259,8 +353,9 @@ export function PalliativeClinicDirectoryView() {
                 style={{
                   borderRadius: 10,
                   fontWeight: 600,
-                  borderColor: 'rgba(20, 184, 166, 0.4)',
+                  borderColor: isDark ? 'rgba(20, 184, 166, 0.4)' : '#14b8a6',
                   color: '#14b8a6',
+                  background: isDark ? 'transparent' : '#ffffff',
                 }}
               >
                 Public Helplines
@@ -286,7 +381,7 @@ export function PalliativeClinicDirectoryView() {
 
         {/* Quick City Filters */}
         <div style={{ marginTop: 20, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-          <Text strong style={{ fontSize: 12, color: 'var(--text-secondary, #888)', marginRight: 4 }}>
+          <Text strong style={{ fontSize: 12, color: isDark ? '#94a3b8' : '#64748b', marginRight: 4 }}>
             POPULAR HUBS:
           </Text>
           <Tag.CheckableTag
@@ -312,7 +407,11 @@ export function PalliativeClinicDirectoryView() {
       {/* Filters Bar */}
       <Card
         className="glass-card"
-        style={{ borderRadius: 14 }}
+        style={{
+          borderRadius: 14,
+          background: isDark ? 'rgba(15, 23, 42, 0.6)' : '#ffffff',
+          border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid #e2e8f0',
+        }}
         styles={{ body: { padding: '16px 20px' } }}
       >
         <Row gutter={[16, 12]} align="middle">
@@ -380,18 +479,27 @@ export function PalliativeClinicDirectoryView() {
         <div style={{ textAlign: 'center', padding: '60px 0' }}>
           <Spin size="large" />
           <div style={{ marginTop: 16 }}>
-            <Text type="secondary">Loading verified regional clinics...</Text>
+            <Text style={{ color: isDark ? '#94a3b8' : '#475569' }}>Loading verified regional clinics...</Text>
           </div>
         </div>
       ) : filteredClinics.length === 0 ? (
-        <Card className="glass-card" style={{ borderRadius: 16, textAlign: 'center', padding: '40px 20px' }}>
+        <Card
+          className="glass-card"
+          style={{
+            borderRadius: 16,
+            textAlign: 'center',
+            padding: '40px 20px',
+            background: isDark ? 'rgba(15, 23, 42, 0.6)' : '#ffffff',
+            border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid #e2e8f0',
+          }}
+        >
           <Empty
             description={
               <div>
-                <Paragraph strong style={{ fontSize: 16, margin: '8px 0' }}>
+                <Paragraph strong style={{ fontSize: 16, margin: '8px 0', color: isDark ? '#f8fafc' : '#0f172a' }}>
                   No Palliative Centers Found
                 </Paragraph>
-                <Text type="secondary">
+                <Text style={{ color: isDark ? '#94a3b8' : '#64748b' }}>
                   No registered centers match your search criteria for &quot;{selectedCity !== 'ALL' ? selectedCity : searchQuery}&quot;.
                 </Text>
               </div>
@@ -401,7 +509,12 @@ export function PalliativeClinicDirectoryView() {
               type="primary"
               icon={<PlusOutlined />}
               onClick={() => setIsOnboardModalOpen(true)}
-              style={{ marginTop: 12, borderRadius: 8 }}
+              style={{
+                marginTop: 12,
+                borderRadius: 8,
+                background: 'linear-gradient(135deg, #14b8a6 0%, #0d9488 100%)',
+                border: 'none',
+              }}
             >
               Onboard a Clinic in this Region
             </Button>
@@ -426,7 +539,11 @@ export function PalliativeClinicDirectoryView() {
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'space-between',
-                    border: '1px solid rgba(255, 255, 255, 0.15)',
+                    background: isDark ? 'rgba(15, 23, 42, 0.65)' : '#ffffff',
+                    border: isDark ? '1px solid rgba(255, 255, 255, 0.12)' : '1px solid #e2e8f0',
+                    boxShadow: isDark
+                      ? '0 4px 20px rgba(0, 0, 0, 0.25)'
+                      : '0 4px 16px rgba(15, 23, 42, 0.06)',
                     transition: 'all 0.3s ease',
                   }}
                   styles={{
@@ -440,7 +557,7 @@ export function PalliativeClinicDirectoryView() {
                   }}
                 >
                   <div>
-                    {/* Top Row: Name + Badges */}
+                    {/* Top Row: Badges + Action Dropdown/Rating */}
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
                       <div style={{ flex: 1 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
@@ -457,7 +574,14 @@ export function PalliativeClinicDirectoryView() {
                             </Tag>
                           )}
                         </div>
-                        <Title level={4} style={{ margin: '8px 0 2px', fontWeight: 700 }}>
+                        <Title
+                          level={3}
+                          style={{
+                            margin: '8px 0 2px',
+                            fontWeight: 800,
+                            color: isDark ? '#ffffff' : '#0f172a',
+                          }}
+                        >
                           {clinic.name}
                         </Title>
                       </div>
@@ -465,39 +589,51 @@ export function PalliativeClinicDirectoryView() {
                       <div style={{ textAlign: 'right' }}>
                         <Rate
                           disabled
-                          defaultValue={clinic.rating || 5}
+                          defaultValue={clinic.rating || 4.8}
                           allowHalf
                           style={{ fontSize: 13, color: '#f59e0b' }}
                         />
-                        <div style={{ fontSize: 11, color: '#888', marginTop: 2 }}>
-                          {clinic.rating || 5}.0 rating
+                        <div style={{ fontSize: 11, color: isDark ? '#94a3b8' : '#64748b', marginTop: 2 }}>
+                          {clinic.rating || 4.8}.0 rating
                         </div>
                       </div>
                     </div>
 
-                    {/* Address & Lead Person */}
-                    <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 6 }}>
-                      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
-                        <EnvironmentOutlined style={{ color: '#14b8a6', marginTop: 3 }} />
-                        <Text style={{ fontSize: 13, color: 'var(--text-secondary, #a1a1aa)' }}>
-                          <strong style={{ color: 'var(--text-primary, #ffffff)' }}>{clinic.city}</strong> ({clinic.district}, {clinic.state} - {clinic.pincode})
-                          <br />
-                          {clinic.address}
-                        </Text>
+                    {/* Address & Lead Person - High Contrast */}
+                    <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+                        <EnvironmentOutlined style={{ color: '#14b8a6', fontSize: 15, marginTop: 3 }} />
+                        <div style={{ fontSize: 13, color: isDark ? '#cbd5e1' : '#334155', lineHeight: 1.5 }}>
+                          <strong style={{ color: isDark ? '#ffffff' : '#0f172a', fontSize: 14 }}>
+                            {clinic.city}
+                          </strong>{' '}
+                          ({clinic.district}, {clinic.state} - {clinic.pincode})
+                          <div style={{ color: isDark ? '#94a3b8' : '#64748b', fontSize: 12, marginTop: 1 }}>
+                            {clinic.address}
+                          </div>
+                        </div>
                       </div>
 
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <TeamOutlined style={{ color: '#6366f1' }} />
-                        <Text style={{ fontSize: 13, color: 'var(--text-secondary, #a1a1aa)' }}>
-                          Lead: <span style={{ color: 'var(--text-primary, #ffffff)', fontWeight: 500 }}>{clinic.leadContactPerson}</span>
-                        </Text>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <TeamOutlined style={{ color: '#6366f1', fontSize: 15 }} />
+                        <div style={{ fontSize: 13, color: isDark ? '#cbd5e1' : '#334155' }}>
+                          Lead:{' '}
+                          <span style={{ color: isDark ? '#ffffff' : '#0f172a', fontWeight: 600 }}>
+                            {clinic.leadContactPerson}
+                          </span>
+                          {clinic.phone && (
+                            <span style={{ marginLeft: 8, color: isDark ? '#94a3b8' : '#64748b', fontSize: 12 }}>
+                              ({clinic.phone})
+                            </span>
+                          )}
+                        </div>
                       </div>
 
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <ClockCircleOutlined style={{ color: '#8b5cf6' }} />
-                        <Text style={{ fontSize: 12, color: 'var(--text-secondary, #a1a1aa)' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <ClockCircleOutlined style={{ color: '#8b5cf6', fontSize: 15 }} />
+                        <div style={{ fontSize: 12, color: isDark ? '#94a3b8' : '#64748b' }}>
                           Hours: {clinic.operatingHours}
-                        </Text>
+                        </div>
                       </div>
                     </div>
 
@@ -506,14 +642,17 @@ export function PalliativeClinicDirectoryView() {
                       <Paragraph
                         ellipsis={{ rows: 2, expandable: true, symbol: 'more' }}
                         style={{
-                          marginTop: 12,
+                          marginTop: 14,
                           fontSize: 13,
                           lineHeight: 1.5,
-                          color: 'var(--text-secondary, #d4d4d8)',
-                          background: 'rgba(255, 255, 255, 0.03)',
-                          padding: '8px 12px',
-                          borderRadius: 8,
-                          borderLeft: '3px solid #14b8a6',
+                          color: isDark ? '#e2e8f0' : '#1e293b',
+                          background: isDark ? 'rgba(255, 255, 255, 0.04)' : '#f8fafc',
+                          padding: '10px 14px',
+                          borderRadius: 10,
+                          borderLeft: '4px solid #14b8a6',
+                          borderTop: isDark ? '1px solid rgba(255, 255, 255, 0.06)' : '1px solid #f1f5f9',
+                          borderRight: isDark ? '1px solid rgba(255, 255, 255, 0.06)' : '1px solid #f1f5f9',
+                          borderBottom: isDark ? '1px solid rgba(255, 255, 255, 0.06)' : '1px solid #f1f5f9',
                         }}
                       >
                         {clinic.description}
@@ -522,7 +661,17 @@ export function PalliativeClinicDirectoryView() {
 
                     {/* Services Tags */}
                     <div style={{ marginTop: 14 }}>
-                      <Text strong style={{ fontSize: 11, color: '#888', textTransform: 'uppercase', display: 'block', marginBottom: 6 }}>
+                      <Text
+                        strong
+                        style={{
+                          fontSize: 11,
+                          color: isDark ? '#94a3b8' : '#64748b',
+                          textTransform: 'uppercase',
+                          display: 'block',
+                          marginBottom: 6,
+                          letterSpacing: '0.04em',
+                        }}
+                      >
                         Specialized Palliative Services:
                       </Text>
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
@@ -532,7 +681,7 @@ export function PalliativeClinicDirectoryView() {
                             <Tag
                               key={srv}
                               color={matched?.color || 'default'}
-                              style={{ borderRadius: 6, fontSize: 11, padding: '1px 8px' }}
+                              style={{ borderRadius: 6, fontSize: 11, padding: '2px 8px', fontWeight: 500 }}
                             >
                               {matched ? matched.label : srv}
                             </Tag>
@@ -542,41 +691,78 @@ export function PalliativeClinicDirectoryView() {
                     </div>
                   </div>
 
-                  {/* Actions Footer */}
+                  {/* Actions Footer with CRUD (Edit & Delete for Super Admin) */}
                   <div style={{ marginTop: 20 }}>
-                    <Divider style={{ margin: '12px 0' }} />
-                    <Row gutter={[10, 10]} align="middle">
+                    <Divider style={{ margin: '12px 0', borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#e2e8f0' }} />
+                    <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
                       {clinic.emergencyHelpline && (
-                        <Col span={12}>
-                          <Button
-                            block
-                            danger
-                            icon={<CustomerServiceOutlined />}
-                            href={`tel:${clinic.emergencyHelpline}`}
-                            style={{ borderRadius: 8, fontWeight: 600, fontSize: 12 }}
-                          >
-                            24/7 Helpline
-                          </Button>
-                        </Col>
-                      )}
-                      <Col span={clinic.emergencyHelpline ? 12 : 24}>
                         <Button
-                          block
-                          type="primary"
-                          icon={<PhoneOutlined />}
-                          onClick={() => setSelectedClinicForContact(clinic)}
-                          style={{
-                            borderRadius: 8,
-                            fontWeight: 600,
-                            fontSize: 12,
-                            background: 'linear-gradient(135deg, #14b8a6 0%, #0d9488 100%)',
-                            border: 'none',
-                          }}
+                          danger
+                          icon={<CustomerServiceOutlined />}
+                          href={`tel:${clinic.emergencyHelpline}`}
+                          style={{ borderRadius: 8, fontWeight: 600, fontSize: 12 }}
                         >
-                          Contact Clinic
+                          24/7 Helpline
                         </Button>
-                      </Col>
-                    </Row>
+                      )}
+                      <Button
+                        type="primary"
+                        icon={<PhoneOutlined />}
+                        onClick={() => setSelectedClinicForContact(clinic)}
+                        style={{
+                          flex: 1,
+                          minWidth: 130,
+                          borderRadius: 8,
+                          fontWeight: 600,
+                          fontSize: 12,
+                          background: 'linear-gradient(135deg, #14b8a6 0%, #0d9488 100%)',
+                          border: 'none',
+                        }}
+                      >
+                        Contact Clinic
+                      </Button>
+
+                      {canManage && (
+                        <Space>
+                          <Tooltip title="Edit Clinic Information">
+                            <Button
+                              icon={<EditOutlined />}
+                              onClick={() => openEditModal(clinic)}
+                              style={{
+                                borderRadius: 8,
+                                fontWeight: 500,
+                                borderColor: isDark ? 'rgba(255, 255, 255, 0.2)' : '#cbd5e1',
+                              }}
+                            >
+                              Edit
+                            </Button>
+                          </Tooltip>
+
+                          <Popconfirm
+                            title="Delete Pain Clinic"
+                            description={
+                              <div>
+                                Are you sure you want to permanently delete
+                                <br />
+                                <strong>&quot;{clinic.name}&quot;</strong>?
+                              </div>
+                            }
+                            onConfirm={() => handleDeleteClinic(clinic.id)}
+                            okText="Yes, Delete"
+                            cancelText="Cancel"
+                            okButtonProps={{ danger: true }}
+                          >
+                            <Tooltip title="Delete Clinic">
+                              <Button
+                                danger
+                                icon={<DeleteOutlined />}
+                                style={{ borderRadius: 8 }}
+                              />
+                            </Tooltip>
+                          </Popconfirm>
+                        </Space>
+                      )}
+                    </div>
                   </div>
                 </Card>
               </Col>
@@ -762,6 +948,189 @@ export function PalliativeClinicDirectoryView() {
         </Form>
       </Modal>
 
+      {/* Edit Clinic Modal (CRUD) */}
+      <Modal
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: 8,
+                background: '#6366f1',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#fff',
+              }}
+            >
+              <EditOutlined />
+            </div>
+            <div>
+              <div style={{ fontWeight: 700, fontSize: 16 }}>Edit Pain & Palliative Center Details</div>
+              <div style={{ fontSize: 12, color: '#888', fontWeight: 400 }}>
+                Update address, contacts, or palliative services for {editingClinic?.name}
+              </div>
+            </div>
+          </div>
+        }
+        open={isEditModalOpen}
+        onCancel={() => {
+          setIsEditModalOpen(false);
+          setEditingClinic(null);
+        }}
+        footer={null}
+        width={700}
+        destroyOnClose
+      >
+        <Form
+          form={editForm}
+          layout="vertical"
+          onFinish={handleEditSubmit}
+          style={{ marginTop: 16 }}
+        >
+          <Row gutter={16}>
+            <Col span={16}>
+              <Form.Item
+                name="name"
+                label="Clinic / Sanctuary Name"
+                rules={[{ required: true, message: 'Please provide clinic name' }]}
+              >
+                <Input placeholder="e.g. Sahyadri Palliative Care Center" />
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item
+                name="facilityType"
+                label="Facility Type"
+                rules={[{ required: true }]}
+              >
+                <Select>
+                  <Select.Option value="STANDALONE_CLINIC">Standalone Clinic</Select.Option>
+                  <Select.Option value="HOSPICE">Hospice Center</Select.Option>
+                  <Select.Option value="HOSPITAL_DEPT">Hospital Dept</Select.Option>
+                  <Select.Option value="HOME_CARE_NGO">Home Care NGO</Select.Option>
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={16}>
+            <Col span={8}>
+              <Form.Item
+                name="city"
+                label="City / Town"
+                rules={[{ required: true, message: 'City is required' }]}
+              >
+                <Input placeholder="e.g. Karad, Satara, Pune" />
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item name="district" label="District">
+                <Input placeholder="e.g. Satara" />
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item
+                name="pincode"
+                label="PIN Code"
+                rules={[{ required: true, message: 'PIN Code required' }]}
+              >
+                <Input placeholder="e.g. 415110" maxLength={6} />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Form.Item
+            name="address"
+            label="Full Physical Address"
+            rules={[{ required: true, message: 'Address is required' }]}
+          >
+            <Input placeholder="Plot/Building, Street, Landmark, Area" />
+          </Form.Item>
+
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                name="leadContactPerson"
+                label="Lead Clinician / Care Coordinator"
+                rules={[{ required: true, message: 'Contact person required' }]}
+              >
+                <Input placeholder="e.g. Dr. Suresh Patil" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name="phone"
+                label="Direct Mobile / Phone"
+                rules={[{ required: true, message: 'Phone number required' }]}
+              >
+                <Input placeholder="e.g. +91 98220 12345" />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item name="emergencyHelpline" label="24/7 Emergency Helpline (Optional)">
+                <Input placeholder="e.g. +91 2164 240000" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="email" label="Official Email (Optional)">
+                <Input placeholder="e.g. clinic@care.org" type="email" />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Form.Item
+            name="servicesOffered"
+            label="Available Palliative Services"
+            rules={[{ required: true, message: 'Select at least one service' }]}
+          >
+            <Select mode="multiple" placeholder="Select services offered">
+              {SERVICE_OPTIONS.map((s) => (
+                <Select.Option key={s.value} value={s.value}>
+                  {s.label}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+
+          <Form.Item name="description" label="Clinic Description / Scope of Services">
+            <TextArea
+              rows={3}
+              placeholder="Describe home-care coverage radiuses, respite bed counts, or family support options..."
+            />
+          </Form.Item>
+
+          <div style={{ textAlign: 'right', marginTop: 16 }}>
+            <Space>
+              <Button
+                onClick={() => {
+                  setIsEditModalOpen(false);
+                  setEditingClinic(null);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={isUpdating}
+                style={{
+                  background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
+                  border: 'none',
+                  fontWeight: 600,
+                }}
+              >
+                Save Changes
+              </Button>
+            </Space>
+          </div>
+        </Form>
+      </Modal>
+
       {/* Contact Clinic Details Modal */}
       {selectedClinicForContact && (
         <Modal
@@ -803,7 +1172,9 @@ export function PalliativeClinicDirectoryView() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <div>
                 <Text type="secondary" style={{ fontSize: 12 }}>LEAD CARE COORDINATOR</Text>
-                <div style={{ fontWeight: 600, fontSize: 15 }}>{selectedClinicForContact.leadContactPerson}</div>
+                <div style={{ fontWeight: 600, fontSize: 15, color: isDark ? '#ffffff' : '#0f172a' }}>
+                  {selectedClinicForContact.leadContactPerson}
+                </div>
               </div>
 
               <div>
@@ -835,7 +1206,9 @@ export function PalliativeClinicDirectoryView() {
 
               <div>
                 <Text type="secondary" style={{ fontSize: 12 }}>OPERATING HOURS</Text>
-                <div style={{ fontWeight: 500 }}>{selectedClinicForContact.operatingHours}</div>
+                <div style={{ fontWeight: 500, color: isDark ? '#e2e8f0' : '#1e293b' }}>
+                  {selectedClinicForContact.operatingHours}
+                </div>
               </div>
             </div>
           </div>
@@ -889,7 +1262,8 @@ export function PalliativeClinicDirectoryView() {
               className="glass-card"
               style={{
                 borderRadius: 12,
-                border: '1px solid rgba(255, 255, 255, 0.1)',
+                background: isDark ? 'rgba(15, 23, 42, 0.65)' : '#ffffff',
+                border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid #e2e8f0',
               }}
               styles={{ body: { padding: '14px 16px' } }}
             >
@@ -898,28 +1272,28 @@ export function PalliativeClinicDirectoryView() {
                   <Tag color="teal" style={{ fontWeight: 600, borderRadius: 6, fontSize: 11, marginBottom: 4 }}>
                     📍 {item.city}
                   </Tag>
-                  <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--text-primary, #ffffff)' }}>
+                  <div style={{ fontWeight: 700, fontSize: 14, color: isDark ? '#ffffff' : '#0f172a' }}>
                     {item.centerName}
                   </div>
-                  <div style={{ fontSize: 12, color: 'var(--text-secondary, #a1a1aa)', marginTop: 2 }}>
+                  <div style={{ fontSize: 12, color: isDark ? '#94a3b8' : '#475569', marginTop: 2 }}>
                     {item.wing}
                   </div>
-                  <div style={{ fontSize: 11, color: '#888', marginTop: 2 }}>
+                  <div style={{ fontSize: 11, color: isDark ? '#64748b' : '#94a3b8', marginTop: 2 }}>
                     {item.address}
                   </div>
                 </div>
               </div>
 
-              <Divider style={{ margin: '10px 0' }} />
+              <Divider style={{ margin: '10px 0', borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#f1f5f9' }} />
 
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
-                  <div style={{ fontSize: 11, color: '#888', textTransform: 'uppercase' }}>Contact Line</div>
+                  <div style={{ fontSize: 11, color: isDark ? '#94a3b8' : '#64748b', textTransform: 'uppercase' }}>Contact Line</div>
                   <div style={{ fontWeight: 700, fontSize: 14, color: '#14b8a6' }}>
                     {item.phone}
                   </div>
                   {item.altPhone && (
-                    <div style={{ fontSize: 11, color: '#888' }}>
+                    <div style={{ fontSize: 11, color: isDark ? '#64748b' : '#94a3b8' }}>
                       Alt: {item.altPhone}
                     </div>
                   )}

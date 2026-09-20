@@ -1,8 +1,11 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { CreatePalliativeClinicDto } from './dto/create-clinic.dto';
+import { UpdatePalliativeClinicDto } from './dto/update-clinic.dto';
 import { CreatePalliativeAssessmentDto } from './dto/create-assessment.dto';
 import { v4 as uuidv4 } from 'uuid';
+import * as fs from 'fs';
+import * as path from 'path';
 
 export interface PalliativeClinicRecord {
   id: string;
@@ -48,14 +51,43 @@ export interface PalliativeAssessmentRecord {
 @Injectable()
 export class PalliativeService {
   private readonly logger = new Logger(PalliativeService.name);
+  private readonly storageFilePath = path.join(process.cwd(), 'data', 'palliative-clinics.json');
 
-  // Persistent clinic and assessment stores (starts empty with zero mock data)
+  // Persistent clinic and assessment stores
   private clinics: PalliativeClinicRecord[] = [];
-
-  // Store for digital ESAS assessments
   private assessments: PalliativeAssessmentRecord[] = [];
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {
+    this.clinics = this.loadClinicsFromDisk();
+    this.logger.log(`Loaded ${this.clinics.length} palliative clinic records from disk`);
+  }
+
+  private loadClinicsFromDisk(): PalliativeClinicRecord[] {
+    try {
+      if (fs.existsSync(this.storageFilePath)) {
+        const raw = fs.readFileSync(this.storageFilePath, 'utf-8');
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          return parsed;
+        }
+      }
+    } catch (err) {
+      this.logger.error('Failed to load palliative clinics from disk', err);
+    }
+    return [];
+  }
+
+  private saveClinicsToDisk(): void {
+    try {
+      const dir = path.dirname(this.storageFilePath);
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+      fs.writeFileSync(this.storageFilePath, JSON.stringify(this.clinics, null, 2), 'utf-8');
+    } catch (err) {
+      this.logger.error('Failed to save palliative clinics to disk', err);
+    }
+  }
 
   public async getClinics(query: { city?: string; service?: string; search?: string }) {
     let result = [...this.clinics];
@@ -108,8 +140,53 @@ export class PalliativeService {
     };
 
     this.clinics.unshift(newClinic);
+    this.saveClinicsToDisk();
     this.logger.log(`Onboarded new Palliative Clinic: ${newClinic.name} in ${newClinic.city}`);
     return newClinic;
+  }
+
+  public async getClinicById(id: string): Promise<PalliativeClinicRecord> {
+    const clinic = this.clinics.find((c) => c.id === id);
+    if (!clinic) {
+      throw new NotFoundException(`Palliative clinic with ID "${id}" not found`);
+    }
+    return clinic;
+  }
+
+  public async updateClinic(id: string, dto: UpdatePalliativeClinicDto): Promise<PalliativeClinicRecord> {
+    const index = this.clinics.findIndex((c) => c.id === id);
+    if (index === -1) {
+      throw new NotFoundException(`Palliative clinic with ID "${id}" not found`);
+    }
+
+    const existing = this.clinics[index];
+    const updated: PalliativeClinicRecord = {
+      ...existing,
+      ...dto,
+      id: existing.id,
+      createdAt: existing.createdAt,
+    };
+
+    this.clinics[index] = updated;
+    this.saveClinicsToDisk();
+    this.logger.log(`Updated Palliative Clinic: ${updated.name} (${updated.id})`);
+    return updated;
+  }
+
+  public async deleteClinic(id: string): Promise<{ success: boolean; id: string; message: string }> {
+    const index = this.clinics.findIndex((c) => c.id === id);
+    if (index === -1) {
+      throw new NotFoundException(`Palliative clinic with ID "${id}" not found`);
+    }
+
+    const removed = this.clinics.splice(index, 1)[0];
+    this.saveClinicsToDisk();
+    this.logger.log(`Deleted Palliative Clinic: ${removed.name} (${removed.id})`);
+    return {
+      success: true,
+      id,
+      message: `Palliative clinic "${removed.name}" deleted successfully`,
+    };
   }
 
   public async submitAssessment(dto: CreatePalliativeAssessmentDto): Promise<PalliativeAssessmentRecord> {
