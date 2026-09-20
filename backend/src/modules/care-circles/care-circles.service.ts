@@ -749,4 +749,42 @@ export class CareCirclesService {
       data: { likesCount: { increment: 1 } },
     });
   }
+
+  async updatePost(tenantId: string, currentUserId: string, postId: string, dto: Partial<CreateCaregiverPostDto>) {
+    const post = await this.prisma.caregiverPost.findUnique({
+      where: { id: postId },
+      include: { author: true },
+    });
+
+    if (!post || post.tenantId !== tenantId) {
+      throw new NotFoundException('Post not found.');
+    }
+
+    return this.prisma.caregiverPost.update({
+      where: { id: postId },
+      data: {
+        title: dto.title !== undefined ? dto.title : post.title,
+        content: dto.content !== undefined ? dto.content : post.content,
+        category: dto.category !== undefined ? dto.category : post.category,
+      },
+    });
+  }
+
+  async deletePost(tenantId: string, postId: string) {
+    const post = await this.prisma.caregiverPost.findUnique({
+      where: { id: postId },
+    });
+
+    if (!post || post.tenantId !== tenantId) {
+      throw new NotFoundException('Post not found.');
+    }
+
+    await this.prisma.caregiverPostComment.deleteMany({
+      where: { postId },
+    });
+
+    return this.prisma.caregiverPost.delete({
+      where: { id: postId },
+    });
+  }
 }

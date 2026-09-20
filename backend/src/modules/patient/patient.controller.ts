@@ -1,4 +1,16 @@
-import { Controller, Get, Post, Body, Patch, Param, Query, UseGuards, UseInterceptors } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Patch,
+  Param,
+  Query,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiHeader } from '@nestjs/swagger';
 import { PatientService } from './patient.service';
 import { CreatePatientDto } from './dto/create-patient.dto';
@@ -93,6 +105,31 @@ export class PatientController {
   ): Promise<ApiResponseDto<any>> {
     const data = await this.patientService.update(tenantId, id, updatePatientDto);
     return { success: true, data, message: 'Patient updated successfully' };
+  }
+
+  @Put(':id')
+  @Permissions('patient:write')
+  @ApiOperation({ summary: 'Update patient details (REST PUT alias)' })
+  @ApiResponse({ status: 200, description: 'Patient updated successfully' })
+  async updatePut(
+    @CurrentTenant() tenantId: string,
+    @Param('id') id: string,
+    @Body() updatePatientDto: UpdatePatientDto,
+  ): Promise<ApiResponseDto<any>> {
+    const data = await this.patientService.update(tenantId, id, updatePatientDto);
+    return { success: true, data, message: 'Patient updated successfully' };
+  }
+
+  @Delete(':id')
+  @Permissions('patient:write')
+  @ApiOperation({ summary: 'Delete or archive patient record' })
+  @ApiResponse({ status: 200, description: 'Patient deleted or archived successfully' })
+  async delete(
+    @CurrentTenant() tenantId: string,
+    @Param('id') id: string,
+  ): Promise<ApiResponseDto<any>> {
+    const data = await this.patientService.delete(tenantId, id);
+    return { success: true, data, message: 'Patient record removed successfully' };
   }
 
   @Get(':id/journey')

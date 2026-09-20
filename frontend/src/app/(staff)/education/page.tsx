@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Table, Button, Tag, Space, Modal, Form, Input, Select, message, Typography } from 'antd';
-import { PlusOutlined, EyeOutlined, CheckCircleOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Table, Button, Tag, Space, Modal, Form, Input, Select, message, Typography, Popconfirm } from 'antd';
+import { PlusOutlined, EyeOutlined, CheckCircleOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import { useEducationArticles } from '@/hooks/use-engagement';
 import { engagementService } from '@/services/engagement.service';
 import { EducationContent } from '@/types/engagement';
@@ -13,7 +13,10 @@ const { TextArea } = Input;
 export default function EducationPage() {
   const { data: articles = [], isLoading, refetch } = useEducationArticles();
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  const [editingArticle, setEditingArticle] = useState<EducationContent | null>(null);
   const [form] = Form.useForm();
+  const [editForm] = Form.useForm();
 
   const handlePublish = async (id: string) => {
     try {
@@ -44,6 +47,41 @@ export default function EducationPage() {
       refetch();
     } catch (error) {
       message.error('Failed to create article');
+    }
+  };
+
+  const openEditModal = (record: EducationContent) => {
+    setEditingArticle(record);
+    editForm.setFieldsValue({
+      title: record.title,
+      category: record.category,
+      language: record.language,
+      body: record.body || (record as any).content || '',
+      status: record.status,
+    });
+    setIsEditModalVisible(true);
+  };
+
+  const onEditFinish = async (values: any) => {
+    if (!editingArticle) return;
+    try {
+      await engagementService.updateArticle(editingArticle.id, values);
+      message.success('Article updated successfully');
+      setIsEditModalVisible(false);
+      setEditingArticle(null);
+      refetch();
+    } catch {
+      message.error('Failed to update article');
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      await engagementService.deleteArticle(id);
+      message.success('Article permanently deleted');
+      refetch();
+    } catch {
+      message.error('Failed to delete article');
     }
   };
 
@@ -101,14 +139,22 @@ export default function EducationPage() {
       title: 'Actions',
       key: 'actions',
       render: (_: any, record: EducationContent) => (
-        <Space size="middle">
-          <Button type="text" icon={<EyeOutlined />} title="Preview" />
+        <Space size="small">
+          <Button size="small" type="text" icon={<EyeOutlined />} title="Preview" />
           {record.status !== 'PUBLISHED' && (
-            <Button type="text" icon={<CheckCircleOutlined />} onClick={() => handlePublish(record.id)} title="Publish" />
+            <Button size="small" type="text" icon={<CheckCircleOutlined />} onClick={() => handlePublish(record.id)} title="Publish" />
           )}
-          {record.status !== 'ARCHIVED' && (
-            <Button type="text" danger icon={<DeleteOutlined />} onClick={() => handleArchive(record.id)} title="Archive" />
-          )}
+          <Button size="small" icon={<EditOutlined />} onClick={() => openEditModal(record)} title="Edit Article" />
+          <Popconfirm
+            title="Delete Article"
+            description="Permanently delete this educational article?"
+            onConfirm={() => handleDelete(record.id)}
+            okText="Yes, Delete"
+            cancelText="No"
+            okButtonProps={{ danger: true }}
+          >
+            <Button size="small" danger icon={<DeleteOutlined />} title="Delete Article" />
+          </Popconfirm>
         </Space>
       ),
     },
@@ -170,6 +216,61 @@ export default function EducationPage() {
             <Space>
               <Button type="primary" htmlType="submit">Save</Button>
               <Button onClick={() => setIsModalVisible(false)}>Cancel</Button>
+            </Space>
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      {/* Edit Article Modal */}
+      <Modal
+        title="Edit Educational Article"
+        open={isEditModalVisible}
+        onCancel={() => {
+          setIsEditModalVisible(false);
+          setEditingArticle(null);
+        }}
+        footer={null}
+        width={800}
+      >
+        <Form form={editForm} layout="vertical" onFinish={onEditFinish}>
+          <Form.Item name="title" label="Title" rules={[{ required: true }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item name="category" label="Category" rules={[{ required: true }]}>
+            <Select>
+              <Select.Option value="Nutrition">Nutrition</Select.Option>
+              <Select.Option value="Side Effects">Side Effects</Select.Option>
+              <Select.Option value="Staging">Staging</Select.Option>
+              <Select.Option value="Emotional Wellness">Emotional Wellness</Select.Option>
+              <Select.Option value="Financial Guidance">Financial Guidance</Select.Option>
+            </Select>
+          </Form.Item>
+          <Form.Item name="language" label="Language" rules={[{ required: true }]}>
+            <Select>
+              <Select.Option value="en">English</Select.Option>
+              <Select.Option value="hi">हिंदी (Hindi)</Select.Option>
+              <Select.Option value="mr">मराठी (Marathi)</Select.Option>
+            </Select>
+          </Form.Item>
+          <Form.Item name="body" label="Content Body (Markdown)" rules={[{ required: true }]}>
+            <TextArea rows={10} />
+          </Form.Item>
+          <Form.Item name="status" label="Status">
+            <Select>
+              <Select.Option value="DRAFT">Draft</Select.Option>
+              <Select.Option value="IN_REVIEW">In Review</Select.Option>
+              <Select.Option value="APPROVED">Approved</Select.Option>
+              <Select.Option value="PUBLISHED">Published</Select.Option>
+              <Select.Option value="ARCHIVED">Archived</Select.Option>
+            </Select>
+          </Form.Item>
+          <Form.Item>
+            <Space>
+              <Button type="primary" htmlType="submit">Save Changes</Button>
+              <Button onClick={() => {
+                setIsEditModalVisible(false);
+                setEditingArticle(null);
+              }}>Cancel</Button>
             </Space>
           </Form.Item>
         </Form>

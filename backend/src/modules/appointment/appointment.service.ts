@@ -201,6 +201,13 @@ export class AppointmentService {
     });
   }
 
+  async delete(tenantId: string, id: string) {
+    await this.findById(tenantId, id);
+    return this.prisma.appointment.delete({
+      where: { id },
+    });
+  }
+
   async markNoShow(tenantId: string, id: string) {
     return this.prisma.appointment.update({
       where: { id, tenantId } as any,

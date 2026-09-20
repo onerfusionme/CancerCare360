@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Patch, Param, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { CareGapService } from './care-gap.service';
 import { CreateRuleDto } from './dto/create-rule.dto';
@@ -36,6 +36,25 @@ export class CareGapController {
     @Body() updateDto: Partial<CreateRuleDto>,
   ) {
     return this.careGapService.updateRule(tenantId, id, updateDto);
+  }
+
+  @Put('care-gap-rules/:id')
+  @ApiOperation({ summary: 'Update rule (PUT alias)' })
+  updateRulePut(
+    @CurrentTenant() tenantId: string,
+    @Param('id') id: string,
+    @Body() updateDto: Partial<CreateRuleDto>,
+  ) {
+    return this.careGapService.updateRule(tenantId, id, updateDto);
+  }
+
+  @Delete('care-gap-rules/:id')
+  @ApiOperation({ summary: 'Delete care gap rule' })
+  deleteRule(
+    @CurrentTenant() tenantId: string,
+    @Param('id') id: string,
+  ) {
+    return this.careGapService.deleteRule(tenantId, id);
   }
 
   @Post('care-gap-rules/:id/toggle')

@@ -73,6 +73,13 @@ export class CampaignService {
     });
   }
 
+  async delete(tenantId: string, id: string) {
+    await this.findOne(tenantId, id);
+    return this.prisma.campaign.delete({
+      where: { id },
+    });
+  }
+
   async requestApproval(tenantId: string, id: string) {
     await this.findOne(tenantId, id);
     return this.prisma.campaign.update({

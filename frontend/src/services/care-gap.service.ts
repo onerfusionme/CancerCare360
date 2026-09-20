@@ -24,5 +24,9 @@ export const careGapService = {
   },
   generateTasks: async (): Promise<void> => {
     await apiClient.post('/api/v1/care-gaps/generate-tasks');
-  }
+  },
+  deleteRule: async (id: string): Promise<any> => {
+    const { data } = await apiClient.delete(`/api/v1/care-gap-rules/${id}`);
+    return data?.data || data;
+  },
 };

@@ -2,6 +2,8 @@ import {
   Controller,
   Get,
   Post,
+  Put,
+  Delete,
   Patch,
   Body,
   Param,
@@ -136,5 +138,39 @@ export class CareCirclesController {
   likePost(@Request() req: any, @Param('id') postId: string) {
     const tenantId = req.tenantId || req.user.tenantId;
     return this.careCirclesService.likePost(tenantId, postId);
+  }
+
+  @Put('posts/:id')
+  @ApiOperation({ summary: 'Update discussion post' })
+  updatePost(
+    @Request() req: any,
+    @Param('id') postId: string,
+    @Body() dto: Partial<CreateCaregiverPostDto>,
+  ) {
+    const tenantId = req.tenantId || req.user.tenantId;
+    const userId = req.user.sub || req.user.id;
+    return this.careCirclesService.updatePost(tenantId, userId, postId, dto);
+  }
+
+  @Patch('posts/:id')
+  @ApiOperation({ summary: 'Update discussion post (PATCH)' })
+  patchPost(
+    @Request() req: any,
+    @Param('id') postId: string,
+    @Body() dto: Partial<CreateCaregiverPostDto>,
+  ) {
+    const tenantId = req.tenantId || req.user.tenantId;
+    const userId = req.user.sub || req.user.id;
+    return this.careCirclesService.updatePost(tenantId, userId, postId, dto);
+  }
+
+  @Delete('posts/:id')
+  @ApiOperation({ summary: 'Delete discussion post' })
+  deletePost(
+    @Request() req: any,
+    @Param('id') postId: string,
+  ) {
+    const tenantId = req.tenantId || req.user.tenantId;
+    return this.careCirclesService.deletePost(tenantId, postId);
   }
 }

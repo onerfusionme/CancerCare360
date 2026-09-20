@@ -2,7 +2,9 @@ import {
   Controller,
   Get,
   Post,
+  Put,
   Patch,
+  Delete,
   Body,
   Param,
   Query,
@@ -94,5 +96,22 @@ export class SecondOpinionController {
   @ApiOperation({ summary: 'Convert second opinion case into an active registered patient journey' })
   convertToPatient(@Request() req: any, @Param('id') id: string) {
     return this.service.convertToPatient(this.extractTenantId(req), id);
+  }
+
+  @Put(':id')
+  @Patch(':id')
+  @ApiOperation({ summary: 'Update second opinion case details' })
+  updateCase(
+    @Request() req: any,
+    @Param('id') id: string,
+    @Body() dto: any,
+  ) {
+    return this.service.updateCase(this.extractTenantId(req), id, dto);
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Delete a second opinion case' })
+  deleteCase(@Request() req: any, @Param('id') id: string) {
+    return this.service.delete(this.extractTenantId(req), id);
   }
 }

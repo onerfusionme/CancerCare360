@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Post,
+  Put,
   Patch,
   Delete,
   Body,
@@ -113,6 +114,25 @@ export class FinancialAidController {
     @Body() dto: UpdateAidApplicationStatusDto,
   ) {
     return this.reliefService.updateApplicationStatus(this.extractTenantId(req), id, dto);
+  }
+
+  @Put('applications/:id')
+  @ApiOperation({ summary: 'Update application details' })
+  updateApplication(
+    @Request() req: any,
+    @Param('id') id: string,
+    @Body() dto: any,
+  ) {
+    return this.reliefService.updateApplication(this.extractTenantId(req), id, dto);
+  }
+
+  @Delete('applications/:id')
+  @ApiOperation({ summary: 'Delete aid application' })
+  deleteApplication(
+    @Request() req: any,
+    @Param('id') id: string,
+  ) {
+    return this.reliefService.deleteApplication(this.extractTenantId(req), id);
   }
 
   @Get('donors')

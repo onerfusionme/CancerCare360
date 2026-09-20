@@ -19,6 +19,7 @@ import {
   Form,
   message,
   Divider,
+  Popconfirm,
 } from 'antd';
 import {
   AuditOutlined,
@@ -36,6 +37,8 @@ import {
   SafetyCertificateOutlined,
   TeamOutlined,
   UserOutlined,
+  DeleteOutlined,
+  EditOutlined,
 } from '@ant-design/icons';
 import { SecondOpinionDetailModal } from './SecondOpinionDetailModal';
 
@@ -157,6 +160,19 @@ export function SecondOpinionHubView() {
       message.error(err?.message || 'Error submitting case inquiry.');
     } finally {
       setIsSubmittingNewCase(false);
+    }
+  };
+
+  const handleDeleteCase = async (id: string, patientName: string) => {
+    try {
+      const res = await fetch(`http://localhost:3001/api/v1/second-opinion/${id}`, {
+        method: 'DELETE',
+      });
+      if (!res.ok) throw new Error('Failed to delete case');
+      message.success(`Second opinion case for ${patientName} deleted successfully`);
+      fetchCases();
+    } catch {
+      message.error('Failed to delete second opinion case');
     }
   };
 
@@ -502,9 +518,31 @@ export function SecondOpinionHubView() {
                               <FilePdfOutlined style={{ marginRight: 4 }} />
                               {c.documents?.length || 0} scans
                             </div>
-                            <div>
-                              {c.assignedDoctor ? `Dr. ${c.assignedDoctor.lastName}` : 'Unassigned'}
-                            </div>
+                            <Space size={4}>
+                              <div>
+                                {c.assignedDoctor ? `Dr. ${c.assignedDoctor.lastName}` : 'Unassigned'}
+                              </div>
+                              <Popconfirm
+                                title="Delete Case"
+                                description="Permanently delete this second opinion case?"
+                                onConfirm={(e) => {
+                                  e?.stopPropagation();
+                                  handleDeleteCase(c.id, c.patientName);
+                                }}
+                                okText="Yes, Delete"
+                                cancelText="No"
+                                okButtonProps={{ danger: true }}
+                              >
+                                <Button
+                                  size="small"
+                                  type="text"
+                                  danger
+                                  icon={<DeleteOutlined />}
+                                  onClick={(e) => e.stopPropagation()}
+                                  title="Delete Case"
+                                />
+                              </Popconfirm>
+                            </Space>
                           </div>
                         </Card>
                       ))
@@ -596,16 +634,28 @@ export function SecondOpinionHubView() {
                 title: 'Action',
                 key: 'action',
                 render: (_, record) => (
-                  <Button
-                    size="small"
-                    type="primary"
-                    onClick={() => {
-                      setSelectedCase(record);
-                      setIsDetailModalOpen(true);
-                    }}
-                  >
-                    Review Dossier
-                  </Button>
+                  <Space size="small">
+                    <Button
+                      size="small"
+                      type="primary"
+                      onClick={() => {
+                        setSelectedCase(record);
+                        setIsDetailModalOpen(true);
+                      }}
+                    >
+                      Review Dossier
+                    </Button>
+                    <Popconfirm
+                      title="Delete Second Opinion Case"
+                      description={`Permanently delete case ${record.caseNumber} for ${record.patientName}?`}
+                      onConfirm={() => handleDeleteCase(record.id, record.patientName)}
+                      okText="Yes, Delete"
+                      cancelText="No"
+                      okButtonProps={{ danger: true }}
+                    >
+                      <Button size="small" danger icon={<DeleteOutlined />} title="Delete Case" />
+                    </Popconfirm>
+                  </Space>
                 ),
               },
             ]}

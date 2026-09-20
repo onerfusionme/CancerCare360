@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Query, UseGuards, Delete, Put } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { AppointmentService } from './appointment.service';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
@@ -126,5 +126,24 @@ export class AppointmentController {
     @Param('id') id: string,
   ) {
     return this.appointmentService.markNoShow(tenantId, id);
+  }
+
+  @Put(':id')
+  @ApiOperation({ summary: 'Update appointment details (PUT alias)' })
+  updatePut(
+    @CurrentTenant() tenantId: string,
+    @Param('id') id: string,
+    @Body() updateAppointmentDto: UpdateAppointmentDto,
+  ) {
+    return this.appointmentService.update(tenantId, id, updateAppointmentDto);
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Delete appointment record' })
+  delete(
+    @CurrentTenant() tenantId: string,
+    @Param('id') id: string,
+  ) {
+    return this.appointmentService.delete(tenantId, id);
   }
 }

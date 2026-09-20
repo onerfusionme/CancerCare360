@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Query, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Patch, Param, Query, UseGuards, Request } from '@nestjs/common';
 import { CampaignService } from './campaign.service';
 import { CreateCampaignDto } from './dto/create-campaign.dto';
 import { UpdateCampaignDto } from './dto/update-campaign.dto';
@@ -36,6 +36,18 @@ export class CampaignController {
   @ApiOperation({ summary: 'Update campaign' })
   update(@Request() req: any, @Param('id') id: string, @Body() updateCampaignDto: UpdateCampaignDto) {
     return this.campaignService.update(req.user.tenantId, id, updateCampaignDto);
+  }
+
+  @Put(':id')
+  @ApiOperation({ summary: 'Update campaign (PUT alias)' })
+  updatePut(@Request() req: any, @Param('id') id: string, @Body() updateCampaignDto: UpdateCampaignDto) {
+    return this.campaignService.update(req.user.tenantId, id, updateCampaignDto);
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Delete campaign' })
+  delete(@Request() req: any, @Param('id') id: string) {
+    return this.campaignService.delete(req.user.tenantId, id);
   }
 
   @Post(':id/request-approval')

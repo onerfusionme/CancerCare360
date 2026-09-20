@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Patch, Param, Body, Query, UseGuards } from '@nestjs/common';
+import { Controller, Post, Get, Patch, Put, Delete, Param, Body, Query, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { InvestigationService } from './investigation.service';
 import { CreateInvestigationDto } from './dto/create-investigation.dto';
@@ -68,5 +68,25 @@ export class InvestigationController {
     @Body() dto: UpdateInvestigationDto,
   ) {
     return this.investigationService.updateStatus(tenantId, id, userId, dto);
+  }
+
+  @Put(':id')
+  @ApiOperation({ summary: 'Update investigation details (PUT alias)' })
+  updatePut(
+    @CurrentTenant() tenantId: string,
+    @CurrentUser('id') userId: string,
+    @Param('id') id: string,
+    @Body() dto: UpdateInvestigationDto,
+  ) {
+    return this.investigationService.updateStatus(tenantId, id, userId, dto);
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Delete an investigation record' })
+  delete(
+    @CurrentTenant() tenantId: string,
+    @Param('id') id: string,
+  ) {
+    return this.investigationService.delete(tenantId, id);
   }
 }

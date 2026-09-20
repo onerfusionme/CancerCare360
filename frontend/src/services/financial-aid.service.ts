@@ -262,6 +262,16 @@ export const financialAidService = {
     return res.data;
   },
 
+  async updateApplication(id: string, payload: Partial<CreateAidApplicationPayload>): Promise<AidApplication> {
+    const res = await apiClient.put<AidApplication>(`/api/v1/relief/applications/${id}`, payload);
+    return res.data;
+  },
+
+  async deleteApplication(id: string): Promise<any> {
+    const res = await apiClient.delete(`/api/v1/relief/applications/${id}`);
+    return res.data;
+  },
+
   async getDonors(): Promise<PhilanthropistDonor[]> {
     const res = await apiClient.get<PhilanthropistDonor[]>('/api/v1/relief/donors');
     return res.data;

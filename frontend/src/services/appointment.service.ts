@@ -66,5 +66,10 @@ export const appointmentService = {
     const response = await apiClient.get('/api/v1/appointments/no-show-risks', { params: { date } });
     const data = response.data?.data || response.data;
     return Array.isArray(data) ? data : [];
-  }
+  },
+
+  deleteAppointment: async (id: string): Promise<any> => {
+    const response = await apiClient.delete(`/api/v1/appointments/${id}`);
+    return response.data;
+  },
 };

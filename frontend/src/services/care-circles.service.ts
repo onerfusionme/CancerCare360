@@ -205,4 +205,14 @@ export const careCirclesService = {
     const res = await apiClient.post(`/api/v1/care-circles/posts/${postId}/like`);
     return res.data?.data || res.data;
   },
+
+  updatePost: async (postId: string, dto: Partial<{ title: string; content: string; category: PostCategory; cancerType: string }>): Promise<CaregiverPost> => {
+    const res = await apiClient.put(`/api/v1/care-circles/posts/${postId}`, dto);
+    return res.data?.data || res.data;
+  },
+
+  deletePost: async (postId: string): Promise<any> => {
+    const res = await apiClient.delete(`/api/v1/care-circles/posts/${postId}`);
+    return res.data?.data || res.data;
+  },
 };

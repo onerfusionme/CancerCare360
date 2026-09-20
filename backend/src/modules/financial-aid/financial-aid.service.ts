@@ -748,6 +748,39 @@ export class FinancialAidService {
     });
   }
 
+  async deleteApplication(rawTenantId: string | undefined, id: string) {
+    const tenantId = await this.resolveTenantId(rawTenantId);
+    const existing = await this.prisma.aidApplication.findFirst({
+      where: { id },
+    });
+    if (!existing) {
+      throw new NotFoundException(`Aid Application with ID ${id} not found.`);
+    }
+
+    return this.prisma.aidApplication.delete({
+      where: { id },
+    });
+  }
+
+  async updateApplication(rawTenantId: string | undefined, id: string, dto: any) {
+    const tenantId = await this.resolveTenantId(rawTenantId);
+    const existing = await this.prisma.aidApplication.findFirst({
+      where: { id },
+    });
+    if (!existing) {
+      throw new NotFoundException(`Aid Application with ID ${id} not found.`);
+    }
+
+    return this.prisma.aidApplication.update({
+      where: { id },
+      data: dto,
+      include: {
+        scheme: true,
+        estimate: true,
+      },
+    });
+  }
+
   // -------------------------------------------------------------
   // Philanthropist Donors & Pledges
   // -------------------------------------------------------------

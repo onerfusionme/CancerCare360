@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Table, Button, Switch, Modal, Form, Select, Input, InputNumber, Card, Typography, Space, message } from 'antd';
-import { ArrowLeftOutlined, PlusOutlined, EditOutlined } from '@ant-design/icons';
+import { Table, Button, Switch, Modal, Form, Select, Input, InputNumber, Card, Typography, Space, message, Popconfirm } from 'antd';
+import { ArrowLeftOutlined, PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
 import { useCareGapRules } from '@/hooks/use-care-gaps';
 import { careGapService } from '@/services/care-gap.service';
@@ -56,16 +56,33 @@ export default function CareGapRulesAdminPage() {
         }
       }
 
-      await careGapService.createRule({
-        ...values,
-        conditions: parsedCond
-      });
+      if (editingRule) {
+        await careGapService.updateRule(editingRule.id, {
+          ...values,
+          conditions: parsedCond
+        });
+      } else {
+        await careGapService.createRule({
+          ...values,
+          conditions: parsedCond
+        });
+      }
       message.success(editingRule ? 'Rule updated successfully' : 'Rule created successfully');
       setModalOpen(false);
       form.resetFields();
       refetch();
     } catch {
       message.error('Failed to save care gap rule');
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      await careGapService.deleteRule(id);
+      message.success('Protocol rule deleted successfully');
+      refetch();
+    } catch {
+      message.error('Failed to delete rule');
     }
   };
 
@@ -94,9 +111,23 @@ export default function CareGapRulesAdminPage() {
       title: 'Actions',
       key: 'actions',
       render: (_: any, record: any) => (
-        <Button type="link" icon={<EditOutlined />} onClick={() => openEditModal(record)}>
-          Edit
-        </Button>
+        <Space size="small">
+          <Button type="link" icon={<EditOutlined />} onClick={() => openEditModal(record)}>
+            Edit
+          </Button>
+          <Popconfirm
+            title="Delete Care Gap Rule"
+            description="Are you sure you want to delete this protocol rule?"
+            onConfirm={() => handleDelete(record.id)}
+            okText="Yes, Delete"
+            cancelText="No"
+            okButtonProps={{ danger: true }}
+          >
+            <Button type="link" danger icon={<DeleteOutlined />}>
+              Delete
+            </Button>
+          </Popconfirm>
+        </Space>
       )
     }
   ];

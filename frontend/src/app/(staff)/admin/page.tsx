@@ -20,6 +20,8 @@ import {
   Tooltip,
   Avatar,
   Divider,
+  Modal,
+  Form,
 } from 'antd';
 import {
   SafetyCertificateOutlined,
@@ -61,8 +63,11 @@ export default function AdminPage() {
 
   // Modals
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
+  const [isEditUserModalOpen, setIsEditUserModalOpen] = useState(false);
+  const [editingUser, setEditingUser] = useState<StaffUser | null>(null);
   const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
   const [editingRole, setEditingRole] = useState<RoleData | null>(null);
+  const [editUserForm] = Form.useForm();
 
   // Resend action loading map
   const [resendingMap, setResendingMap] = useState<Record<string, boolean>>({});
@@ -116,6 +121,45 @@ export default function AdminPage() {
       fetchUsers();
     } catch (err: any) {
       message.error('Failed to toggle status.');
+    }
+  };
+
+  const openEditUserModal = (user: StaffUser) => {
+    setEditingUser(user);
+    editUserForm.setFieldsValue({
+      firstName: user.firstName,
+      lastName: user.lastName,
+      phone: user.phone || '',
+      roleIds: user.roles || [],
+    });
+    setIsEditUserModalOpen(true);
+  };
+
+  const handleEditUserSubmit = async (values: any) => {
+    if (!editingUser) return;
+    try {
+      await adminRbacService.updateUser(editingUser.id, {
+        firstName: values.firstName,
+        lastName: values.lastName,
+        phone: values.phone,
+        roleIds: values.roleIds,
+      });
+      message.success('Staff user updated successfully');
+      setIsEditUserModalOpen(false);
+      setEditingUser(null);
+      fetchUsers();
+    } catch (err: any) {
+      message.error(err?.response?.data?.message || 'Failed to update user');
+    }
+  };
+
+  const handleDeleteUser = async (user: StaffUser) => {
+    try {
+      await adminRbacService.deleteUser(user.id);
+      message.success(`Staff user ${user.firstName} ${user.lastName} removed from system`);
+      fetchUsers();
+    } catch (err: any) {
+      message.error(err?.response?.data?.message || 'Failed to delete user');
     }
   };
 
@@ -424,6 +468,29 @@ export default function AdminPage() {
                               >
                                 {record.status === 'ACTIVE' ? 'Deactivate' : 'Activate'}
                               </Button>
+                              <Button
+                                size="small"
+                                icon={<EditOutlined />}
+                                onClick={() => openEditUserModal(record)}
+                                title="Edit User"
+                              >
+                                Edit
+                              </Button>
+                              <Popconfirm
+                                title="Delete Staff User"
+                                description={`Permanently delete user account for ${record.firstName} ${record.lastName}?`}
+                                onConfirm={() => handleDeleteUser(record)}
+                                okText="Yes, Delete"
+                                cancelText="No"
+                                okButtonProps={{ danger: true }}
+                              >
+                                <Button
+                                  size="small"
+                                  danger
+                                  icon={<DeleteOutlined />}
+                                  title="Delete User"
+                                />
+                              </Popconfirm>
                             </Space>
                           ),
                         },
@@ -680,6 +747,54 @@ export default function AdminPage() {
         }}
         editingRole={editingRole}
       />
+
+      {/* Staff User Editing Modal */}
+      <Modal
+        title="Edit Staff User Account"
+        open={isEditUserModalOpen}
+        onCancel={() => {
+          setIsEditUserModalOpen(false);
+          setEditingUser(null);
+        }}
+        footer={null}
+        width={550}
+      >
+        <Form form={editUserForm} layout="vertical" onFinish={handleEditUserSubmit}>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item name="firstName" label="First Name" rules={[{ required: true }]}>
+                <Input />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="lastName" label="Last Name" rules={[{ required: true }]}>
+                <Input />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Form.Item name="phone" label="Phone Number">
+            <Input placeholder="+91 98765 43210" />
+          </Form.Item>
+          <Form.Item name="roleIds" label="Role(s)" rules={[{ required: true }]}>
+            <Select mode="multiple" placeholder="Select roles">
+              {roles.map(r => (
+                <Select.Option key={r.id} value={r.id}>
+                  {r.name.replace(/_/g, ' ')}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+          <Form.Item>
+            <Space>
+              <Button type="primary" htmlType="submit">Save Changes</Button>
+              <Button onClick={() => {
+                setIsEditUserModalOpen(false);
+                setEditingUser(null);
+              }}>Cancel</Button>
+            </Space>
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 }

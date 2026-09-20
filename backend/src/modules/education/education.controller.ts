@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Query, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Patch, Param, Query, UseGuards, Request } from '@nestjs/common';
 import { EducationService } from './education.service';
 import { CreateEducationDto } from './dto/create-education.dto';
 import { UpdateEducationDto } from './dto/update-education.dto';
@@ -46,6 +46,18 @@ export class EducationController {
   @ApiOperation({ summary: 'Update education content' })
   update(@Request() req: any, @Param('id') id: string, @Body() updateEducationDto: UpdateEducationDto) {
     return this.educationService.update(req.user.tenantId, id, updateEducationDto);
+  }
+
+  @Put(':id')
+  @ApiOperation({ summary: 'Update education content (PUT alias)' })
+  updatePut(@Request() req: any, @Param('id') id: string, @Body() updateEducationDto: UpdateEducationDto) {
+    return this.educationService.update(req.user.tenantId, id, updateEducationDto);
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Delete education content' })
+  delete(@Request() req: any, @Param('id') id: string) {
+    return this.educationService.delete(req.user.tenantId, id);
   }
 
   @Post(':id/submit-review')

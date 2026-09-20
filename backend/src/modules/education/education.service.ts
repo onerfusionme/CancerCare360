@@ -77,6 +77,13 @@ export class EducationService {
     });
   }
 
+  async delete(tenantId: string, id: string) {
+    await this.findOne(tenantId, id);
+    return this.prisma.educationContent.delete({
+      where: { id },
+    });
+  }
+
   async submitForReview(tenantId: string, id: string, userId: string) {
     await this.findOne(tenantId, id);
     return this.prisma.educationContent.update({

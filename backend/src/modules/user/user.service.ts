@@ -298,6 +298,22 @@ export class UserService {
     return { success: true, status: updated.status };
   }
 
+  async delete(tenantId: string, id: string) {
+    await this.findById(tenantId, id);
+    try {
+      await this.prisma.userRole.deleteMany({ where: { userId: id } });
+      const deleted = await this.prisma.user.delete({ where: { id } });
+      return { success: true, message: 'User deleted successfully', data: deleted };
+    } catch (err) {
+      // If foreign keys prevent hard delete (e.g. appointments assigned), mark inactive
+      const updated = await this.prisma.user.update({
+        where: { id },
+        data: { status: UserStatus.INACTIVE },
+      });
+      return { success: true, message: 'User archived as inactive due to linked records', data: updated };
+    }
+  }
+
   private async resolveRoleIds(tenantId: string, roleIdsOrNames: string[]): Promise<string[]> {
     if (!roleIdsOrNames || roleIdsOrNames.length === 0) return [];
 

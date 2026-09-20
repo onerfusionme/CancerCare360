@@ -330,4 +330,36 @@ export class SecondOpinionService {
       case: updatedCase,
     };
   }
+
+  /**
+   * Update second opinion case details
+   */
+  async updateCase(tenantId: string, id: string, dto: any) {
+    const resolvedTenantId = await this.resolveTenantId(tenantId);
+    const existing = await this.prisma.secondOpinionCase.findFirst({
+      where: { id, tenantId: resolvedTenantId },
+    });
+    if (!existing) throw new NotFoundException('Second opinion case not found.');
+
+    const { id: _, tenantId: __, ...updateFields } = dto;
+    return this.prisma.secondOpinionCase.update({
+      where: { id },
+      data: updateFields,
+    });
+  }
+
+  /**
+   * Delete second opinion case and linked documents
+   */
+  async delete(tenantId: string, id: string) {
+    const resolvedTenantId = await this.resolveTenantId(tenantId);
+    const existing = await this.prisma.secondOpinionCase.findFirst({
+      where: { id, tenantId: resolvedTenantId },
+    });
+    if (!existing) throw new NotFoundException('Second opinion case not found.');
+
+    await this.prisma.secondOpinionDocument.deleteMany({ where: { caseId: id } });
+    const deleted = await this.prisma.secondOpinionCase.delete({ where: { id } });
+    return { success: true, message: 'Second opinion case deleted successfully', data: deleted };
+  }
 }

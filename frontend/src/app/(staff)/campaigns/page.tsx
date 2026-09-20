@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Table, Button, Tag, Space, Modal, Form, Input, Select, DatePicker, Row, Col, Card, Statistic, message, Typography } from 'antd';
-import { PlusOutlined, RocketOutlined, MailOutlined, MessageOutlined, MobileOutlined, AppstoreOutlined } from '@ant-design/icons';
+import { Table, Button, Tag, Space, Modal, Form, Input, Select, DatePicker, Row, Col, Card, Statistic, message, Typography, Popconfirm } from 'antd';
+import { PlusOutlined, RocketOutlined, MailOutlined, MessageOutlined, MobileOutlined, AppstoreOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useCampaigns } from '@/hooks/use-engagement';
 import { engagementService } from '@/services/engagement.service';
 import { Campaign } from '@/types/engagement';
@@ -12,7 +12,10 @@ const { Title } = Typography;
 export default function CampaignsPage() {
   const { data: campaigns = [], isLoading, refetch } = useCampaigns();
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  const [editingCampaign, setEditingCampaign] = useState<Campaign | null>(null);
   const [form] = Form.useForm();
+  const [editForm] = Form.useForm();
 
   const handleLaunch = async (id: string) => {
     try {
@@ -33,6 +36,40 @@ export default function CampaignsPage() {
       refetch();
     } catch (error) {
       message.error('Failed to create campaign');
+    }
+  };
+
+  const openEditModal = (record: Campaign) => {
+    setEditingCampaign(record);
+    editForm.setFieldsValue({
+      name: record.name,
+      type: record.type,
+      channel: record.channel,
+      audienceCriteria: record.audienceCriteria,
+    });
+    setIsEditModalVisible(true);
+  };
+
+  const onEditFinish = async (values: any) => {
+    if (!editingCampaign) return;
+    try {
+      await engagementService.updateCampaign(editingCampaign.id, values);
+      message.success('Campaign updated successfully');
+      setIsEditModalVisible(false);
+      setEditingCampaign(null);
+      refetch();
+    } catch {
+      message.error('Failed to update campaign');
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      await engagementService.deleteCampaign(id);
+      message.success('Campaign deleted successfully');
+      refetch();
+    } catch {
+      message.error('Failed to delete campaign');
     }
   };
 
@@ -99,12 +136,23 @@ export default function CampaignsPage() {
       title: 'Actions',
       key: 'actions',
       render: (_: any, record: Campaign) => (
-        <Space size="middle">
+        <Space size="small">
           {(record.deliveryStatus === 'DRAFT' || record.deliveryStatus === 'SCHEDULED') && (
             <Button type="primary" size="small" icon={<RocketOutlined />} onClick={() => handleLaunch(record.id)}>
               Launch
             </Button>
           )}
+          <Button size="small" icon={<EditOutlined />} onClick={() => openEditModal(record)} title="Edit Campaign" />
+          <Popconfirm
+            title="Delete Campaign"
+            description="Permanently delete this campaign?"
+            onConfirm={() => handleDelete(record.id)}
+            okText="Yes, Delete"
+            cancelText="No"
+            okButtonProps={{ danger: true }}
+          >
+            <Button size="small" danger icon={<DeleteOutlined />} title="Delete Campaign" />
+          </Popconfirm>
         </Space>
       ),
     },
@@ -189,6 +237,49 @@ export default function CampaignsPage() {
             <Space>
               <Button type="primary" htmlType="submit">Create</Button>
               <Button onClick={() => setIsModalVisible(false)}>Cancel</Button>
+            </Space>
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      {/* Edit Campaign Modal */}
+      <Modal
+        title="Edit Campaign"
+        open={isEditModalVisible}
+        onCancel={() => {
+          setIsEditModalVisible(false);
+          setEditingCampaign(null);
+        }}
+        footer={null}
+        width={700}
+      >
+        <Form form={editForm} layout="vertical" onFinish={onEditFinish}>
+          <Form.Item name="name" label="Campaign Name" rules={[{ required: true }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item name="type" label="Campaign Type" rules={[{ required: true }]}>
+            <Select>
+              <Select.Option value="SCREENING">Screening</Select.Option>
+              <Select.Option value="AWARENESS">Awareness</Select.Option>
+              <Select.Option value="VACCINATION">Vaccination</Select.Option>
+              <Select.Option value="FOLLOW_UP_REMINDER">Follow-up Reminder</Select.Option>
+            </Select>
+          </Form.Item>
+          <Form.Item name="channel" label="Channel" rules={[{ required: true }]}>
+            <Select>
+              <Select.Option value="WhatsApp">WhatsApp</Select.Option>
+              <Select.Option value="SMS">SMS</Select.Option>
+              <Select.Option value="Email">Email</Select.Option>
+              <Select.Option value="Portal">Patient Portal</Select.Option>
+            </Select>
+          </Form.Item>
+          <Form.Item>
+            <Space>
+              <Button type="primary" htmlType="submit">Save Changes</Button>
+              <Button onClick={() => {
+                setIsEditModalVisible(false);
+                setEditingCampaign(null);
+              }}>Cancel</Button>
             </Space>
           </Form.Item>
         </Form>

@@ -25,6 +25,7 @@ import {
   Tooltip,
   Empty,
   Spin,
+  Popconfirm,
 } from 'antd';
 import {
   TeamOutlined,
@@ -43,6 +44,8 @@ import {
   MedicineBoxOutlined,
   CompassOutlined,
   ShareAltOutlined,
+  EditOutlined,
+  DeleteOutlined,
 } from '@ant-design/icons';
 import {
   careCirclesService,
@@ -104,8 +107,12 @@ export default function CareCirclesView() {
   const [loadingPosts, setLoadingPosts] = useState<boolean>(false);
   const [selectedPostCategory, setSelectedPostCategory] = useState<string>('ALL');
   const [postModalOpen, setPostModalOpen] = useState<boolean>(false);
+  const [editPostModalOpen, setEditPostModalOpen] = useState<boolean>(false);
+  const [editingPost, setEditingPost] = useState<CaregiverPost | null>(null);
   const [postForm] = Form.useForm();
+  const [editPostForm] = Form.useForm();
   const [submittingPost, setSubmittingPost] = useState<boolean>(false);
+  const [updatingPost, setUpdatingPost] = useState<boolean>(false);
   const [commentInputs, setCommentInputs] = useState<Record<string, string>>({});
 
   // 1. Load initial data
@@ -321,6 +328,43 @@ export default function CareCirclesView() {
       message.error(e?.response?.data?.message || 'Failed to publish post');
     } finally {
       setSubmittingPost(false);
+    }
+  };
+
+  const handleOpenEditPost = (post: CaregiverPost) => {
+    setEditingPost(post);
+    editPostForm.setFieldsValue({
+      title: post.title,
+      category: post.category,
+      cancerType: post.cancerType,
+      content: post.content,
+    });
+    setEditPostModalOpen(true);
+  };
+
+  const handleEditPost = async (values: any) => {
+    if (!editingPost) return;
+    setUpdatingPost(true);
+    try {
+      await careCirclesService.updatePost(editingPost.id, values);
+      message.success('Post updated successfully!');
+      setEditPostModalOpen(false);
+      setEditingPost(null);
+      loadPosts(selectedPostCategory);
+    } catch {
+      message.error('Failed to update post');
+    } finally {
+      setUpdatingPost(false);
+    }
+  };
+
+  const handleDeletePost = async (postId: string) => {
+    try {
+      await careCirclesService.deletePost(postId);
+      message.success('Post deleted successfully');
+      setPosts((prev) => prev.filter((p) => p.id !== postId));
+    } catch {
+      message.error('Failed to delete post');
     }
   };
 
@@ -1097,7 +1141,20 @@ export default function CareCirclesView() {
                                 Shared by <b>{post.author.displayName}</b> • {post.city}, {post.district} • {new Date(post.createdAt).toLocaleDateString()}
                               </div>
                             </div>
-                            <Tag color="purple">{post.cancerType}</Tag>
+                            <Space>
+                              <Tag color="purple">{post.cancerType}</Tag>
+                              <Button size="small" icon={<EditOutlined />} onClick={() => handleOpenEditPost(post)} title="Edit Post" />
+                              <Popconfirm
+                                title="Delete Community Post"
+                                description="Permanently delete this discussion post?"
+                                onConfirm={() => handleDeletePost(post.id)}
+                                okText="Yes, Delete"
+                                cancelText="No"
+                                okButtonProps={{ danger: true }}
+                              >
+                                <Button size="small" danger icon={<DeleteOutlined />} title="Delete Post" />
+                              </Popconfirm>
+                            </Space>
                           </div>
 
                           <Paragraph style={{ fontSize: 13, lineHeight: 1.6, whiteSpace: 'pre-line', margin: '12px 0' }}>
@@ -1545,6 +1602,50 @@ export default function CareCirclesView() {
             <Button onClick={() => setPostModalOpen(false)}>Cancel</Button>
             <Button type="primary" htmlType="submit" loading={submittingPost} style={{ background: '#0d9488', borderColor: '#0d9488' }}>
               Publish Experience
+            </Button>
+          </div>
+        </Form>
+      </Modal>
+
+      {/* Modal: Edit Discussion Post */}
+      <Modal
+        title="Edit Community Discussion Post"
+        open={editPostModalOpen}
+        onCancel={() => {
+          setEditPostModalOpen(false);
+          setEditingPost(null);
+        }}
+        footer={null}
+      >
+        <Form form={editPostForm} layout="vertical" onFinish={handleEditPost}>
+          <Form.Item name="category" label="Category" rules={[{ required: true }]}>
+            <Select>
+              <Option value={PostCategory.DIET_AND_DYSPHAGIA}>🥣 Dysphagia & Liquid Diets</Option>
+              <Option value={PostCategory.CHEMO_SIDE_EFFECTS}>🩺 Chemo & Radiation Side Effects</Option>
+              <Option value={PostCategory.LOCAL_LOGISTICS_AND_TRAVEL}>🚗 Karad / Western Maharashtra Travel & Care</Option>
+              <Option value={PostCategory.EMOTIONAL_AND_FAMILY_SUPPORT}>💛 Caregiver Courage & Moral Support</Option>
+            </Select>
+          </Form.Item>
+
+          <Form.Item name="cancerType" label="Cancer Type" rules={[{ required: true }]}>
+            <Input placeholder="e.g. Esophageal Cancer" />
+          </Form.Item>
+
+          <Form.Item name="title" label="Post Title" rules={[{ required: true }]}>
+            <Input placeholder="e.g. Post title" />
+          </Form.Item>
+
+          <Form.Item name="content" label="Experience / Recipe / Precaution Details" rules={[{ required: true }]}>
+            <TextArea rows={5} />
+          </Form.Item>
+
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 16 }}>
+            <Button onClick={() => {
+              setEditPostModalOpen(false);
+              setEditingPost(null);
+            }}>Cancel</Button>
+            <Button type="primary" htmlType="submit" loading={updatingPost} style={{ background: '#0d9488', borderColor: '#0d9488' }}>
+              Save Changes
             </Button>
           </div>
         </Form>

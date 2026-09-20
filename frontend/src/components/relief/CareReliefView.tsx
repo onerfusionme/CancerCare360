@@ -1188,13 +1188,39 @@ Cancelled Cheque or Bank Passbook copy of the Hospital`,
                         title: 'Actions',
                         key: 'actions',
                         render: (_, record: AidApplication) => (
-                          <Button
-                            size="small"
-                            onClick={() => handleOpenStatusModal(record)}
-                            style={{ fontWeight: 600 }}
-                          >
-                            Update Status
-                          </Button>
+                          <Space size="small">
+                            <Button
+                              size="small"
+                              onClick={() => handleOpenStatusModal(record)}
+                              style={{ fontWeight: 600 }}
+                            >
+                              Update Status
+                            </Button>
+                            <Popconfirm
+                              title="Delete Aid Application"
+                              description={`Permanently delete application #${record.applicationRefNumber} for ${record.applicantName}?`}
+                              onConfirm={async () => {
+                                try {
+                                  await financialAidService.deleteApplication(record.id);
+                                  message.success('Application record deleted successfully');
+                                  loadApplications();
+                                  loadSummary();
+                                } catch {
+                                  message.error('Failed to delete application');
+                                }
+                              }}
+                              okText="Yes, Delete"
+                              cancelText="No"
+                              okButtonProps={{ danger: true }}
+                            >
+                              <Button
+                                size="small"
+                                danger
+                                icon={<DeleteOutlined />}
+                                title="Delete Application"
+                              />
+                            </Popconfirm>
+                          </Space>
                         ),
                       },
                     ]}

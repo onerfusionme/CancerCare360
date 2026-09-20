@@ -55,6 +55,12 @@ export class CareGapService {
     });
   }
 
+  async deleteRule(tenantId: string, id: string) {
+    return this.prisma.careGapRule.delete({
+      where: { id, tenantId } as any,
+    });
+  }
+
   private calculatePriority(params: {
     baseWeight: number;
     gapLabel: string;

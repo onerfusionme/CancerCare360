@@ -204,6 +204,18 @@ export class InvestigationService {
     });
   }
 
+  async delete(tenantId: string, id: string) {
+    const investigation = await this.prisma.investigation.findUnique({
+      where: { id, tenantId },
+    });
+    if (!investigation) {
+      throw new NotFoundException(`Investigation with ID ${id} not found`);
+    }
+    return this.prisma.investigation.delete({
+      where: { id },
+    });
+  }
+
   async getPending(tenantId: string) {
     return this.prisma.investigation.findMany({
       where: {

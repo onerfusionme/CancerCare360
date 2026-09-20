@@ -30,6 +30,10 @@ export const engagementService = {
     const { data } = await api.post(`${PREFIX}/education/${id}/archive`);
     return data?.data || data;
   },
+  deleteArticle: async (id: string): Promise<any> => {
+    const { data } = await api.delete(`${PREFIX}/education/${id}`);
+    return data?.data || data;
+  },
 
   // Campaigns
   getCampaigns: async (): Promise<Campaign[]> => {
@@ -42,6 +46,14 @@ export const engagementService = {
   },
   createCampaign: async (dto: Partial<Campaign>): Promise<Campaign> => {
     const { data } = await api.post(`${PREFIX}/campaigns`, dto);
+    return data?.data || data;
+  },
+  updateCampaign: async (id: string, dto: Partial<Campaign>): Promise<Campaign> => {
+    const { data } = await api.put(`${PREFIX}/campaigns/${id}`, dto);
+    return data?.data || data;
+  },
+  deleteCampaign: async (id: string): Promise<any> => {
+    const { data } = await api.delete(`${PREFIX}/campaigns/${id}`);
     return data?.data || data;
   },
   executeCampaign: async (id: string): Promise<Campaign> => {

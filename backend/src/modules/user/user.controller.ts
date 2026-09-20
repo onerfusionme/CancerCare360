@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Query, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Post, Put, Body, Patch, Param, Query, Delete, UseGuards, UseInterceptors } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiHeader } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -75,6 +75,7 @@ export class UserController {
   }
 
   @Patch(':id')
+  @Put(':id')
   @Roles('ADMIN', 'SYSTEM_ADMIN', 'platform_admin', 'hospital_admin')
   @ApiOperation({ summary: 'Update user' })
   @ApiResponse({ status: 200, description: 'User updated' })
@@ -85,6 +86,18 @@ export class UserController {
   ): Promise<ApiResponseDto<any>> {
     const data = await this.userService.update(tenantId, id, updateUserDto);
     return { success: true, data, message: 'User updated successfully' };
+  }
+
+  @Delete(':id')
+  @Roles('ADMIN', 'SYSTEM_ADMIN', 'platform_admin', 'hospital_admin')
+  @ApiOperation({ summary: 'Delete user' })
+  @ApiResponse({ status: 200, description: 'User deleted or archived' })
+  async delete(
+    @CurrentTenant() tenantId: string,
+    @Param('id') id: string,
+  ): Promise<ApiResponseDto<any>> {
+    const result = await this.userService.delete(tenantId, id);
+    return { success: true, data: result.data, message: result.message };
   }
 
   @Post(':id/resend-credentials')

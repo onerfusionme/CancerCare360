@@ -19,7 +19,8 @@ import {
   Badge, 
   Tooltip,
   Divider,
-  Empty
+  Empty,
+  Popconfirm
 } from 'antd';
 import { 
   PlusOutlined, 
@@ -31,7 +32,9 @@ import {
   FileDoneOutlined,
   MedicineBoxOutlined,
   AlertOutlined,
-  ReloadOutlined
+  ReloadOutlined,
+  EditOutlined,
+  DeleteOutlined
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { investigationService } from '@/services/investigation.service';
@@ -66,10 +69,13 @@ export default function InvestigationsPage() {
   // Modals
   const [orderModalOpen, setOrderModalOpen] = useState(false);
   const [resultModalOpen, setResultModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedInv, setSelectedInv] = useState<any | null>(null);
+  const [editingInv, setEditingInv] = useState<any | null>(null);
 
   const [orderForm] = Form.useForm();
   const [resultForm] = Form.useForm();
+  const [editForm] = Form.useForm();
 
   const { data: patientData } = usePatients();
   const patientList = Array.isArray(patientData?.data) ? patientData.data : (Array.isArray(patientData) ? patientData : []);
@@ -168,8 +174,48 @@ export default function InvestigationsPage() {
       });
       message.success('Report reviewed & finalized by treating oncologist');
       fetchData();
-    } catch (err) {
+    } catch (err: any) {
       message.error('Failed to finalize review');
+    }
+  };
+
+  // Edit Investigation
+  const openEditModal = (record: any) => {
+    setEditingInv(record);
+    editForm.setFieldsValue({
+      investigationType: record.investigationType || record.type,
+      notes: record.notes || record.resultSummary,
+    });
+    setEditModalOpen(true);
+  };
+
+  const handleEditSubmit = async () => {
+    try {
+      const values = await editForm.validateFields();
+      if (!editingInv) return;
+      await investigationService.updateInvestigation(editingInv.id, {
+        investigationType: values.investigationType,
+        notes: values.notes,
+        resultSummary: values.notes,
+      });
+      message.success('Investigation updated successfully');
+      setEditModalOpen(false);
+      setEditingInv(null);
+      fetchData();
+    } catch (err: any) {
+      if (err.errorFields) return;
+      message.error('Failed to update investigation');
+    }
+  };
+
+  // Delete Investigation
+  const handleDelete = async (id: string) => {
+    try {
+      await investigationService.deleteInvestigation(id);
+      message.success('Investigation record removed successfully');
+      fetchData();
+    } catch (err) {
+      message.error('Failed to remove investigation');
     }
   };
 
@@ -286,37 +332,44 @@ export default function InvestigationsPage() {
     {
       title: 'Action',
       key: 'action',
-      render: (_: any, record: any) => {
-        if (record.status === 'ORDERED') {
-          return (
+      render: (_: any, record: any) => (
+        <Space size="small">
+          {record.status === 'ORDERED' && (
             <Button size="small" onClick={() => handleAdvanceStatus(record, 'SAMPLE_COLLECTED')}>
               Collect Specimen
             </Button>
-          );
-        }
-        if (record.status === 'SAMPLE_COLLECTED') {
-          return (
+          )}
+          {record.status === 'SAMPLE_COLLECTED' && (
             <Button size="small" type="dashed" onClick={() => handleAdvanceStatus(record, 'IN_PROGRESS')}>
               Process in Lab
             </Button>
-          );
-        }
-        if (record.status === 'IN_PROGRESS') {
-          return (
+          )}
+          {record.status === 'IN_PROGRESS' && (
             <Button size="small" type="primary" onClick={() => handleAdvanceStatus(record, 'REPORT_AVAILABLE')} style={{ background: '#ea580c' }}>
               Enter Report
             </Button>
-          );
-        }
-        if (record.status === 'REPORT_AVAILABLE') {
-          return (
+          )}
+          {record.status === 'REPORT_AVAILABLE' && (
             <Button size="small" type="primary" icon={<CheckCircleOutlined />} onClick={() => handleReviewSignOff(record)} style={{ background: '#10b981' }}>
               Oncologist Sign-Off
             </Button>
-          );
-        }
-        return <span style={{ color: '#10b981', fontWeight: 600, fontSize: 12 }}>✓ Reviewed</span>;
-      },
+          )}
+          {record.status === 'REVIEWED' && (
+            <span style={{ color: '#10b981', fontWeight: 600, fontSize: 12 }}>✓ Reviewed</span>
+          )}
+          <Button size="small" icon={<EditOutlined />} onClick={() => openEditModal(record)} title="Edit Investigation" />
+          <Popconfirm
+            title="Delete Investigation"
+            description="Permanently delete this investigation record?"
+            onConfirm={() => handleDelete(record.id)}
+            okText="Yes, Delete"
+            cancelText="No"
+            okButtonProps={{ danger: true }}
+          >
+            <Button size="small" danger icon={<DeleteOutlined />} title="Delete Investigation" />
+          </Popconfirm>
+        </Space>
+      ),
     },
   ];
 
@@ -612,6 +665,44 @@ export default function InvestigationsPage() {
                 rows={4}
                 placeholder="e.g., [CRITICAL_ABNORMAL] Invasive Ductal Carcinoma, Grade 2. Margins clear. ER: 95% Positive, PR: 85% Positive, HER2: 3+ Positive."
               />
+            </Form.Item>
+          </Form>
+        </div>
+      </Modal>
+
+      {/* Edit Investigation Modal */}
+      <Modal
+        title="Edit Diagnostic Investigation"
+        open={editModalOpen}
+        onCancel={() => {
+          setEditModalOpen(false);
+          setEditingInv(null);
+        }}
+        onOk={handleEditSubmit}
+        okText="Save Changes"
+        destroyOnClose
+        width={550}
+      >
+        <div style={{ marginTop: 14 }}>
+          <Form form={editForm} layout="vertical">
+            <Form.Item
+              name="investigationType"
+              label={<span style={{ fontWeight: 600 }}>Investigation / Test Modality</span>}
+              rules={[{ required: true, message: 'Please select modality' }]}
+            >
+              <Select placeholder="Select diagnostic test modality">
+                {MODALITIES.map(m => (
+                  <Select.Option key={m.value} value={m.value}>
+                    {m.label}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
+            <Form.Item
+              name="notes"
+              label={<span style={{ fontWeight: 600 }}>Clinical Notes / Instructions</span>}
+            >
+              <TextArea rows={3} placeholder="Special instructions or clinical indication" />
             </Form.Item>
           </Form>
         </div>

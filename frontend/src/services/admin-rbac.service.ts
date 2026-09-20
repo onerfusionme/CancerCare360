@@ -89,6 +89,11 @@ export const adminRbacService = {
     return res.data;
   },
 
+  deleteUser: async (userId: string) => {
+    const res = await apiClient.delete(`/api/v1/users/${userId}`);
+    return res.data;
+  },
+
   // Roles & Permissions
   getRoles: async (): Promise<RoleData[]> => {
     const res = await apiClient.get('/api/v1/roles');

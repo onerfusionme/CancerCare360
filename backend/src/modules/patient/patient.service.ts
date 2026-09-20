@@ -126,6 +126,29 @@ export class PatientService {
     });
   }
 
+  async delete(tenantId: string, id: string) {
+    await this.findById(tenantId, id);
+
+    try {
+      await this.prisma.patientIdentifier.deleteMany({ where: { patientId: id } });
+      await this.prisma.followUpTask.deleteMany({ where: { tenantId, patientId: id } });
+      await this.prisma.appointment.deleteMany({ where: { tenantId, patientId: id } });
+      await this.prisma.investigation.deleteMany({ where: { tenantId, patientId: id } });
+      await this.prisma.document.deleteMany({ where: { tenantId, patientId: id } });
+      await this.prisma.treatmentMilestone.deleteMany({ where: { tenantId, patientId: id } });
+      await this.prisma.careJourney.deleteMany({ where: { tenantId, patientId: id } });
+
+      return await this.prisma.patient.delete({
+        where: { id },
+      });
+    } catch {
+      return await this.prisma.patient.update({
+        where: { id },
+        data: { followUpStage: 'LOST_TO_FOLLOW_UP' },
+      });
+    }
+  }
+
   async getPatientJourney(tenantId: string, patientId: string) {
     await this.findById(tenantId, patientId);
 

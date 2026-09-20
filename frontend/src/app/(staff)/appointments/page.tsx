@@ -29,7 +29,9 @@ import {
   CheckCircleOutlined, 
   PlayCircleOutlined, 
   CloseCircleOutlined, 
-  FieldTimeOutlined 
+  FieldTimeOutlined,
+  DeleteOutlined,
+  EditOutlined 
 } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
 import { 
@@ -44,7 +46,8 @@ import {
 } from '@/hooks/use-appointments';
 import { AppointmentStatus, Appointment } from '@/types/appointment';
 import { waitlistService } from '@/services/waitlist.service';
-import { useQuery } from '@tanstack/react-query';
+import { appointmentService } from '@/services/appointment.service';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { usePatients } from '@/hooks/use-patients';
 import ClinicFlowBoard from '@/components/appointment/ClinicFlowBoard';
 import dayjs from 'dayjs';
@@ -54,6 +57,7 @@ const { Title, Text } = Typography;
 
 export default function AppointmentsPage() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState('1');
   const [selectedDoctor, setSelectedDoctor] = useState<string>('all');
 
@@ -133,11 +137,28 @@ export default function AppointmentsPage() {
   const handleRescheduleSubmit = async (values: any) => {
     if (!selectedAppointment) return;
     try {
+      await appointmentService.updateAppointment(selectedAppointment.id, {
+        scheduledAt: values.scheduledAt.toISOString(),
+      });
       message.success(`Appointment for ${selectedAppointment.patient?.name || 'patient'} rescheduled to ${values.scheduledAt.format('DD MMM YYYY, hh:mm A')}`);
       setRescheduleModalOpen(false);
       rescheduleForm.resetFields();
+      queryClient.invalidateQueries({ queryKey: ['appointments'] });
+      queryClient.invalidateQueries({ queryKey: ['todays-appointments'] });
     } catch (e) {
       message.error('Failed to reschedule');
+    }
+  };
+
+  // CRUD: Hard Delete Appointment
+  const handleDelete = async (id: string) => {
+    try {
+      await appointmentService.deleteAppointment(id);
+      message.success('Appointment permanently deleted');
+      queryClient.invalidateQueries({ queryKey: ['appointments'] });
+      queryClient.invalidateQueries({ queryKey: ['todays-appointments'] });
+    } catch (e) {
+      message.error('Failed to delete appointment');
     }
   };
 
@@ -243,6 +264,16 @@ export default function AppointmentsPage() {
               </Popconfirm>
             </>
           )}
+          <Popconfirm
+            title="Delete Appointment Record"
+            description="Permanently delete this appointment entry from records?"
+            onConfirm={() => handleDelete(record.id)}
+            okText="Yes, Delete"
+            cancelText="No"
+            okButtonProps={{ danger: true }}
+          >
+            <Button size="small" danger icon={<DeleteOutlined />} title="Delete Appointment" />
+          </Popconfirm>
         </Space>
       )
     }
